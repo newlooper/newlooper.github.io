@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>EOF，到底怎么回事 - Looper 的博客</title>
+  <meta name="description" content="TL;DR 首先，确未想到，为说清楚这个玩意儿，居然要用不少的篇幅；其次，当涉及对一些概念、原理的追溯时，递归到多深的地步，也难以拿捏；好在，写这些文字主要是为了将来碰到某些反直觉的情况时可以有个快捷解答；最后若能得到碰巧逛到这里的同仁指点迷津，纠正错误，互通有无，就算赚到了 :-）
+希望读完此文，能够消除一些关于 EOF 的疑惑，再碰到关于她的一些争论时，大家能够相视一笑。
+愿此文，能解释
+ 什么是 EOF？ 为什么需要 EOF？ 文件里包不包含 EOF？ 控制台输入时的 EOF 的表示方式和处理行为是怎么样的? 不同计算机语言的 EOF 如何定义的？ …… may your blade never dull   section-0 概念澄清  In computing, end-of-file (commonly abbreviated EOF) is a condition in a computer operating system where no more data can be read from a data source. The data source is usually called a file or stream. ——Wikipedia
+ 难为下定义的人们，描述既不能太复杂，又要尽可能的说清一个事物的本质。
+好了，从上面的叙述中，我们萃取出关于 EOF："><script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "Looper 的博客",
+    
+    "url": "\/"
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "\/"
+  
+  
+  
+  
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "\/post\/original\/cs\/io\/eof\/",
+          "name": "E o f，到底怎么回事"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : ""
+  },
+  "headline": "EOF，到底怎么回事",
+  "description" : "TL;DR 首先，确未想到，为说清楚这个玩意儿，居然要用不少的篇幅；其次，当涉及对一些概念、原理的追溯时，递归到多深的地步，也难以拿捏；好在，写这些文字主要是为了将来碰到某些反直觉的情况时可以有个快捷解答；最后若能得到碰巧逛到这里的同仁指点迷津，纠正错误，互通有无，就算赚到了 :-）\n希望读完此文，能够消除一些关于 EOF 的疑惑，再碰到关于她的一些争论时，大家能够相视一笑。\n愿此文，能解释\n 什么是 EOF？ 为什么需要 EOF？ 文件里包不包含 EOF？ 控制台输入时的 EOF 的表示方式和处理行为是怎么样的? 不同计算机语言的 EOF 如何定义的？ …… may your blade never dull   section-0 概念澄清  In computing, end-of-file (commonly abbreviated EOF) is a condition in a computer operating system where no more data can be read from a data source. The data source is usually called a file or stream. ——Wikipedia\n 难为下定义的人们，描述既不能太复杂，又要尽可能的说清一个事物的本质。\n好了，从上面的叙述中，我们萃取出关于 EOF：",
+  "inLanguage" : "en",
+  "wordCount":  1972 ,
+  "datePublished" : "2020-08-03T15:52:41",
+  "dateModified" : "2020-08-03T15:52:41",
+  "image" : "\/",
+  "keywords" : [ "" ],
+  "mainEntityOfPage" : "\/post\/original\/cs\/io\/eof\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "\/",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
+
+<meta property="og:title" content="EOF，到底怎么回事" />
+<meta property="og:description" content="TL;DR 首先，确未想到，为说清楚这个玩意儿，居然要用不少的篇幅；其次，当涉及对一些概念、原理的追溯时，递归到多深的地步，也难以拿捏；好在，写这些文字主要是为了将来碰到某些反直觉的情况时可以有个快捷解答；最后若能得到碰巧逛到这里的同仁指点迷津，纠正错误，互通有无，就算赚到了 :-）
+希望读完此文，能够消除一些关于 EOF 的疑惑，再碰到关于她的一些争论时，大家能够相视一笑。
+愿此文，能解释
+ 什么是 EOF？ 为什么需要 EOF？ 文件里包不包含 EOF？ 控制台输入时的 EOF 的表示方式和处理行为是怎么样的? 不同计算机语言的 EOF 如何定义的？ …… may your blade never dull   section-0 概念澄清  In computing, end-of-file (commonly abbreviated EOF) is a condition in a computer operating system where no more data can be read from a data source. The data source is usually called a file or stream. ——Wikipedia
+ 难为下定义的人们，描述既不能太复杂，又要尽可能的说清一个事物的本质。
+好了，从上面的叙述中，我们萃取出关于 EOF：">
+<meta property="og:url" content="/post/original/cs/io/eof/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Looper 的博客" />
+
+  <meta name="twitter:title" content="EOF，到底怎么回事" />
+  <meta name="twitter:description" content="TL;DR 首先，确未想到，为说清楚这个玩意儿，居然要用不少的篇幅；其次，当涉及对一些概念、原理的追溯时，递归到多深的地步，也难以拿捏；好在，写这些文字主要是为了将来碰到某些反直觉的情况时可以有个快捷解答；最后若能得到碰巧逛到这里的同仁指点迷津，纠正错误，互通有无，就算赚到了 :-）
+希望读完此文，能够消除一些关于 EOF 的疑惑，再碰到关于她的一些争论时，大家能够相视一笑。
+愿此文，能解释
+ 什 …">
+  <meta name="twitter:card" content="summary" />
+  <meta name="generator" content="Hugo 0.74.3" />
+  <link rel="alternate" href="/index.xml" type="application/rss+xml" title="Looper 的博客"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css" integrity="sha384-9eLZqc9ds8eNjO3TmqPeYcDj8n+Qfa4nuSiGYa6DjLNcv9BtN69ZIulL9+8CqC9Y" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"><link rel="stylesheet" href="/css/main.css" /><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" /><link rel="stylesheet" href="/css/syntax.css" /><link rel="stylesheet" href="/css/codeblock.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/default-skin/default-skin.min.css" integrity="sha384-iD0dNku6PYSIQLyfTOpB06F2KCZJAKLOThS5HRe8b3ibhdEQ6eKsFf/EeFxdOt5R" crossorigin="anonymous"><style>
+.container {
+    width: 1400px;
+    min-width: 1400px;
+}
+</style>
+
+
+
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">Looper 的博客</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+        
+
+        
+
+        
+      </ul>
+    </div>
+
+    
+
+  </div>
+</nav>
+
+
+
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+  
+  
+  
+
+
+
+
+
+
+  
+
+  <header class="header-section ">
+    
+    <div class="intro-header no-img">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="post-heading">
+              
+                <h1>EOF，到底怎么回事</h1>
+              
+              
+              
+              
+                <span class="post-meta">
+  
+  
+  <i class="fas fa-calendar"></i>&nbsp;Posted on August 3, 2020
+  
+  
+  
+  
+    
+      &nbsp;|&nbsp;<i class="fas fa-user"></i>&nbsp;
+    
+  
+  
+</span>
+
+
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        <h2 id="tldr">TL;DR</h2>
+<p><em>首先，确未想到，为说清楚这个玩意儿，居然要用不少的篇幅；其次，当涉及对一些概念、原理的追溯时，递归到多深的地步，也难以拿捏；好在，写这些文字主要是为了将来碰到某些反直觉的情况时可以有个快捷解答；最后若能得到碰巧逛到这里的同仁指点迷津，纠正错误，互通有无，就算赚到了 :-）</em></p>
+<p><em>希望读完此文，能够消除一些关于 EOF 的疑惑，再碰到关于她的一些争论时，大家能够相视一笑。</em></p>
+<p>愿此文，能解释</p>
+<ul>
+<li>什么是 EOF？</li>
+<li>为什么需要 EOF？</li>
+<li>文件里包不包含 EOF？</li>
+<li>控制台输入时的 EOF 的表示方式和处理行为是怎么样的?</li>
+<li>不同计算机语言的 EOF 如何定义的？</li>
+<li>……</li>
+<li><em>may your blade never dull</em></li>
+</ul>
+<hr>
+<h2 id="section-0">section-0</h2>
+<h3 id="概念澄清">概念澄清</h3>
+<blockquote>
+<p>In computing, end-of-file (commonly abbreviated <a href="https://en.wikipedia.org/wiki/End-of-file">EOF</a>) is a condition in a computer operating system where no more data can be read from a data source. The data source is usually called a file or stream.
+——Wikipedia</p>
+</blockquote>
+<p><em>难为下定义的人们，描述既不能太复杂，又要尽可能的说清一个事物的本质。</em></p>
+<p>好了，从上面的叙述中，我们萃取出关于 EOF：</p>
+<ul>
+<li>范畴：<code>计算机操作系统中</code>，其他领域看来用不着这玩意儿</li>
+<li>含义：一种<code>状况</code>，什么状况？表明从数据源(通常指文件或流)中已无数据可读</li>
+</ul>
+<p>如果只看到这里，EOF 似乎只是抽象概念而已，她应该独立于操作系统的种类、也应该独立于能够在某种操作系统下编译的计算机语言，everything before &lsquo;but&rsquo; is bullshit。</p>
+<p>但是，维基百科在紧挨着定义的下一段里说：</p>
+<blockquote>
+<p>In the <strong>C Standard Library</strong>, the character reading functions such as <strong>getchar</strong> return a value equal to the symbolic value (macro) <strong>EOF</strong> to indicate that an end-of-file condition has occurred. The actual value of <strong>EOF</strong> is implementation-dependent (but is commonly <strong>-1</strong>, such as in glibc[2]) and is <strong>distinct from</strong> all <strong>valid character codes</strong>. Block-reading functions return the number of bytes read, and if this is fewer than asked for, then the end of file was reached or an error occurred (checking of <strong>errno</strong> or dedicated function, such as <strong>ferror</strong> is often required to determine which).
+——Wikipedia</p>
+</blockquote>
+<p>展开：</p>
+<ul>
+<li>定义既然说了，EOF 表明了&quot;已无数据可读&quot;的状况，那么识别这种状况的依据是什么？</li>
+<li>计算机语言上千种，唯独选了 C 来描述 EOF 的实现(我没有发明过一门计算机语言，即便发明过，也没资格对任何一门品头论足)，可见虽然不同语言对于 EOF 的实现可能不同，但无疑 C 的很有代表性</li>
+<li>只要能起到识别结束的作用就成，并没有一个标准说 EOF 该怎么实现，但<strong>通常</strong>是用一个能够<strong>区别</strong>于<strong>全部有效字符码</strong>的<strong>值</strong>，比如 glibc 里用 <strong>-1</strong>。啊，越来越具体，越来越靠近 CPU 里那些用于判断的指令和寄存器</li>
+<li>短暂的概念陈述后，定义者放下了遮面的琵琶，挥舞着藏在身上的各种刀凿斧锯迎面扑来——阻塞 IO 中的读函数，返回读取到的字节数，如果实际数据长度小于指定的长度，重点1：就会产生一个 EOF（谁产生的后面说）；重点2：出错了呢？也是返个 EOF 给你。啊？那我的程序怎么办，到底是读完了还是出错了？别慌——瞧 errno 或问 ferror 去</li>
+</ul>
+<p>至此，我们暂且可以总结出：</p>
+<ul>
+<li>从功用的角度说 EOF，其对于输入输出操作时标识结尾具有不可或缺性，这种概括屏蔽掉了实现细节</li>
+<li>一旦讨论具体实现时，就不可避免的要限定在某种操作系统和某种计算机语言的环境中</li>
+</ul>
+<p>同时，新的疑问自然产生：</p>
+<ul>
+<li>尝听人说，在现代操作系统中，对于输入输出这类操作，运行在用户态的应用程序一般是不直接访问硬件的，要请求叫做系统调用的内核接口通过缓冲区来间接进行，那么 EOF 是由内核生成并返给应用程序的吗？除了直接告诉我答案是或否，哪里有直接的证据？</li>
+<li>EOF 的实现没有具体规范，那么操作系统与应用程序之间是如何打招呼：“文件已经读完”的呢？</li>
+<li>EOF 的处理策略与表现特征，是跨平台跨语言统一的，还是各家有各家的高招儿呢？</li>
+</ul>
+<p>让我们带着疑问，误入藕花深处……</p>
+<blockquote>
+<p>下定义，但不规定具体的实现，这下好了，且看众多的操作系统和计算机语言们如何搭配自己的 EOF &ldquo;卡组&rdquo;。</p>
+</blockquote>
+<hr>
+<h2 id="section-1">section-1</h2>
+<h3 id="先说文件">先说文件</h3>
+<blockquote>
+<p>注意：不要将 Linux 中的<code>一切皆文件</code>的<code>文件</code>二字，与我们现在所说的<code>文件</code>混淆，这里说的文件，就是通常在外部存储器（如：磁盘）中保存的那些普通文件，特别是文本文件。</p>
+</blockquote>
+<p>静态的相对单纯些，我们就从其开始</p>
+<blockquote>
+<p>Some MS-DOS programs, including parts of the Microsoft MS-DOS shell (COMMAND.COM) and operating-system utility programs (such as EDLIN), treat a <strong>Control-Z in a text file</strong> as marking the end of meaningful data, and/or append a Control-Z to the end when writing a text file. This was done for two reasons:</p>
+<ul>
+<li>Backward compatibility with CP/M. The CP/M file system only recorded the lengths of files in multiples of 128-byte &ldquo;records&rdquo;, so by convention a Control-Z character was used to mark the end of meaningful data if it ended in the middle of a record. The MS-DOS filesystem has always <strong>recorded the exact byte-length of files</strong>, so this was never necessary on MS-DOS.</li>
+<li>It allows programs to use the <strong>same code</strong> to <strong>read</strong> input from both a <strong>terminal</strong> and a <strong>text file</strong>.</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>——Wikipedia</p>
+</blockquote>
+<p>乍看之下，为了兼容性和代码复用以及便利性，某些 MS-DOS 程序在保存文件的时候会在最后多写入一个和正文无关的，但用来标识有意义数据的结尾的字符，只不过选的值不是 -1，而是一个有效的 ASCII 字符，即：替换字符( Control-Z 码值 26)，这算不算文件中包含 EOF？</p>
+<p>嗯，不算。</p>
+<blockquote>
+<p>简明结论：文件中不包含 EOF。或者说，文件不通过在自身内容的最后放一个特殊的额外的字符来标记自己的结尾！</p>
+</blockquote>
+<p>说的这么绝对，那上面的(Control-Z 码值 26)被写在了某些文件的尾部该作何解？</p>
+<p>可以这么说：这个在某些文件中的(Control-Z 码值 26)字符，只有在那些把他<code>当作文件结尾标识</code>来对待的程序中，才表现得具备了 EOF 的特征；换句话说，对于那些不把(Control-Z 码值 26)当做文件结尾标识的程序来说，这就是个普通的 ascii 字符，只不过他不可打印而已。</p>
+<p>$$
+那文件的结尾在哪？这个问题该转换为：怎么判断文件读完了？
+$$</p>
+<blockquote>
+<p>简明结论：读取文件时，判断是否读完全部内容，不是靠文件内容中的特殊字符，而是文件系统中的重要元数据之一——文件长度</p>
+</blockquote>
+<p><img src="/images/post/original/cs/io/eof/one_byte.png" alt="image"></p>
+<h3 id="再说终端">再说终端</h3>
+<p>上一节中，在已知文件长度的情况下，不需要 EOF 存在于文件中，就可以知道何时文件读取完毕。然而，对于处理在终端中输入的数据来说，怎么标识出输入的结束呢？</p>
+<blockquote>
+<p>Input from a terminal <strong>never really &ldquo;ends&rdquo;</strong> (unless the device is disconnected), but it is useful to enter more than one &ldquo;<strong>file</strong>&ldquo;into a terminal, so <strong>a key sequence</strong> is <strong>reserved</strong> to indicate end of input. In <strong>UNIX</strong> the translation of the keystroke to EOF is performed by the <strong>terminal driver</strong>, so a program does not need to distinguish terminals from other input files. By default, the driver converts a <strong>Control-D character</strong> at the start of a line into an end-of-file indicator. To insert an actual Control-D (ASCII 04) character into the input stream, the user precedes it with a &ldquo;quote&rdquo; command character (usually Control-V). AmigaDOS is similar but uses Control-\ instead of Control-D.</p>
+</blockquote>
+<blockquote>
+<p>In <strong>DOS and Windows</strong> (and in CP/M and many DEC operating systems such as RT-11 or VMS), reading from the terminal will <strong>never produce an EOF</strong>. Instead, programs <strong>recognize</strong> that the source is a terminal (or other &ldquo;character device&rdquo;) and interpret a given <strong>reserved character or sequence as an end-of-file indicator</strong>; most commonly this is an <strong>ASCII Control-Z, code 26</strong>.</p>
+</blockquote>
+<blockquote>
+<p>——Wikipedia</p>
+</blockquote>
+<p>诚然，这回长度是未知的了，若不指明在何时在哪里结束，程序将无法得知：一段输入已经结束。</p>
+<p>虽然，定义规范并没有限制要用那个值来表示 EOF，可实现者却无法规避以下问题：</p>
+<ol>
+<li>这个值不能和任何有效字符冲突</li>
+<li>这个值得能从键盘输入，且不能太麻烦</li>
+<li>这个值虽然特殊，但没有特殊到占用太多的内存，为其设计特别的处理逻辑的地步</li>
+<li>键盘上就那么些组合，怎么才能同时满足以上 3 点</li>
+</ol>
+<p>且看，具有代表性的实现：</p>
+<ul>
+<li>
+<p>在 UNIX 中，组合键击(Control-D 码值 04)转换为 EOF 是由终端驱动完成的，因此应用程序<strong>不需要</strong>将终端和普通文件<strong>区别对待</strong>。</p>
+<ul>
+<li><strong>提问</strong>：既然我们的键盘输入(Control-D 码值 04)被终端截胡转成 EOF 了，文件中又不存 EOF，那我要想在文件中切实的存一个(Control-D 码值 04)怎么办呢？</li>
+<li><strong>回答</strong>：转义，先按(Control-V)紧接着按(Control-D)。注意，这不是把 EOF 输入进去了，是把没被转成 EOF 的原本码值输入进去了。</li>
+</ul>
+</li>
+<li>
+<p>在 DOS 和 Windows 中，从终端读取永远不会产生 EOF。取而代之的，因为程序知道数据源是终端而不是文件（留意其与 UNIX 策略的不同），所以将特定的保留字符或序列当作文件结束指示符看待，最常见的是(Control-Z 码值 26)。(哦~ Control-Z 好像在哪里见过你。)</p>
+</li>
+</ul>
+<hr>
+<h2 id="section-2">section-2</h2>
+<h3 id="let-us-reading-the-fucking-source-code">let us reading the fucking source code&hellip;</h3>
+<blockquote>
+<p>就说嘛，拿个 echo 和 hexdump 就想糊弄过去？笑~</p>
+</blockquote>
+<p>在 faq.cprogramming.com 站点上，有一篇很古老的文章 <a href="https://faq.cprogramming.com/cgi-bin/smartfaq.cgi?answer=1048865140&amp;id=1043284351">Definition of EOF and how to use it effectively</a></p>
+<p>开篇就一锤定音的说到：</p>
+<ul>
+<li>EOF 不是 A char</li>
+<li>EOF 不是 A value that exists at the end of a file</li>
+<li>EOF 不是 A value that could exist in the middle of a file</li>
+</ul>
+<p>还好还好，和我们前面说的不冲突。该文作者的目的，是希望学习该语言的程序员不要掉进该语言的 EOF 的一些陷阱，留意作者所说的关于与 EOF 比较时变量类型的坑。其与我们当前关注的宽泛的 EOF 并不直接关联，因此在这里仅做了链接，不打算展开。</p>
+<p>回到我们的探索。</p>
+<p>C 语言中对 EOF 的定义简单明了：</p>
+<blockquote>
+<p>&lt;stdio.h&gt;</p>
+</blockquote>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#75715e">#define EOF     (-1)
+</span></code></pre></div><p>真的是<code>-1</code>，那么，各家都是用的<code>-1</code>吗？我们看一看 <a href="https://www.gnu.org/software/libc/manual/html_node/index.html">The GNU C Library</a> 怎么说</p>
+<blockquote>
+<p><a href="https://www.gnu.org/software/libc/manual/html_node/EOF-and-Errors.html">12.15 End-Of-File and Errors</a>
+Macro: int EOF
+This macro is an integer value that is returned by a number of narrow stream functions to indicate an end-of-file condition, or some other error situation. With the GNU C Library, EOF is -1. In other libraries, <strong>its value may be some other negative number.</strong></p>
+</blockquote>
+<p>也就是说，程序要做判断时 EOF 不可与 -1 互换。欸，NULL 和 ‘\0’ 何尝不是如此。像这类规范中不限定具体实现的例子，在 CS(Computer Science) 世界里比比皆是，比如 Go 的包导入；比如 C++ 自增自减运算符的副作用；比如……停，当前这点儿事还没扯完呢。</p>
+<p>记得之前我们说在某些条件下，会产生 EOF，但那时没说是谁产生的。</p>
+<p>下面就去代码中寻觅答案，这也能捎带着回答 section-0 末尾提出的问题。</p>
+<p>我们选 glibc-2.31 (clone 能不能快点)里的 getc 为例子：</p>
+<blockquote>
+<p>glibc-2.31/libio/getc.c</p>
+</blockquote>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#75715e">#include</span> <span style="color:#75715e">&#34;libioP.h&#34;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&#34;stdio.h&#34;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span>
+...
+
+<span style="color:#66d9ef">int</span>
+_IO_getc (FILE <span style="color:#f92672">*</span>fp)
+{
+  <span style="color:#66d9ef">int</span> result;
+  CHECK_FILE (fp, EOF);
+  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>_IO_need_lock (fp))
+    <span style="color:#66d9ef">return</span> _IO_getc_unlocked (fp);
+  _IO_acquire_lock (fp);
+  result <span style="color:#f92672">=</span> _IO_getc_unlocked (fp);
+  _IO_release_lock (fp);
+  <span style="color:#66d9ef">return</span> result;
+}
+
+...
+</code></pre></div><p>这是一个需要确保线程安全的函数，可以看到其为了进入临界区而获得锁的逻辑。这里关注的是 <code>_IO_getc_unlocked</code>，查看此宏，看到他又展开为另一个宏（老一些的版本没有这个步骤）：</p>
+<blockquote>
+<p>glibc-2.31/libio/libio.h</p>
+</blockquote>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp">...
+<span style="color:#75715e">#define _IO_getc_unlocked(_fp) __getc_unlocked_body (_fp) 
+</span><span style="color:#75715e"></span>...
+</code></pre></div><p>继续定位<code>__getc_unlocked_body</code>，这是一个内联宏，作用是可以用不调函数的方式执行从流中读取数据的逻辑。其中，<code>__glibc_unlikely</code>并不改变比较结果，而是用来通知编译器在此处进行恰当优化的，他与我们的读调用何时产生 EOF 无关，不展开了，继续追索：</p>
+<blockquote>
+<p>glibc-2.31/bits/types/struct_FILE.h</p>
+</blockquote>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp">...
+<span style="color:#75715e">/* These macros are used by bits/stdio.h and internal headers.  */</span>
+
+<span style="color:#75715e">#define __getc_unlocked_body(_fp)                                 \
+</span><span style="color:#75715e">(__glibc_unlikely ((_fp)-&gt;_IO_read_ptr &gt;= (_fp)-&gt;_IO_read_end)    \
+</span><span style="color:#75715e">? __uflow (_fp) : *(unsigned char *) (_fp)-&gt;_IO_read_ptr++)
+</span><span style="color:#75715e"></span>...
+</code></pre></div><p>我们离真相，还差一步，这里先把不太直观的代码简化为等价的函数体：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#66d9ef">inline</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">__getc_unlocked_body</span>(FILE <span style="color:#f92672">*</span>fp) {
+    <span style="color:#66d9ef">if</span> (_fp<span style="color:#f92672">-&gt;</span>_IO_read_ptr <span style="color:#f92672">&gt;=</span> _fp<span style="color:#f92672">-&gt;</span>_IO_read_end)
+        <span style="color:#66d9ef">return</span> __uflow(_fp);
+    <span style="color:#66d9ef">else</span>
+        <span style="color:#66d9ef">return</span> <span style="color:#f92672">*</span>(<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>)(_fp<span style="color:#f92672">-&gt;</span>_IO_read_ptr<span style="color:#f92672">++</span>);
+}
+</code></pre></div><ul>
+<li>如果，<code>_IO_read_ptr &gt;= _IO_read_end</code>，说明缓冲区已读完，需要重新从 IO 设备中读取数据到缓冲区。</li>
+<li>否则，说明尚未到达缓冲区末尾，只需返回<code>_IO_read_ptr</code>所指向的一个字节大小的内容，然后<code>_IO_read_ptr</code>的加 1，指向下一个字节。</li>
+<li>最初的时候<code>_IO_read_ptr</code>和<code>_IO_read_end</code>是相等的，这样才会从键盘中进行读取。</li>
+</ul>
+<p>最终，定位到 <code>__uflow</code> 函数：</p>
+<blockquote>
+<p>glibc-2.31/libio/genops.c</p>
+</blockquote>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp">...
+<span style="color:#66d9ef">int</span>
+__uflow (FILE <span style="color:#f92672">*</span>fp)
+{
+  <span style="color:#66d9ef">if</span> (_IO_vtable_offset (fp) <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> _IO_fwide (fp, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) <span style="color:#f92672">!=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)
+    <span style="color:#66d9ef">return</span> EOF;
+
+  <span style="color:#66d9ef">if</span> (fp<span style="color:#f92672">-&gt;</span>_mode <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>)
+    _IO_fwide (fp, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>);
+  <span style="color:#66d9ef">if</span> (_IO_in_put_mode (fp))
+    <span style="color:#66d9ef">if</span> (_IO_switch_to_get_mode (fp) <span style="color:#f92672">==</span> EOF)
+      <span style="color:#66d9ef">return</span> EOF;
+  <span style="color:#66d9ef">if</span> (fp<span style="color:#f92672">-&gt;</span>_IO_read_ptr <span style="color:#f92672">&lt;</span> fp<span style="color:#f92672">-&gt;</span>_IO_read_end)
+    <span style="color:#66d9ef">return</span> <span style="color:#f92672">*</span>(<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>) fp<span style="color:#f92672">-&gt;</span>_IO_read_ptr<span style="color:#f92672">++</span>;
+  <span style="color:#66d9ef">if</span> (_IO_in_backup (fp))
+    {
+      _IO_switch_to_main_get_area (fp);
+      <span style="color:#66d9ef">if</span> (fp<span style="color:#f92672">-&gt;</span>_IO_read_ptr <span style="color:#f92672">&lt;</span> fp<span style="color:#f92672">-&gt;</span>_IO_read_end)
+	<span style="color:#66d9ef">return</span> <span style="color:#f92672">*</span>(<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>) fp<span style="color:#f92672">-&gt;</span>_IO_read_ptr<span style="color:#f92672">++</span>;
+    }
+  <span style="color:#66d9ef">if</span> (_IO_have_markers (fp))
+    {
+      <span style="color:#66d9ef">if</span> (save_for_backup (fp, fp<span style="color:#f92672">-&gt;</span>_IO_read_end))
+	<span style="color:#66d9ef">return</span> EOF;
+    }
+  <span style="color:#66d9ef">else</span> <span style="color:#a6e22e">if</span> (_IO_have_backup (fp))
+    _IO_free_backup_area (fp);
+  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">_IO_UFLOW</span> (fp);
+}
+...
+</code></pre></div><p>呜呼呀，满屏的 EOF。——注意上面代码的语境，程序领空中运行在用户态的库函数。</p>
+<p>关于 EOF 是在哪里产生的，这里还有一篇老外的文章，<a href="https://ruslanspivak.com/eofnotchar/">EOF is not a character</a>。图文并茂，既有跨语言的横向对比，又有纵深的底层原理说明。比我写的好多了，大家有空可以看看。</p>
+<p>我们摘抄一段：</p>
+<blockquote>
+<p>How do the high-level I/O routines in the examples above determine the end-of-file condition? On Linux systems the routines either directly or indirectly use the read() system call provided by the kernel. The getc() function (or macro) in C, for example, uses the read() system call and returns EOF if read() indicated the end-of-file condition. The read() system call returns 0 to indicate the EOF condition.</p>
+</blockquote>
+<p><img src="/images/post/original/cs/io/eof/getc_read.png" alt="image"></p>
+<p>这里就告诉了我们结论，EOF 并非由内核直接产生，库函数是通过判断系统调用的返回值，进而决定是否要返回 EOF 给调用者的。（老外随手画的图，看起来比我用 visio 做的一点不差。。。）</p>
+<p>另外多说一句：其实到<code>int __uflow (FILE *fp)</code>这里还没完，还有很多宏、函数，可以细追下去，比如在最终的系统调用<code>sys_read</code>之前，能追到<code>int _IO_new_file_underflow (FILE *fp)</code>，但可能需要运行时调试。因其与产生 EOF 的关系不是直接的，为省略篇幅就不全粘过来了。</p>
+<hr>
+<h2 id="section-3">section-3</h2>
+<h3 id="举起我们的栗子">举起我们的栗子</h3>
+<p>看了那么多别人的代码，我们自己也应该试着写一写，写不好没关系，反正也不是拿去卖钱的。</p>
+<p>$$
+\left ( \frac{表演真正的技术}{露一把真正的怯}\right )^{是时候了}= 1
+$$</p>
+<p>原则，我们的程序</p>
+<ul>
+<li>要尽量简单</li>
+<li>要能达到让我们不再对 EOF 的怪异行为困惑的目的</li>
+<li>尽量不只使用一种系统、一种语言，免得孤证不证，以偏概全</li>
+</ul>
+<p>既然是问题带我们误入的藕花深处，为了解答疑问，就让我们——争渡，睁渡</p>
+<p>记得前文中，UNIX 和 Windows 下的终端对于文件结尾的处理策略是不同的，具体差在哪呢？</p>
+<p>看如下代码：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#75715e">&lt;?php</span>
+
+$line <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+
+<span style="color:#66d9ef">while</span> (<span style="color:#66d9ef">false</span> <span style="color:#f92672">!==</span> ($char <span style="color:#f92672">=</span> <span style="color:#a6e22e">fgetc</span>(<span style="color:#a6e22e">STDIN</span>))) {
+    <span style="color:#66d9ef">echo</span> <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\t</span><span style="color:#e6db74">char-&#34;</span>, $line<span style="color:#f92672">++</span>, <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\t</span><span style="color:#e6db74">&#34;</span>, <span style="color:#a6e22e">ord</span>($char), <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>;
+}
+</code></pre></div><p>这段程序的功能如下：</p>
+<ul>
+<li>启动后阻塞，等待用户输入，遇到文件结尾标记(注意我这里没用 EOF 的叫法)就退出。</li>
+<li>在遇到文件结尾标记之前，用户每输入一次回车，就执行循环内的代码，fgetc 负责读取一个字符(不是字节)，而 ord 将被读到的字符的第一个字节转为 0-255 之间的值(就是对应的 ASCII)。</li>
+<li>把经过处理的输入，用稍微友好一点的格式打印出来。</li>
+</ul>
+<blockquote>
+<p>在 Windows 10 终端下，使用 php-cli 7.x 执行此程序，输入的过程是：
+ENTER、a ENTER、A ENTER、abc ENTER、aBc ENTER、CTRL-D ENTER、CTRL-DCTRL-D ENTER、CTRL-Z ENTER</p>
+</blockquote>
+<p>输出如下：# 和后面的内容是我加的注释</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">
+		char-1  <span style="color:#ae81ff">13</span> <span style="color:#75715e"># ASCII of CR \r</span>
+		char-2  <span style="color:#ae81ff">10</span> <span style="color:#75715e"># ASCII of LF \n</span>
+a      
+		char-3  <span style="color:#ae81ff">97</span> <span style="color:#75715e"># ASCII of a</span>
+		char-4  <span style="color:#ae81ff">13</span> <span style="color:#75715e"># ASCII of CR \r</span>
+		char-5  <span style="color:#ae81ff">10</span> <span style="color:#75715e"># ASCII of LF \n</span>
+A      
+		char-6  <span style="color:#ae81ff">65</span> <span style="color:#75715e"># ASCII of A</span>
+		char-7  <span style="color:#ae81ff">13</span> <span style="color:#75715e"># ASCII of CR \r</span>
+		char-8  <span style="color:#ae81ff">10</span> <span style="color:#75715e"># ASCII of LF \n</span>
+abc    
+		char-9  <span style="color:#ae81ff">97</span> <span style="color:#75715e"># ASCII of a</span>
+		char-10 <span style="color:#ae81ff">98</span> <span style="color:#75715e"># ASCII of b</span>
+		char-11 <span style="color:#ae81ff">99</span> <span style="color:#75715e"># ASCII of c</span>
+		char-12 <span style="color:#ae81ff">13</span> <span style="color:#75715e"># ASCII of CR \r</span>
+		char-13 <span style="color:#ae81ff">10</span> <span style="color:#75715e"># ASCII of LF \n</span>
+aBc    
+		char-14 <span style="color:#ae81ff">97</span> <span style="color:#75715e"># ASCII of a</span>
+		char-15 <span style="color:#ae81ff">66</span> <span style="color:#75715e"># ASCII of B</span>
+		char-16 <span style="color:#ae81ff">99</span> <span style="color:#75715e"># ASCII of c</span>
+		char-17 <span style="color:#ae81ff">13</span> <span style="color:#75715e"># ASCII of CR \r</span>
+		char-18 <span style="color:#ae81ff">10</span> <span style="color:#75715e"># ASCII of LF \n</span>
+^D     
+		char-19 <span style="color:#ae81ff">4</span>  <span style="color:#75715e"># ASCII of CTRL-D</span>
+		char-20 <span style="color:#ae81ff">13</span> <span style="color:#75715e"># ASCII of CR \r</span>
+		char-21 <span style="color:#ae81ff">10</span> <span style="color:#75715e"># ASCII of LF \n</span>
+^D^D   
+		char-22 <span style="color:#ae81ff">4</span>  <span style="color:#75715e"># ASCII of CTRL-D</span>
+		char-23 <span style="color:#ae81ff">4</span>  <span style="color:#75715e"># ASCII of CTRL-D</span>
+		char-24 <span style="color:#ae81ff">13</span> <span style="color:#75715e"># ASCII of CR \r</span>
+		char-25 <span style="color:#ae81ff">10</span> <span style="color:#75715e"># ASCII of LF \n</span>
+^Z
+</code></pre></div><p>关于 CR 和 LF 的话题，网络上的文章比关于 EOF 的多，可以搜索来看。在 Linux 和 MacOS 下，同样的程序，同样的输入，输出会与 Windows 不同。例如在 MacOS 下 ENTER 只对应一个单独的 \n，没有 \r。</p>
+<p>我们目前的关注点不在于不同系统对于 CR 和 LF 的不同策略，那是一个可以追溯到没有计算机时代的故事。现在想看的是不同平台下，对待表示输入结束的文件结尾标识的异同。</p>
+<p>首先，前文中说过，Windows 中从终端读取输入，不会产生 EOF；其次，为了表示文件结尾，他选用了 CTRL-Z ASCII 26，作为输入结束的标记，所以我们才能够看到对于 CTRL-D，Windows 将其视作普通字符，程序读取该字符并将其 ASCII 码值打印到屏幕上。而当我们输入了 CTRL-Z 并 ENTER 后，程序退出（实际上是退出的循环，但因为退出循环后没别的代码了，程序自然退出），并没有打印 CTRL-Z 的 ASCII 码值。那么，能不能让本程序在 Windows 下打出这个 CTRL-Z 的码值，并且不退出程序呢？可以的，这样操作：</p>
+<blockquote>
+<p>启动程序，输入一些除了 CTRL-Z 以外的其他输入，然后 CTRL-Z，最后回车。
+比如：anything but &ldquo;CTRL-Z&rdquo;，然后 CTRL-Z，最后 ENTER</p>
+</blockquote>
+<p>输出如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">anything but <span style="color:#e6db74">&#34;CTRL-Z&#34;</span>^Z
+		char-1  <span style="color:#ae81ff">97</span> <span style="color:#75715e"># 我该选个字母少的句子。。。懒，省略一些注释</span>
+		char-2  <span style="color:#ae81ff">110</span>
+		char-3  <span style="color:#ae81ff">121</span>
+		char-4  <span style="color:#ae81ff">116</span>
+		char-5  <span style="color:#ae81ff">104</span>
+		char-6  <span style="color:#ae81ff">105</span>
+		char-7  <span style="color:#ae81ff">110</span>
+		char-8  <span style="color:#ae81ff">103</span>
+		char-9  <span style="color:#ae81ff">32</span>
+		char-10 <span style="color:#ae81ff">98</span>
+		char-11 <span style="color:#ae81ff">117</span>
+		char-12 <span style="color:#ae81ff">116</span>
+		char-13 <span style="color:#ae81ff">32</span>
+		char-14 <span style="color:#ae81ff">34</span>
+		char-15 <span style="color:#ae81ff">67</span>
+		char-16 <span style="color:#ae81ff">84</span>
+		char-17 <span style="color:#ae81ff">82</span>
+		char-18 <span style="color:#ae81ff">76</span>
+		char-19 <span style="color:#ae81ff">45</span>
+		char-20 <span style="color:#ae81ff">90</span>
+		char-21 <span style="color:#ae81ff">34</span>
+		char-22 <span style="color:#ae81ff">26</span> <span style="color:#75715e"># ASCII of CTRL-Z，哦，26，我们终于亲眼见到了你</span>
+		char-23 <span style="color:#ae81ff">13</span> <span style="color:#75715e"># ASCII of CR \r</span>
+		char-24 <span style="color:#ae81ff">10</span> <span style="color:#75715e"># ASCII of LF \n</span>
+</code></pre></div><p>程序打印了 CTRL-Z 26，并且没有退出，继续等待我们的下一轮输入。为什么没退出，后面详解。</p>
+<p><em>在其他平台下运行同样程序的操作留给有好奇心的你我他。</em></p>
+<p>让我们的 Windows 先等着，说说其他系统。</p>
+<p>比如 Linux 下，输入 CTRL-Z，程序会被切入后台执行，需用 fg 命令唤回，这个和我们的 EOF 无关，略过。那么输入 CTRL-D 呢，不必输入 ENTER 了，程序会立刻对 EOF 做出响应。</p>
+<p>系统和语言都换一换。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#75715e">// 你好，号称 C+Python 的 Golang
+</span><span style="color:#75715e"></span><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+
+<span style="color:#f92672">import</span> (
+	<span style="color:#e6db74">&#34;bufio&#34;</span>
+	<span style="color:#e6db74">&#34;io&#34;</span>
+	<span style="color:#e6db74">&#34;os&#34;</span>
+)
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#a6e22e">line</span>, <span style="color:#a6e22e">r</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">bufio</span>.<span style="color:#a6e22e">NewReader</span>(<span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Stdin</span>)
+	<span style="color:#66d9ef">for</span> {
+		<span style="color:#a6e22e">c</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">ReadByte</span>()
+		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">EOF</span> {
+			<span style="color:#66d9ef">break</span>
+		}
+		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+			panic(<span style="color:#a6e22e">err</span>)
+		}
+		println(<span style="color:#e6db74">&#34;\tchar-&#34;</span>, <span style="color:#a6e22e">line</span>, <span style="color:#e6db74">&#34;\t&#34;</span>, <span style="color:#a6e22e">c</span>) <span style="color:#75715e">// 人家都用 fmt.xxx，就你特殊。嘛，为了省点内存，免得逃逸了:-)
+</span><span style="color:#75715e"></span>		<span style="color:#a6e22e">line</span><span style="color:#f92672">++</span>
+	}
+}
+</code></pre></div><blockquote>
+<p>以下为 Ubuntu 20.04 终端下，go 1.14.4 运行该程序的输出，输入过程：
+ENTER、a ENTER、A ENTER、abc ENTER、aBc ENTER、CTRL-D</p>
+</blockquote>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">
+		char-1          <span style="color:#ae81ff">10</span>
+a      
+		char-2          <span style="color:#ae81ff">97</span>
+		char-3          <span style="color:#ae81ff">10</span>
+A      
+		char-4          <span style="color:#ae81ff">65</span>
+		char-5          <span style="color:#ae81ff">10</span>
+abc    
+		char-6          <span style="color:#ae81ff">97</span>
+		char-7          <span style="color:#ae81ff">98</span>
+		char-8          <span style="color:#ae81ff">99</span>
+		char-9          <span style="color:#ae81ff">10</span>
+aBc    
+		char-10         <span style="color:#ae81ff">97</span>
+		char-11         <span style="color:#ae81ff">66</span>
+		char-12         <span style="color:#ae81ff">99</span>
+		char-13         <span style="color:#ae81ff">10</span>
+</code></pre></div><p>可以看到，不同平台对待 ENTER 的行为是一致的，但对待文件结束标记却不同</p>
+<ul>
+<li>Windows 下输入 CTRL-Z，并不会有响应，必须等 ENTER 后，才进入判断和处理流程</li>
+<li>Linux 下只要输入 EOF（由 CTRL-D 转换而来）就会立刻进入处理流程</li>
+</ul>
+<p>还没完，记得之前的例子，我们曾用某种输入方式让那个 PHP 程序在 Windows 下输出了我们输入的 CTRL-Z，那么对于我们的这个 GO 程序，是否适用呢？很遗憾，GO 并不把 EOF 当作有效输入返回给用户程序，无论在哪个平台。</p>
+<p>虽然无法让 GO 打印出我们通过终端输入的 EOF 的码值，但前面的方法（先输入一些内容，不回车直接给 EOF）的确改变了文件结尾标记的默认行为，下面解释其原理：</p>
+<p>在 <a href="https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/contents.html">The Open Group Base Specifications Issue 7, 2018 edition</a>（如果感觉这玩意儿名字陌生，他还有另一个名字：POSIX。虽然也可能像我一样，久闻其名，却不知其全貌，但起码比第一个名字脸熟多了）的<a href="https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap11.html#tag_11">11.1.9 Special Characters</a>中，关于 EOF 的描述：</p>
+<blockquote>
+<p>EOF
+Special character on input, which is recognized if the ICANON flag is set. When received, all the bytes waiting to be read are immediately passed to the process without waiting for a &lt;newline&gt;, and the EOF is discarded. Thus, if there are no bytes waiting (that is, the EOF occurred at the beginning of a line), a byte count of zero shall be returned from the read(), representing an end-of-file indication. If ICANON is set, the EOF character shall be discarded when processed.</p>
+</blockquote>
+<p>我们来试着翻译一下：</p>
+<blockquote>
+<p>EOF
+输入中的特殊字符，在 ICANON 标志为真时被识别。当遇到这个字符时，所有等待被读取的字节将<strong>立刻</strong>被传给处理程序而<strong>无需等待</strong>一个<strong>新行符</strong>，同时该 EOF 被<strong>丢弃</strong>。然而，如果当前没有字节等待被处理（也即：EOF 出现在了一行的<strong>行首</strong>），一个 0 长度的字节计数将被 read() 返回，表现出一种 EOF 迹象。如果 ICANON 为真，EOF 字符在被处理后应该被丢弃。</p>
+</blockquote>
+<p>欸，EOF 就够晕的了，怎么又杀出个 ICANON flag？</p>
+<p>嗯，规范中也是都写清楚了的，是终端 I/O 工作模式相关的内容(欸~就不能只有一种键盘，一种鼠标，一种显示器，一种系统，一种接口么。。。)，EOF 在其中只是很小的一部分。可以看看国内这哥们儿的一篇文章：<a href="https://www.cnblogs.com/nufangrensheng/p/3575752.html">终端 I/O 之综述</a>，弄清楚终端 I/O 的故事，有助于我们正向的理解终端处理用户输入的各种策略。</p>
+<p>最后一例：代码取自我翻译的一个老外的汇编教程，原址：https://asmtutor.com/</p>
+<p>高级语言看真相，总是隔着层纱，我们需要定性的结论</p>
+<pre><code class="language-x86asm" data-lang="x86asm">; Hello World Program (Getting input)
+; Compile with: nasm -f elf helloworld-input.asm
+; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 helloworld-input.o -o helloworld-input
+; Run with: ./helloworld-input
+ 
+%include        'functions.asm'
+ 
+SECTION .data
+msg1        db      'Please enter your name: ', 0h      ; message string asking user for input
+msg2        db      'Hello, ', 0h                       ; message string to use after user has entered their name
+ 
+SECTION .bss
+sinput:     resb    255                                 ; reserve a 255 byte space in memory for the users input string
+ 
+SECTION .text
+global  _start
+ 
+_start:
+ 
+    mov     eax, msg1
+    call    sprint
+ 
+    mov     edx, 255        ; number of bytes to read
+    mov     ecx, sinput     ; reserved space to store our input (known as a buffer)
+    mov     ebx, 0          ; read from the STDIN file
+    mov     eax, 3          ; invoke SYS_READ (kernel opcode 3)
+    int     80h
+ 
+    mov     eax, msg2
+    call    sprint
+ 
+    mov     eax, sinput     ; move our buffer into eax (Note: input contains a linefeed)
+    call    sprint          ; call our print function
+ 
+    call    quit
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ nasm -f elf helloworld-input.asm
+$ ld -m elf_i386 helloworld-input.o -o helloworld-input
+$ ./helloworld-input
+Please enter your name: Dylan
+Hello, Dylan
+</code></pre></div><p>嗯？EOF 呢？</p>
+<p>如果，你的阻塞读，只需要处理一次输入，那么 ENTER 就够用了，用不着 EOF。ENTER 的作用只是：</p>
+<ul>
+<li>这一行输入已完成，读函数别阻塞了，排空缓冲区，立刻返回。还想再读？从新发 sys_read！（嘿，老铁，你的煎饼熟了，拿走吧，钱货两清。要加个蛋？那您从新下单）</li>
+</ul>
+<p>但是，如果你需要不停的处理用户输入，则要将阻塞读扔进循环（通常是满足某种条件就 break 的死循环），而这时，ENTER 还是那个 ENTER，该起什么作用还起什么作用，但他不能用来退出这个循环，那咱们选个谁来退出这个循环？</p>
+<p>啊～ EOF，掀起你的盖头来（什么？杀进程。噫，夫子乱人之性也）</p>
+<p>诶，那人，你一开始说 C 的实现很具有代表性，结果你仨例子没一个 C 的？（忘了我 多难过 多不能接受；忘了我 只要你好过 就足够；忘了我 忘了我们的梦；当你想起我 我已不是我……）</p>
+<p>至此，我们大概可以解释——</p>
+<ul>
+<li>
+<p>EOF 做什么用的？没有行不行？</p>
+</li>
+<li>
+<p>取名字可是个学问，老外管这个“用来解决前面那一堆文字阐述的事儿”的玩意儿叫：End-of-File。你觉得是否传神呢。</p>
+</li>
+<li>
+<p>计算机唯快不破的，怎么分清个头尾居然这么麻烦</p>
+</li>
+<li>
+<p>为什么阻塞读的循环中，在已经输入了一些内容到终端的情况下，要按两次 CTRL-D，才能退出循环</p>
+</li>
+<li>
+<p>ENTER 不能替代 EOF，但 EOF 有时却起到了 ENTER 的效用</p>
+</li>
+</ul>
+<hr>
+<p><em>场外乱入一下，之后的内容大都与本文无关可略：写到这里的时候，不知怎么的，忽然忆起了一个关于32位操作系统和4G物理内存的故事，有兴趣可以递归浏览一把，这哥们写的挺好，让我不必再为这个话题在脑子里反转剧情了：<a href="https://www.zhihu.com/question/22594254">为何微软不在新的操作系统中让 32 位支持大于 4GB 的内存？</a></em></p>
+<hr>
+<h2 id="section-nan">section-NaN</h2>
+<h3 id="多余的话">多余的话</h3>
+<p>今天，我们使用计算机也好，学习计算机相关的知识技术也罢，都已经是在面对一个几乎封装到无可在封、间接到几乎无缝可插、象与质天差地别、与其诞生伊始相去甚远的集大成的存在了。用起来固然比旧时要愉悦（比如：输入方式一再的简化），但是乱花渐欲迷人眼，对于追溯着学习这门学科并试图窥其全貌的人就不那么友好了……时常是，原本好奇心给足了动力的，就是向回捣着捣着就困了。端的是不如从一开始就看着计算机经过飞速成长，激烈蜕变，无奈取舍等等过程而演化成今天的样子来的自然。（好在，据那些玩过大型机的人说，还是微机省电~）</p>
+<p>各行有各行的业障，各界有各界的风景。在 CS 世界里——</p>
+<p>我们有：</p>
+<ul>
+<li>图灵的杯具</li>
+<li>二极管诞生的趣闻</li>
+<li>快摩尔不下去的定律</li>
+<li>因为 Intel 曾把地址总线和数据总线做的不一边宽而造成的内存管理的违和，以及为了兼容之而不得不背到今后的内存分段包袱</li>
+</ul>
+<p>也有：</p>
+<ul>
+<li>人月神话中绕不过的怪圈</li>
+<li>被日本的毒舌程序员喷的体无完肤、他自己却耍的飞起的 C 指针声明</li>
+<li>IBM 发现应该摁住微软但已经来不及时的故事，被微软和谷歌换位上演</li>
+<li>Sping 望着 EJB 远去的背影，独自呢喃——我终于变成了自己当年所讨厌的样子</li>
+</ul>
+<p>曾记否：</p>
+<ul>
+<li>今日大红大紫的 iOS 因为 jobs 和 linus 两人的&quot;矜持&quot;而没能跑在 Linux 上的&quot;佳话&rdquo;</li>
+<li>感谢 BitMover 公司，我们能用上 linus 用快的难以望其项背的速度开发的免费开源的 GIT；哦对，别忘记听一听关于 GIT 用 C 却没用 C++ 编写而引起的论战，其规模和影响力丝毫不亚于宏内核与微内核之辩</li>
+<li>我至今记忆犹新的一个笑话——【1987 - Larry Wall 在电脑前打了个盹，脑门子压到了键盘上。醒来之后，Larry Wall 深信 ，在他的显示器上出现的神秘字符串并非是随机的，那是某种编程语言之程序样例的神谕。那必是上帝要他的先知——Larry Wall，去设计的。Perl 语言就此诞生了。】容我先笑一阵。</li>
+<li>高德纳老爷子说，读不懂《计算机程序设计艺术》就不要学习编程，给我造成的是不是入错行的疑问，好伤心</li>
+</ul>
+<p>不可略：</p>
+<ul>
+<li>自互联网普及以来，现实中的种种在虚拟中的微妙映射</li>
+<li>尚未从“心，脑，计算机”的灵魂拷问中醒过神来的人们，面对人工智能时的不知所措与欲罢不能</li>
+<li>似乎这个领域生来就是未走先跑，因而其衍生与附属也就难免其俗</li>
+<li>太多了，太多了……</li>
+</ul>
+<p>别忘了：</p>
+<ul>
+<li>程序员们可以为争论哪种语言天下第一而错过人生中许多更重要的事情，比如休息</li>
+</ul>
+<p>还有还有，梦中的橄榄树，橄榄树……</p>
+
+
+<p style="text-align:right">——2020年08月01日，北京丰台</p>
+
+
+
+
+        
+
+        
+
+        
+      </article>
+
+      
+        <ul class="pager blog-pager">
+          
+          
+        </ul>
+      
+
+
+      
+
+    </div>
+  </div>
+</div>
+
+      
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+          
+        </ul>
+        <p class="credits copyright text-muted">
+          
+
+          &nbsp;&bull;&nbsp;&copy;
+          
+            2020
+          
+
+          
+            &nbsp;&bull;&nbsp;
+            <a href="/">Looper 的博客</a>
+          
+        </p>
+        
+        <p class="credits theme-by text-muted">
+          <a href="https://gohugo.io">Hugo v0.74.3</a> powered &nbsp;&bull;&nbsp; Theme <a href="https://github.com/halogenica/beautifulhugo">Beautiful Hugo</a> adapted from <a href="https://deanattali.com/beautiful-jekyll/">Beautiful Jekyll</a>
+          
+        </p>
+      </div>
+    </div>
+  </div>
+</footer><script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.js" integrity="sha384-K3vbOmF2BtaVai+Qk37uypf7VrgBubhQreNQe9aGsz9lB63dIFiQVlJbr92dw2Lx" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/contrib/auto-render.min.js" integrity="sha384-kmZOZB5ObwgQnS/DuDg6TScgOiWWBiVt0plIRkZCmE6rDZGrEOQeHM5PcHi+nyqe" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="/js/main.js"></script><script> renderMathInElement(document.body); </script><script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.js" integrity="sha384-QELNnmcmU8IR9ZAykt67vGr9/rZJdHbiWi64V88fCPaOohUlHCqUD/unNN0BXSqy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe-ui-default.min.js" integrity="sha384-m67o7SkQ1ALzKZIFh4CiTA8tmadaujiTa9Vu+nqPSwDOqHrDmxLezTdFln8077+q" crossorigin="anonymous"></script><script src="/js/load-photoswipe.js"></script>
+
+
+
+
+
+
+
+
+
+    
+  </body>
+</html>
+

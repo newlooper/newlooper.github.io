@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Looper 的博客</title>
+    <link>/</link>
+    <description>Recent content on Looper 的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Mon, 03 Aug 2020 15:52:41 +0800</lastBuildDate>
+    
+	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>EOF，到底怎么回事</title>
+      <link>/post/original/cs/io/eof/</link>
+      <pubDate>Mon, 03 Aug 2020 15:52:41 +0800</pubDate>
+      
+      <guid>/post/original/cs/io/eof/</guid>
+      <description>TL;DR 首先，确未想到，为说清楚这个玩意儿，居然要用不少的篇幅；其次，当涉及对一些概念、原理的追溯时，递归到多深的地步，也难以拿捏；好在，写这些文字主要是为了将来碰到某些反直觉的情况时可以有个快捷解答；最后若能得到碰巧逛到这里的同仁指点迷津，纠正错误，互通有无，就算赚到了 :-）
+希望读完此文，能够消除一些关于 EOF 的疑惑，再碰到关于她的一些争论时，大家能够相视一笑。
+愿此文，能解释
+ 什么是 EOF？ 为什么需要 EOF？ 文件里包不包含 EOF？ 控制台输入时的 EOF 的表示方式和处理行为是怎么样的? 不同计算机语言的 EOF 如何定义的？ …… may your blade never dull   section-0 概念澄清  In computing, end-of-file (commonly abbreviated EOF) is a condition in a computer operating system where no more data can be read from a data source. The data source is usually called a file or stream. ——Wikipedia
+ 难为下定义的人们，描述既不能太复杂，又要尽可能的说清一个事物的本质。
+好了，从上面的叙述中，我们萃取出关于 EOF：</description>
+    </item>
+    
+  </channel>
+</rss>
