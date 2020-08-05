@@ -65,7 +65,7 @@
   "headline": "EOF，到底怎么回事",
   "description" : "TL;DR 首先，确未想到，为说清楚这个玩意儿，居然要用不少的篇幅；其次，当涉及对一些概念、原理的追溯时，递归到多深的地步，也难以拿捏；好在，写这些文字主要是为了将来碰到某些反直觉的情况时可以有个快捷解答；最后若能得到碰巧逛到这里的同仁指点迷津，纠正错误，互通有无，就算赚到了 :-）\n希望读完此文，能够消除一些关于 EOF 的疑惑，再碰到关于她的一些争论时，大家能够相视一笑。\n愿此文，能解释\n 什么是 EOF？ 为什么需要 EOF？ 文件里包不包含 EOF？ 控制台输入时的 EOF 的表示方式和处理行为是怎么样的? 不同计算机语言的 EOF 如何定义的？ …… may your blade never dull   section-0 概念澄清  In computing, end-of-file (commonly abbreviated EOF) is a condition in a computer operating system where no more data can be read from a data source. The data source is usually called a file or stream.\n——Wikipedia\n 难为下定义的人们，描述既不能太复杂，又要尽可能的说清一个事物的本质。\n好了，从上面的叙述中，我们萃取出关于 EOF：",
   "inLanguage" : "zh-cn",
-  "wordCount":  1977 ,
+  "wordCount":  2085 ,
   "datePublished" : "2020-08-03T15:52:41",
   "dateModified" : "2020-08-03T15:52:41",
   "image" : "https:\/\/newlooper.github.io\/images\/site\/avatar-icon.png",
@@ -238,7 +238,7 @@
   
   
   
-    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;1977&nbsp;个字
+    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;2085&nbsp;个字
   
   
     
@@ -340,12 +340,101 @@
 <p>说的这么绝对，那上面的(Control-Z 码值 26)被写在了某些文件的尾部该作何解？</p>
 <p>可以这么说：这个在某些文件中的(Control-Z 码值 26)字符，只有在那些把他<code>当作文件结尾标识</code>来对待的程序中，才表现得具备了 EOF 的特征；换句话说，对于那些不把(Control-Z 码值 26)当做文件结尾标识的程序来说，这就是个普通的 ascii 字符，只不过他不可打印而已。</p>
 <p>$$
-那文件的结尾在哪？这个问题该转换为：怎么判断文件读完了？
+那文件的结尾到底在哪？
 $$</p>
+<blockquote>
+<p>先回答这样一个问题：假设文件中有一个或多个字节的数据用来标明其结尾，那么对于二进制文件，如何区分内容和结尾呢？<br>
+嗯，不太灵。看来，单靠文件内容本身，做不到这一点。</p>
+</blockquote>
+<p>$$
+『文件的结尾在哪』这个问题该转换为：怎么判断文件读完了？
+$$</p>
+<p>听老辈们说——戏不够，神仙凑~</p>
 <blockquote>
 <p>简明结论：读取文件时，判断是否读完全部内容，不是靠文件内容中的特殊字符，而是文件系统中的重要元数据之一——文件长度</p>
 </blockquote>
 <p><img src="/images/post/original/cs/io/eof/one_byte.png" alt="image"></p>
+<p>长度，居然不是文件内容的附属品，有这么重要的作用？为了突出这一点，我们来做个实验，感受一下文件长度的威力：</p>
+<p>不开虚拟机了，怪麻烦的，就手头的 Windows 了。通常情况下，我们无法直接修改诸如文件大小、创建时间等重要的元数据信息，但我们可以间接地晃 Windows 一枪……</p>
+<p>删文件大家都干过，那么 Windows 的回收站想必不陌生，我们的实验步骤如下：</p>
+<ol>
+<li>
+<p>先清空回收站。然后随便建个什么文件，本例是空的 txt，叫 empty.txt；这个文件扔进回收站<img src="/images/post/original/cs/io/eof/win_recycle_bin_2.png" alt="image"></p>
+</li>
+<li>
+<p>管理员身份启动 cmd</p>
+</li>
+<li>
+<p>获取当前用户的 SID 后，进入该用户对应的回收站<img src="/images/post/original/cs/io/eof/win_recycle_bin_1.png" alt="image"></p>
+</li>
+<li>
+<p>以 $R 开头的那个是我们删除的文件本身，大小是 0 没错；而我们关注的是在回收站中和他成对儿出现的以 $I 开头的文件，本例中名为：$ICPJMHU.txt</p>
+</li>
+<li>
+<p>他的大小不是 0，看来里头有东西，我们来看一下</p>
+<div class="highlight"><pre class="chroma"><code class="language-powershell" data-lang="powershell"><span class="nb">type </span><span class="nv">$ICPJMHU</span><span class="p">.</span><span class="n">txt</span>
+<span class="err"></span><span class="n">Z</span><span class="err"></span><span class="n">u輏</span><span class="p">?</span><span class="s2">&#34;C:\Users\Looper\Desktop\empty.txt
+</span></code></pre></div><p>嗯，有能看懂的，有乱码的。我们需要从二进制视角来看他的内容</p>
+</li>
+<li>
+<p>打开 <a href="https://docs.microsoft.com/en-us/windows/wsl/">WSL</a>，我们已经知道 SID了，所以这次直接进目录<img src="/images/post/original/cs/io/eof/win_recycle_bin_3.png" alt="image"></p>
+</li>
+<li>
+<p>vi 二进制打开 $ICPJMHU.txt 后，唤起 xxd 查看十六进制显示<img src="/images/post/original/cs/io/eof/win_recycle_bin_4.png" alt="image">
+路径的部分，没什么可说的，除了每个字符占了俩字节(这是因为 Windows 默认存的是 UTF-16)</p>
+</li>
+<li>
+<p>我们逐个说明各个二进制段的作用</p>
+</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>段</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0~7的8个字节</td>
+<td>固定的值：0200 0000 0000 0000</td>
+</tr>
+<tr>
+<td><strong>8~15的8个字节</strong></td>
+<td><strong>被删除文件的大小</strong></td>
+</tr>
+<tr>
+<td>16~23的8个字节</td>
+<td>文件被删除的时间</td>
+</tr>
+<tr>
+<td>24~27的4个字节</td>
+<td>被删除文件的名字的字节数</td>
+</tr>
+<tr>
+<td>剩下的字节</td>
+<td>被删除文件的完整路径</td>
+</tr>
+</tbody>
+</table>
+<ol start="9">
+<li>好，吟唱完毕，施法~<br>
+我们把8~15的8个字节修改成：FFFF FFFF FFFF FF7F<br>
+保存退出，回到 Windows，从新查看被删除文件的属性<br>
+<img src="/images/post/original/cs/io/eof/win_recycle_bin_5.png" alt="image">
+$$
+7.99 EB = 7.99 * 1024 PB
+$$
+$$
+7.99 EB = 7.99 * 1024 * 1024 TB
+$$
+$$
+7.99 EB = 7.99 * 1024 * 1024 * 1024 GB = 8579197173.76 GB
+$$</li>
+</ol>
+<blockquote>
+<p>友情提示：24~27的4个字节存了一个长度，啊，你咋就和文件大小长得那么像~</p>
+</blockquote>
 <h3 id="再说终端">再说终端</h3>
 <p>上一节中，在已知文件长度的情况下，不需要 EOF 存在于文件中，就可以知道何时文件读取完毕。然而，对于处理在终端中输入的数据来说，怎么标识出输入的结束呢？</p>
 <blockquote>
