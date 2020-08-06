@@ -8,13 +8,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
   <title>EOF，到底怎么回事 - Looper 的博客</title>
-  <meta name="description" content="TL;DR 首先，确未想到，为说清楚这个玩意儿，居然要用不少的篇幅；其次，当涉及对一些概念、原理的追溯时，递归到多深的地步，也难以拿捏；好在，写这些文字主要是为了将来碰到某些反直觉的情况时可以有个快捷解答；最后若能得到碰巧逛到这里的同仁指点迷津，纠正错误，互通有无，就算赚到了 :-）
+  <meta name="description" content="TL;DR 首先，确未想到，为说清楚这个玩意儿，居然要用不少的篇幅；其次，当涉及对一些概念、原理的追溯时，递归到多深的地步，也不容易拿捏；好在，写这些文字主要是为了将来碰到某些反直觉的情况时可以有个快捷解答；最后若能得到碰巧逛到这里的同仁指点迷津，纠正错误，互通有无，就算赚到了 :-）
 希望读完此文，能够消除一些关于 EOF 的疑惑，再碰到关于她的一些争论时，大家能够相视一笑。
 愿此文，能解释
- 什么是 EOF？ 为什么需要 EOF？ 文件里包不包含 EOF？ 控制台输入时的 EOF 的表示方式和处理行为是怎么样的? 不同计算机语言的 EOF 如何定义的？ …… may your blade never dull   section-0 概念澄清  In computing, end-of-file (commonly abbreviated EOF) is a condition in a computer operating system where no more data can be read from a data source. The data source is usually called a file or stream.
+ 什么是 EOF？ 为什么需要 EOF？ 文件里包不包含 EOF？ 终端输入时的 EOF 的表示方式和处理行为是怎么样的? 不同计算机语言的 EOF 如何定义的？ …… may your blade never dull   section-0 概念澄清  In computing, end-of-file (commonly abbreviated EOF) is a condition in a computer operating system where no more data can be read from a data source. The data source is usually called a file or stream.
 ——Wikipedia
  难为下定义的人们，描述既不能太复杂，又要尽可能的说清一个事物的本质。
-好了，从上面的叙述中，我们萃取出关于 EOF：">
+好，从上面的叙述中，我们萃取出关于 EOF：">
   <meta name="author" content="Dylan Cheng"/><script type="application/ld+json">
 {
     "@context": "http://schema.org",
@@ -63,9 +63,9 @@
     "name" : "Dylan Cheng"
   },
   "headline": "EOF，到底怎么回事",
-  "description" : "TL;DR 首先，确未想到，为说清楚这个玩意儿，居然要用不少的篇幅；其次，当涉及对一些概念、原理的追溯时，递归到多深的地步，也难以拿捏；好在，写这些文字主要是为了将来碰到某些反直觉的情况时可以有个快捷解答；最后若能得到碰巧逛到这里的同仁指点迷津，纠正错误，互通有无，就算赚到了 :-）\n希望读完此文，能够消除一些关于 EOF 的疑惑，再碰到关于她的一些争论时，大家能够相视一笑。\n愿此文，能解释\n 什么是 EOF？ 为什么需要 EOF？ 文件里包不包含 EOF？ 控制台输入时的 EOF 的表示方式和处理行为是怎么样的? 不同计算机语言的 EOF 如何定义的？ …… may your blade never dull   section-0 概念澄清  In computing, end-of-file (commonly abbreviated EOF) is a condition in a computer operating system where no more data can be read from a data source. The data source is usually called a file or stream.\n——Wikipedia\n 难为下定义的人们，描述既不能太复杂，又要尽可能的说清一个事物的本质。\n好了，从上面的叙述中，我们萃取出关于 EOF：",
+  "description" : "TL;DR 首先，确未想到，为说清楚这个玩意儿，居然要用不少的篇幅；其次，当涉及对一些概念、原理的追溯时，递归到多深的地步，也不容易拿捏；好在，写这些文字主要是为了将来碰到某些反直觉的情况时可以有个快捷解答；最后若能得到碰巧逛到这里的同仁指点迷津，纠正错误，互通有无，就算赚到了 :-）\n希望读完此文，能够消除一些关于 EOF 的疑惑，再碰到关于她的一些争论时，大家能够相视一笑。\n愿此文，能解释\n 什么是 EOF？ 为什么需要 EOF？ 文件里包不包含 EOF？ 终端输入时的 EOF 的表示方式和处理行为是怎么样的? 不同计算机语言的 EOF 如何定义的？ …… may your blade never dull   section-0 概念澄清  In computing, end-of-file (commonly abbreviated EOF) is a condition in a computer operating system where no more data can be read from a data source. The data source is usually called a file or stream.\n——Wikipedia\n 难为下定义的人们，描述既不能太复杂，又要尽可能的说清一个事物的本质。\n好，从上面的叙述中，我们萃取出关于 EOF：",
   "inLanguage" : "zh-cn",
-  "wordCount":  2085 ,
+  "wordCount":  2093 ,
   "datePublished" : "2020-08-03T15:52:41",
   "dateModified" : "2020-08-03T15:52:41",
   "image" : "https:\/\/newlooper.github.io\/images\/site\/avatar-icon.png",
@@ -85,23 +85,23 @@
 </script>
 
 <meta property="og:title" content="EOF，到底怎么回事" />
-<meta property="og:description" content="TL;DR 首先，确未想到，为说清楚这个玩意儿，居然要用不少的篇幅；其次，当涉及对一些概念、原理的追溯时，递归到多深的地步，也难以拿捏；好在，写这些文字主要是为了将来碰到某些反直觉的情况时可以有个快捷解答；最后若能得到碰巧逛到这里的同仁指点迷津，纠正错误，互通有无，就算赚到了 :-）
+<meta property="og:description" content="TL;DR 首先，确未想到，为说清楚这个玩意儿，居然要用不少的篇幅；其次，当涉及对一些概念、原理的追溯时，递归到多深的地步，也不容易拿捏；好在，写这些文字主要是为了将来碰到某些反直觉的情况时可以有个快捷解答；最后若能得到碰巧逛到这里的同仁指点迷津，纠正错误，互通有无，就算赚到了 :-）
 希望读完此文，能够消除一些关于 EOF 的疑惑，再碰到关于她的一些争论时，大家能够相视一笑。
 愿此文，能解释
- 什么是 EOF？ 为什么需要 EOF？ 文件里包不包含 EOF？ 控制台输入时的 EOF 的表示方式和处理行为是怎么样的? 不同计算机语言的 EOF 如何定义的？ …… may your blade never dull   section-0 概念澄清  In computing, end-of-file (commonly abbreviated EOF) is a condition in a computer operating system where no more data can be read from a data source. The data source is usually called a file or stream.
+ 什么是 EOF？ 为什么需要 EOF？ 文件里包不包含 EOF？ 终端输入时的 EOF 的表示方式和处理行为是怎么样的? 不同计算机语言的 EOF 如何定义的？ …… may your blade never dull   section-0 概念澄清  In computing, end-of-file (commonly abbreviated EOF) is a condition in a computer operating system where no more data can be read from a data source. The data source is usually called a file or stream.
 ——Wikipedia
  难为下定义的人们，描述既不能太复杂，又要尽可能的说清一个事物的本质。
-好了，从上面的叙述中，我们萃取出关于 EOF：">
+好，从上面的叙述中，我们萃取出关于 EOF：">
 <meta property="og:image" content="https://newlooper.github.io/images/site/avatar-icon.png" />
 <meta property="og:url" content="https://newlooper.github.io/post/original/cs/io/eof/" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Looper 的博客" />
 
   <meta name="twitter:title" content="EOF，到底怎么回事" />
-  <meta name="twitter:description" content="TL;DR 首先，确未想到，为说清楚这个玩意儿，居然要用不少的篇幅；其次，当涉及对一些概念、原理的追溯时，递归到多深的地步，也难以拿捏；好在，写这些文字主要是为了将来碰到某些反直觉的情况时可以有个快捷解答；最后若能得到碰巧逛到这里的同仁指点迷津，纠正错误，互通有无，就算赚到了 :-）
+  <meta name="twitter:description" content="TL;DR 首先，确未想到，为说清楚这个玩意儿，居然要用不少的篇幅；其次，当涉及对一些概念、原理的追溯时，递归到多深的地步，也不容易拿捏；好在，写这些文字主要是为了将来碰到某些反直觉的情况时可以有个快捷解答；最后若能得到碰巧逛到这里的同仁指点迷津，纠正错误，互通有无，就算赚到了 :-）
 希望读完此文，能够消除一些关于 EOF 的疑惑，再碰到关于她的一些争论时，大家能够相视一笑。
 愿此文，能解释
- 什 …">
+  …">
   <meta name="twitter:image" content="https://newlooper.github.io/images/site/avatar-icon.png" />
   <meta name="twitter:card" content="summary" />
   <link href='https://newlooper.github.io/img/favicon.ico' rel='icon' type='image/x-icon'/>
@@ -238,7 +238,7 @@
   
   
   
-    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;2085&nbsp;个字
+    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;2093&nbsp;个字
   
   
     
@@ -264,14 +264,14 @@
     <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
       <article role="main" class="blog-post">
         <h2 id="tldr">TL;DR</h2>
-<p><em>首先，确未想到，为说清楚这个玩意儿，居然要用不少的篇幅；其次，当涉及对一些概念、原理的追溯时，递归到多深的地步，也难以拿捏；好在，写这些文字主要是为了将来碰到某些反直觉的情况时可以有个快捷解答；最后若能得到碰巧逛到这里的同仁指点迷津，纠正错误，互通有无，就算赚到了 :-）</em></p>
+<p><em>首先，确未想到，为说清楚这个玩意儿，居然要用不少的篇幅；其次，当涉及对一些概念、原理的追溯时，递归到多深的地步，也不容易拿捏；好在，写这些文字主要是为了将来碰到某些反直觉的情况时可以有个快捷解答；最后若能得到碰巧逛到这里的同仁指点迷津，纠正错误，互通有无，就算赚到了 :-）</em></p>
 <p><em>希望读完此文，能够消除一些关于 EOF 的疑惑，再碰到关于她的一些争论时，大家能够相视一笑。</em></p>
 <p>愿此文，能解释</p>
 <ul>
 <li>什么是 EOF？</li>
 <li>为什么需要 EOF？</li>
 <li>文件里包不包含 EOF？</li>
-<li>控制台输入时的 EOF 的表示方式和处理行为是怎么样的?</li>
+<li>终端输入时的 EOF 的表示方式和处理行为是怎么样的?</li>
 <li>不同计算机语言的 EOF 如何定义的？</li>
 <li>……</li>
 <li><em>may your blade never dull</em></li>
@@ -284,7 +284,7 @@
 <p>——Wikipedia</p>
 </blockquote>
 <p><em>难为下定义的人们，描述既不能太复杂，又要尽可能的说清一个事物的本质。</em></p>
-<p>好了，从上面的叙述中，我们萃取出关于 EOF：</p>
+<p>好，从上面的叙述中，我们萃取出关于 EOF：</p>
 <ul>
 <li>范畴：<code>计算机操作系统中</code>，其他领域看来用不着这玩意儿</li>
 <li>含义：一种<code>状况</code>，什么状况？表明从数据源(通常指文件或流)中已无数据可读</li>
@@ -297,9 +297,9 @@
 </blockquote>
 <p>展开：</p>
 <ul>
-<li>定义既然说了，EOF 表明了&quot;已无数据可读&quot;的状况，那么识别这种状况的依据是什么？</li>
-<li>计算机语言上千种，唯独选了 C 来描述 EOF 的实现(我没有发明过一门计算机语言，即便发明过，也没资格对任何一门品头论足)，可见虽然不同语言对于 EOF 的实现可能不同，但无疑 C 的很有代表性</li>
-<li>只要能起到识别结束的作用就成，并没有一个标准说 EOF 该怎么实现，但<strong>通常</strong>是用一个能够<strong>区别</strong>于<strong>全部有效字符码</strong>的<strong>值</strong>，比如 glibc 里用 <strong>-1</strong>。啊，越来越具体，越来越靠近 CPU 里那些用于判断的指令和寄存器</li>
+<li>定义既然说：EOF 表明了&quot;已无数据可读&quot;的状况，那么识别这种状况的依据是什么？</li>
+<li>计算机语言上千种，唯独选了 C 来描述 EOF 的实现，隐约感到虽然不同语言对于 EOF 的实现可能不同，但 C 的很有代表性</li>
+<li>只要能起到识别<strong>结尾在哪</strong>的作用就成，并没有一个标准说 EOF 该怎么实现，但<strong>通常</strong>是用一个能够<strong>区别</strong>于<strong>全部有效字符码</strong>的<strong>值</strong>，比如 glibc 里用 <strong>-1</strong>。啊，越来越具体，越来越靠近 CPU 里那些用于判断的指令和寄存器</li>
 <li>短暂的概念陈述后，定义者放下了遮面的琵琶，挥舞着藏在身上的各种刀凿斧锯迎面扑来——阻塞 IO 中的读函数，返回读取到的字节数，如果实际数据长度小于指定的长度，重点1：就会产生一个 EOF（谁产生的后面说）；重点2：出错了呢？也是返个 EOF 给你。啊？那我的程序怎么办，到底是读完了还是出错了？别慌——瞧 errno 或问 ferror 去</li>
 </ul>
 <p>至此，我们暂且可以总结出：</p>
@@ -323,7 +323,7 @@
 <blockquote>
 <p>注意：不要将 Linux 中的<code>一切皆文件</code>的<code>文件</code>二字，与我们现在所说的<code>文件</code>混淆，这里说的文件，就是通常在外部存储器（如：磁盘）中保存的那些普通文件，特别是文本文件。</p>
 </blockquote>
-<p>静态的相对单纯些，我们就从其开始</p>
+<p>静态的相对单纯些，我们就从其开始——</p>
 <blockquote>
 <p>Some MS-DOS programs, including parts of the Microsoft MS-DOS shell (COMMAND.COM) and operating-system utility programs (such as EDLIN), treat a <strong>Control-Z in a text file</strong> as marking the end of meaningful data, and/or append a Control-Z to the end when writing a text file. This was done for two reasons:</p>
 <ul>
@@ -338,13 +338,13 @@
 <p>简明结论：文件中不包含 EOF。或者说，文件不通过在自身内容的最后放一个特殊的额外的字符来标记自己的结尾！</p>
 </blockquote>
 <p>说的这么绝对，那上面的(Control-Z 码值 26)被写在了某些文件的尾部该作何解？</p>
-<p>可以这么说：这个在某些文件中的(Control-Z 码值 26)字符，只有在那些把他<code>当作文件结尾标识</code>来对待的程序中，才表现得具备了 EOF 的特征；换句话说，对于那些不把(Control-Z 码值 26)当做文件结尾标识的程序来说，这就是个普通的 ascii 字符，只不过他不可打印而已。</p>
+<p>可以这么说：这个在某些文件中的(Control-Z 码值 26)字符，只有在那些把他<code>当作文件结尾标识</code>来对待的程序中，才表现得具备了 EOF 的特征；换句话说，对于那些不把(Control-Z 码值 26)当做文件结尾标识的程序来说，这就是个普通的 ascii 字符，只不过他<a href="https://web.itu.edu.tr/sgunduz/courses/mikroisl/ascii.html">不可打印</a>而已。</p>
 <p>$$
 那文件的结尾到底在哪？
 $$</p>
 <blockquote>
 <p>先回答这样一个问题：假设文件中有一个或多个字节的数据用来标明其结尾，那么对于二进制文件，如何区分内容和结尾呢？<br>
-嗯，不太灵。看来，单靠文件内容本身，做不到这一点。</p>
+嗯，不太灵光呢。看来，单靠文件内容本身，做不到这一点。</p>
 </blockquote>
 <p>$$
 『文件的结尾在哪』这个问题该转换为：怎么判断文件读完了？
@@ -380,7 +380,7 @@ $$</p>
 <p>打开 <a href="https://docs.microsoft.com/en-us/windows/wsl/">WSL</a>，我们已经知道 SID了，所以这次直接进目录<img src="/images/post/original/cs/io/eof/win_recycle_bin_3.png" alt="image"></p>
 </li>
 <li>
-<p>vi 二进制打开 $ICPJMHU.txt 后，唤起 xxd 查看十六进制显示<img src="/images/post/original/cs/io/eof/win_recycle_bin_4.png" alt="image">
+<p>vi -b $ICPJMHU.txt 二进制打开，调 xxd 查看十六进制显示<img src="/images/post/original/cs/io/eof/win_recycle_bin_4.png" alt="image">
 路径的部分，没什么可说的，除了每个字符占了俩字节(这是因为 Windows 默认存的是 UTF-16)</p>
 </li>
 <li>
@@ -409,7 +409,7 @@ $$</p>
 </tr>
 <tr>
 <td>24~27的4个字节</td>
-<td>被删除文件的名字的字节数</td>
+<td>被删除文件的名字的字符个数</td>
 </tr>
 <tr>
 <td>剩下的字节</td>
@@ -419,7 +419,7 @@ $$</p>
 </table>
 <ol start="9">
 <li>好，吟唱完毕，施法~<br>
-我们把8~15的8个字节修改成：FFFF FFFF FFFF FF7F<br>
+我们把<code>8~15</code>的<code>8</code>个字节修改成：<code>FFFF FFFF FFFF FF7F</code><br>
 保存退出，回到 Windows，从新查看被删除文件的属性<br>
 <img src="/images/post/original/cs/io/eof/win_recycle_bin_5.png" alt="image">
 $$
@@ -456,7 +456,7 @@ $$</li>
 <p>在 UNIX 中，组合键击(Control-D 码值 04)转换为 EOF 是由终端驱动完成的，因此应用程序<strong>不需要</strong>将终端和普通文件<strong>区别对待</strong>。</p>
 <ul>
 <li><strong>提问</strong>：既然我们的键盘输入(Control-D 码值 04)被终端截胡转成 EOF 了，文件中又不存 EOF，那我要想在文件中切实的存一个(Control-D 码值 04)怎么办呢？</li>
-<li><strong>回答</strong>：转义，先按(Control-V)紧接着按(Control-D)。注意，这不是把 EOF 输入进去了，是把没被转成 EOF 的原本码值输入进去了。</li>
+<li><strong>回答</strong>：转义，先按(Control-V)紧接着按(Control-D)。注意，这不是把 EOF 输入进去了，是把没被转成 EOF 的(Control-D)的原本码值输入进去了。</li>
 </ul>
 </li>
 <li>
@@ -476,7 +476,7 @@ $$</li>
 <li>EOF 不是 A value that exists at the end of a file</li>
 <li>EOF 不是 A value that could exist in the middle of a file</li>
 </ul>
-<p>还好还好，和我们前面说的不冲突。该文作者的目的，是希望学习该语言的程序员不要掉进该语言的 EOF 的一些陷阱，留意作者所说的关于与 EOF 比较时变量类型的坑。其与我们当前关注的宽泛的 EOF 并不直接关联，因此在这里仅做了链接，不打算展开。</p>
+<p>还好还好，和我们前面说的不冲突。该文作者的目的，是希望学习该语言的程序员不要掉进该语言的 EOF 的一些陷阱，留意作者所说的关于与 EOF 比较时变量类型的坑。其与我们当前关注的问题并不直接关联，因此在这里仅做了链接，不打算展开。</p>
 <p>回到我们的探索。</p>
 <p>C 语言中对 EOF 的定义简单明了：</p>
 <blockquote>
@@ -491,7 +491,7 @@ $$</li>
 <p>Macro: int EOF<br>
 This macro is an integer value that is returned by a number of narrow stream functions to indicate an end-of-file condition, or some other error situation. With the GNU C Library, EOF is -1. In other libraries, <strong>its value may be some other negative number.</strong></p>
 </blockquote>
-<p>也就是说，程序要做判断时 EOF 不可与 -1 互换。欸，NULL 和 ‘\0’ 何尝不是如此。像这类规范中不限定具体实现的例子，在 CS(Computer Science) 世界里比比皆是，比如 Go 的包导入；比如 C++ 自增自减运算符的副作用；比如……停，当前这点儿事还没扯完呢。</p>
+<p>也就是说，程序要做判断时 EOF 不可与 -1 互换。欸，NULL 和 ‘\0’ 何尝不是如此。像这类规范中不限定具体实现的例子，在 CS(Computer Science) 世界里比比皆是，比如 Go 的包导入；比如 C++ 自增自减运算符的副作用；比如……停，眼前这点儿事还没扯完呢。</p>
 <p>记得之前我们说在某些条件下，会产生 EOF，但那时没说是谁产生的。</p>
 <p>下面就去代码中寻觅答案，这也能捎带着回答 section-0 末尾提出的问题。</p>
 <p>我们选 glibc-2.31 (clone 能不能快点)里的 getc 为例子：</p>
@@ -588,7 +588,7 @@ This macro is an integer value that is returned by a number of narrow stream fun
 <p>How do the high-level I/O routines in the examples above determine the end-of-file condition? On Linux systems the routines either directly or indirectly use the read() system call provided by the kernel. The getc() function (or macro) in C, for example, uses the read() system call and returns EOF if read() indicated the end-of-file condition. The read() system call returns 0 to indicate the EOF condition.</p>
 </blockquote>
 <p><img src="/images/post/original/cs/io/eof/getc_read.png" alt="image"></p>
-<p>这里就告诉了我们结论，EOF 并非由内核直接产生，库函数是通过判断系统调用的返回值，进而决定是否要返回 EOF 给调用者的。（老外随手画的图，看起来比我用 visio 做的一点不差。。。）</p>
+<p>这里就告诉了我们结论，EOF 并非由内核直接产生，库函数是通过判断系统调用的返回值，进而决定是否要返回 EOF 给调用者的。（老外随手画的图，看起来比我费半天劲用 visio 做的一点不差。。。）</p>
 <p>另外多说一句：其实到<code>int __uflow (FILE *fp)</code>这里还没完，还有很多宏、函数，可以细追下去，比如在最终的系统调用<code>sys_read</code>之前，能追到<code>int _IO_new_file_underflow (FILE *fp)</code>，但可能需要运行时调试。因其与产生 EOF 的关系不是直接的，为省略篇幅就不全粘过来了。</p>
 <hr>
 <h2 id="section-3">section-3</h2>
@@ -659,7 +659,7 @@ aBc
 ^Z
 </code></pre></div><p>关于 CR 和 LF 的话题，网络上的文章比关于 EOF 的多，可以搜索来看。在 Linux 和 MacOS 下，同样的程序，同样的输入，输出会与 Windows 不同。例如在 MacOS 下 ENTER 只对应一个单独的 \n，没有 \r。</p>
 <p>我们目前的关注点不在于不同系统对于 CR 和 LF 的不同策略，那是一个可以追溯到没有计算机时代的故事。现在想看的是不同平台下，对待表示输入结束的文件结尾标识的异同。</p>
-<p>首先，前文中说过，Windows 中从终端读取输入，不会产生 EOF；其次，为了表示文件结尾，他选用了 CTRL-Z ASCII 26，作为输入结束的标记，所以我们才能够看到对于 CTRL-D，Windows 将其视作普通字符，程序读取该字符并将其 ASCII 码值打印到屏幕上。而当我们输入了 CTRL-Z 并 ENTER 后，程序退出（实际上是退出的循环，但因为退出循环后没别的代码了，程序自然退出），并没有打印 CTRL-Z 的 ASCII 码值。那么，能不能让本程序在 Windows 下打出这个 CTRL-Z 的码值，并且不退出程序呢？可以的，这样操作：</p>
+<p>首先，前文中说过，Windows 中从终端读取输入，不会产生 EOF；其次，为了表示文件结尾，他选用了 CTRL-Z ASCII 26，作为输入结束的标记，所以我们才能够看到对于 CTRL-D，Windows 将其视作普通字符，程序读取该字符并将其 ASCII 码值打印到屏幕上。而当我们输入了 CTRL-Z 并 ENTER 后，程序退出（实际上是退出的循环，但因为退出循环后没别的代码了，程序自然退出），并没有打印 CTRL-Z 的 ASCII 码值。那么，能不能让该程序在 Windows 下打出这个 CTRL-Z 的码值，并且不退出程序呢？可以的，这样操作：</p>
 <blockquote>
 <p>启动程序，输入一些除了 CTRL-Z 以外的其他输入，然后 CTRL-Z，最后回车。<br>
 比如：anything but &ldquo;CTRL-Z&rdquo;，然后 CTRL-Z，最后 ENTER</p>
@@ -692,9 +692,9 @@ aBc
 		char-24 <span class="m">10</span> <span class="c1"># ASCII of LF \n</span>
 </code></pre></div><p>程序打印了 CTRL-Z 26，并且没有退出，继续等待我们的下一轮输入。为什么没退出，后面详解。</p>
 <p><em>在其他平台下运行同样程序的操作留给有好奇心的你我他。</em></p>
-<p>让我们的 Windows 先等着，说说其他系统。</p>
+<p>让我们的 Windows 先那儿等着，说说其他系统。</p>
 <p>比如 Linux 下，输入 CTRL-Z，程序会被切入后台执行，需用 fg 命令唤回，这个和我们的 EOF 无关，略过。那么输入 CTRL-D 呢，不必输入 ENTER 了，程序会立刻对 EOF 做出响应。</p>
-<p>系统和语言都换一换。</p>
+<p>系统和语言都换一换——</p>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// 你好，号称 C+Python 的 Golang
 </span><span class="c1"></span><span class="kn">package</span> <span class="nx">main</span>
 
@@ -801,34 +801,25 @@ $ ld -m elf_i386 helloworld-input.o -o helloworld-input
 $ ./helloworld-input
 Please enter your name: Dylan
 Hello, Dylan
-</code></pre></div><p>嗯？EOF 呢？</p>
-<p>如果，你的阻塞读，只需要处理一次输入，那么 ENTER 就够用了，用不着 EOF。ENTER 的作用只是：</p>
+</code></pre></div><p>ENTER 后程序结束。嗯？EOF 呢？</p>
+<p>如果，你的阻塞读，只需要处理一次(在 <a href="https://pubs.opengroup.org/onlinepubs/007908775/xbd/termios.html#tag_008_001_006">Canonical mode input processing</a> 里就是一行)输入，那么 ENTER 就够用了，用不着 EOF。ENTER 的作用只是：</p>
 <ul>
 <li>这一行输入已完成，读函数别阻塞了，排空缓冲区，立刻返回。还想再读？从新发 sys_read！（嘿，老铁，你的煎饼熟了，拿走吧，钱货两清。要加个蛋？那您从新下单）</li>
 </ul>
-<p>但是，如果你需要不停的处理用户输入，则要将阻塞读扔进循环（通常是满足某种条件就 break 的死循环），而这时，ENTER 还是那个 ENTER，该起什么作用还起什么作用，但他不能用来退出这个循环，那咱们选个谁来退出这个循环？</p>
-<p>啊～ EOF，掀起你的盖头来（什么？杀进程。噫，夫子乱人之性也）</p>
+<p>但是，如果你需要不停的处理用户输入，则要将阻塞读扔进循环，通常是满足某种条件就 break 的死循环（一如：Server 端的 ACCEPT），而这时，ENTER 还是那个 ENTER，该起什么作用还起什么作用，但他不能用来退出这个循环，那咱们选个谁来退出这个循环？</p>
+<p>啊～ EOF，掀起你的盖头来（你说啥？杀进程、重启机器、拔插销。噫，夫子乱人之性也）</p>
 <p>哦噫，那人，你一开始说 C 的实现很具有代表性，结果你仨例子没一个 C 的？（忘了我 多难过 多不能接受；忘了我 只要你好过 就足够；忘了我 忘了我们的梦；当你想起我 我已不是我……）</p>
 <p>.</p>
 <p>.</p>
 <p>.</p>
 <p>至此，我们大概可以解释——</p>
 <ul>
-<li>
-<p>EOF 做什么用的？没有行不行？</p>
-</li>
-<li>
-<p>取名字可是个学问，老外管这个“用来解决前面那一堆文字阐述的事儿”的玩意儿叫：End-of-File。你觉得是否传神呢。</p>
-</li>
-<li>
-<p>计算机唯快不破的，怎么分清个头尾居然这么麻烦</p>
-</li>
-<li>
-<p>为什么阻塞读的循环中，在已经输入了一些内容到终端的情况下，要按两次 CTRL-D，才能退出循环</p>
-</li>
-<li>
-<p>ENTER 不能替代 EOF，但 EOF 有时却起到了 ENTER 的效用</p>
-</li>
+<li>EOF 做什么用的？没有行不行？</li>
+<li>EOF 是归语言的，还是归系统的？</li>
+<li>取名字可是个学问，老外管这个“用来解决前面那一堆文字阐述的事儿”的玩意儿叫：End-of-File。你觉得是否传神呢。</li>
+<li>计算机唯快不破的，怎么分清个头尾居然这么麻烦</li>
+<li>为什么阻塞读的循环中，在已经输入了一些内容到终端的情况下，要按两次 CTRL-D，才能退出循环</li>
+<li>ENTER 不能替代 EOF，但 EOF 有时却起到了 ENTER 的效用</li>
 </ul>
 <hr>
 <p><em>场外乱入一下，之后的内容大都与本文无关可略：写到这里的时候，不知怎么的，忽然忆起了一个关于32位操作系统和4G物理内存的故事，有兴趣可以递归浏览一把，这哥们写的挺好，让我不必再为这个话题在脑子里反转剧情了：<a href="https://www.zhihu.com/question/22594254">为何微软不在新的操作系统中让 32 位支持大于 4GB 的内存？</a></em></p>

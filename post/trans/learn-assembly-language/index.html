@@ -76,7 +76,7 @@ TL;DR   动机：程序员——多掌握几门计算机语言，还是有好处
   "headline": "Learn Assembly Language 汇编语言学习(拙译)",
   "description" : "Index-0 原址：https:\/\/asmtutor.com\/\n环境：nasm on x64 linux\nTL;DR   动机：程序员——多掌握几门计算机语言，还是有好处的\n  主题：汇编语言——有其不可替代的作用\n  呈示：天下语言逾千——汇编笑看沉舟侧畔\n  展开：欲知程序真相——反编译难，反汇编易\n  再现：大道器也不器——初见时如茶味甘苦，洞悉后若灌顶醍醐；原以为听多说多皆已昨，忽回首似曾相识又如陌；罢，风流不在谈峰健，相对无言味更长……\n    文章作者自己说 This project was put together to teach myself NASM assembly language on linux.\n欸~，原来是很窄众的哦。呵呵。\n写的虽然通俗，但依然能感到其面向的并不是毫无编程基础的人群，所谓“某子不能隐真恶”，无论怎样努力的将大量概念、原理、知识安排到看似聊天般的文字中，这里都要提醒读者注意，提防因为好奇心而陷入递归学习的泥潭……\n  Lesson 1 Hello, world! 背景知识 汇编语言是一种低级语言，汇编程序员与底层硬件之间唯一的接口只有内核本身。用汇编语言编程，涉及到 Linux 内核提供的系统调用机制。这些系统调用是操作系统内置的库函数，提供诸如读取键盘输入以及将输出显示到屏幕之类的功能。\n当用户程序发起系统调用时，内核将立即挂起该程序，进而通过驱动程序让相关硬件完成用户程序所发起的任务请求，最后，将控制权交还给用户程序。\n 注意：驱动程序的驱动二字，形象的描述了内核对硬件的控制\n 在汇编语言中发起系统调用，需要向EAX寄存器写入相应调用的函数编号(也即：操作码OPCODE)，同时设置其他几个寄存器的值作为实际参数，一切准备停当后，指令INT发送一个软中断，内核收到中断请求后接受参数并执行相应的库函数。简单直接。\n来写我们的第壹个汇编程序吧——美玉有瑕 还是从著名的例子——$$Hello, world! $$ 开始，我们的汇编程序将把这个让无数程序员产生我已经学会这种语言了的错觉的字符串打印到标准输出上。\n首先，在数据段定义一个msg变量，并赋给其一个字符串类型的值作为我们程序的输出。而在代码段中，通过编写全局标签_start:，告诉内核我们(写的诗)程序开始的地方(没有远方)\n实际参数通过以下寄存器传给内核：\n EDX存储字符串的长度(字节数) ECX存储字符串的首地址(定义在数据段中的msg变量加载到内存后所在的位置) EBX存储字符串写操作的目标文件——本例中是STDOUT  数据类型和实际参数的含义可以在函数定义中查到。",
   "inLanguage" : "zh-cn",
-  "wordCount":  4424 ,
+  "wordCount":  4755 ,
   "datePublished" : "2020-08-01T16:29:01",
   "dateModified" : "2020-08-01T16:29:01",
   "image" : "https:\/\/newlooper.github.io\/images\/site\/avatar-icon.png",
@@ -263,7 +263,7 @@ TL;DR   动机：程序员——多掌握几门计算机语言，还是有好处
   
   
   
-    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;4424&nbsp;个字
+    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;4755&nbsp;个字
   
   
     
@@ -1332,7 +1332,68 @@ $ ./calculator-atoi <span class="m">20</span> <span class="m">1000</span> <span 
 <span class="m">1337</span>
 </code></pre></div><hr>
 <h2 id="lesson-17-命名空间">Lesson 17 命名空间</h2>
-<hr>
+<p>对于任何包含大量代码库的软件项目，命名空间都是不可或缺的构造。命名空间为标识符引入作用域的概念，使得重用命名约定成为可能，同时增强了代码的可读性和可维护性。在汇编语言中，全局标签标识子例程，而局部标签用来实现命名空间。</p>
+<p>之前的教程中，我们都只使用了全局标签。这意味着即便是实现相同逻辑的代码块，也必须有全局唯一的标签名，前面的<code>finished</code>标签就是一例。同属一个全局作用域，意味着当在一个函数中需要跳出循环时，直接<code>JMP</code>到该函数中的<code>finished</code>标签就行。然而，如果我们需要从另一个函数中跳出循环，和<code>finished</code>代码块功能相同的代码我们得改名。我们希望能重用<code>finished</code>这个名字，因为他能向代码的阅读者暗示出某种已知的逻辑。</p>
+<p>局部标签以<code>.</code>开头，比如：<code>.finished</code>。随着我们的 functions.asm 不断扩展，你可能已经注意到他的出现了。一个局部标签的命名空间，由离他最近的前面的一个全局标签限定。你可以使用<code>JMP</code>跳转到局部标签，编译器将通过当前调用的作用域(基于其之上的全局标签)计算出应该引用哪一个局部标签。</p>
+<h3 id="第拾柒个汇编程序各安生业">第拾柒个汇编程序——各安生业</h3>
+<p>functions.asm 略</p>
+<div class="highlight"><pre class="chroma"><code class="language-asm" data-lang="asm"><span class="c">; Namespace
+</span><span class="c">; Compile with: nasm -f elf namespace.asm
+</span><span class="c">; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 namespace.o -o namespace
+</span><span class="c">; Run with: ./namespace
+</span><span class="c"></span> 
+<span class="err">%</span><span class="nf">include</span>        <span class="err">&#39;</span><span class="no">functions.asm</span><span class="err">&#39;</span>
+ 
+<span class="nf">SECTION</span> <span class="no">.data</span>
+<span class="nf">msg1</span>        <span class="no">db</span>      <span class="err">&#39;</span><span class="no">Jumping</span> <span class="no">to</span> <span class="no">finished</span> <span class="no">label.</span><span class="err">&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="no">h</span>        <span class="c">; a message string
+</span><span class="c"></span><span class="no">msg2</span>        <span class="no">db</span>      <span class="err">&#39;</span><span class="no">Inside</span> <span class="no">subroutine</span> <span class="no">number</span><span class="p">:</span> <span class="err">&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="no">h</span>        <span class="c">; a message string
+</span><span class="c"></span><span class="no">msg3</span>        <span class="no">db</span>      <span class="err">&#39;</span><span class="no">Inside</span> <span class="no">subroutine</span> <span class="err">&#34;</span><span class="no">finished</span><span class="err">&#34;</span><span class="p">.</span><span class="err">&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="no">h</span>     <span class="c">; a message string
+</span><span class="c"></span> 
+<span class="no">SECTION</span> <span class="no">.text</span>
+<span class="nf">global</span>  <span class="no">_start</span>
+ 
+<span class="nl">_start:</span>
+ 
+<span class="nl">subrountineOne:</span>
+    <span class="nf">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="no">msg1</span>       <span class="c">; move the address of msg1 into eax
+</span><span class="c"></span>    <span class="no">call</span>    <span class="no">sprintLF</span>        <span class="c">; call our string printing with linefeed function
+</span><span class="c"></span>    <span class="no">jmp</span>     <span class="no">.finished</span>       <span class="c">; jump to the local label under the subrountineOne scope
+</span><span class="c"></span> 
+<span class="no">.finished</span><span class="p">:</span>
+    <span class="nf">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="no">msg2</span>       <span class="c">; move the address of msg2 into eax
+</span><span class="c"></span>    <span class="no">call</span>    <span class="no">sprint</span>          <span class="c">; call our string printing function
+</span><span class="c"></span>    <span class="no">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="mi">1</span>          <span class="c">; move the value one into eax (for subroutine number one)
+</span><span class="c"></span>    <span class="no">call</span>    <span class="no">iprintLF</span>        <span class="c">; call our integer printing function with linefeed function
+</span><span class="c"></span> 
+<span class="no">subrountineTwo</span><span class="p">:</span>
+    <span class="nf">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="no">msg1</span>       <span class="c">; move the address of msg1 into eax
+</span><span class="c"></span>    <span class="no">call</span>    <span class="no">sprintLF</span>        <span class="c">; call our string print with linefeed function
+</span><span class="c"></span>    <span class="no">jmp</span>     <span class="no">.finished</span>       <span class="c">; jump to the local label under the subrountineTwo scope
+</span><span class="c"></span> 
+<span class="no">.finished</span><span class="p">:</span>
+    <span class="nf">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="no">msg2</span>       <span class="c">; move the address of msg2 into eax
+</span><span class="c"></span>    <span class="no">call</span>    <span class="no">sprint</span>          <span class="c">; call our string printing function
+</span><span class="c"></span>    <span class="no">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="mi">2</span>          <span class="c">; move the value two into eax (for subroutine number two)
+</span><span class="c"></span>    <span class="no">call</span>    <span class="no">iprintLF</span>        <span class="c">; call our integer printing function with linefeed function
+</span><span class="c"></span> 
+    <span class="no">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="no">msg1</span>       <span class="c">; move the address of msg1 into eax
+</span><span class="c"></span>    <span class="no">call</span>    <span class="no">sprintLF</span>        <span class="c">; call our string printing with linefeed function
+</span><span class="c"></span>    <span class="no">jmp</span>     <span class="no">finished</span>        <span class="c">; jump to the global label finished
+</span><span class="c"></span> 
+<span class="no">finished</span><span class="p">:</span>
+    <span class="nf">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="no">msg3</span>       <span class="c">; move the address of msg3 into eax
+</span><span class="c"></span>    <span class="no">call</span>    <span class="no">sprintLF</span>        <span class="c">; call our string printing with linefeed function
+</span><span class="c"></span>    <span class="no">call</span>    <span class="no">quit</span>            <span class="c">; call our quit function
+</span></code></pre></div><div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ nasm -f elf namespace.asm
+$ ld -m elf_i386 namespace.o -o namespace
+$ ./namespace
+Jumping to finished label.
+Inside subroutine number: <span class="m">1</span>
+Jumping to finished label.
+Inside subroutine number: <span class="m">2</span>
+Jumping to finished label.
+Inside subroutine <span class="s2">&#34;finished&#34;</span>.
+</code></pre></div><hr>
 <h2 id="lesson-18-fizzbuzz-游戏">Lesson 18 FizzBuzz 游戏</h2>
 <hr>
 <h2 id="lesson-19-执行命令">Lesson 19 执行命令</h2>
