@@ -8,24 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
   <title>Learn Assembly Language 汇编语言学习(拙译) - Looper 的博客</title>
-  <meta name="description" content="Index-0 原址：https://asmtutor.com/
-环境：nasm on x64 linux
-TL;DR   动机：程序员——多掌握几门计算机语言，还是有好处的
-  主题：汇编语言——有其不可替代的作用
-  呈示：天下语言逾千——汇编笑看沉舟侧畔
-  展开：欲知程序真相——反编译难，反汇编易
-  再现：大道器也不器——初见时如茶味甘苦，洞悉后若灌顶醍醐；原以为听多说多皆已昨，忽回首似曾相识又如陌；罢，风流不在谈峰健，相对无言味更长……
-    文章作者自己说 This project was put together to teach myself NASM assembly language on linux.
-欸~，原来是很窄众的哦。呵呵。
-写的虽然通俗，但依然能感到其面向的并不是毫无编程基础的人群，所谓“某子不能隐真恶”，无论怎样努力的将大量概念、原理、知识安排到看似聊天般的文字中，这里都要提醒读者注意，提防因为好奇心而陷入递归学习的泥潭……
-  Lesson 1 Hello, world! 背景知识 汇编语言是一种低级语言，汇编程序员与底层硬件之间唯一的接口只有内核本身。用汇编语言编程，涉及到 Linux 内核提供的系统调用机制。这些系统调用是操作系统内置的库函数，提供诸如读取键盘输入以及将输出显示到屏幕之类的功能。
-当用户程序发起系统调用时，内核将立即挂起该程序，进而通过驱动程序让相关硬件完成用户程序所发起的任务请求，最后，将控制权交还给用户程序。
- 注意：驱动程序的驱动二字，形象的描述了内核对硬件的控制
- 在汇编语言中发起系统调用，需要向EAX寄存器写入相应调用的函数编号(也即：操作码OPCODE)，同时设置其他几个寄存器的值作为实际参数，一切准备停当后，指令INT发送一个软中断，内核收到中断请求后接受参数并执行相应的库函数。简单直接。
-来写我们的第壹个汇编程序吧——美玉有瑕 还是从著名的例子——$$Hello, world! $$ 开始，我们的汇编程序将把这个让无数程序员产生我已经学会这种语言了的错觉的字符串打印到标准输出上。
-首先，在数据段定义一个msg变量，并赋给其一个字符串类型的值作为我们程序的输出。而在代码段中，通过编写全局标签_start:，告诉内核我们(写的诗)程序开始的地方(没有远方)
-实际参数通过以下寄存器传给内核：
- EDX存储字符串的长度(字节数) ECX存储字符串的首地址(定义在数据段中的msg变量加载到内存后所在的位置) EBX存储字符串写操作的目标文件——本例中是STDOUT  数据类型和实际参数的含义可以在函数定义中查到。">
+  <meta name="description" content="Index-0 原址：https://asmtutor.com/ 环境：nasm on x64 linux TL;DR 动机：程序员——多掌握几门计算机语言，还是有好处的 主题：汇编语言——">
   <meta name="author" content="Dylan Cheng"/><script type="application/ld+json">
 {
     "@context": "http://schema.org",
@@ -74,9 +57,9 @@ TL;DR   动机：程序员——多掌握几门计算机语言，还是有好处
     "name" : "Dylan Cheng"
   },
   "headline": "Learn Assembly Language 汇编语言学习(拙译)",
-  "description" : "Index-0 原址：https:\/\/asmtutor.com\/\n环境：nasm on x64 linux\nTL;DR   动机：程序员——多掌握几门计算机语言，还是有好处的\n  主题：汇编语言——有其不可替代的作用\n  呈示：天下语言逾千——汇编笑看沉舟侧畔\n  展开：欲知程序真相——反编译难，反汇编易\n  再现：大道器也不器——初见时如茶味甘苦，洞悉后若灌顶醍醐；原以为听多说多皆已昨，忽回首似曾相识又如陌；罢，风流不在谈峰健，相对无言味更长……\n    文章作者自己说 This project was put together to teach myself NASM assembly language on linux.\n欸~，原来是很窄众的哦。呵呵。\n写的虽然通俗，但依然能感到其面向的并不是毫无编程基础的人群，所谓“某子不能隐真恶”，无论怎样努力的将大量概念、原理、知识安排到看似聊天般的文字中，这里都要提醒读者注意，提防因为好奇心而陷入递归学习的泥潭……\n  Lesson 1 Hello, world! 背景知识 汇编语言是一种低级语言，汇编程序员与底层硬件之间唯一的接口只有内核本身。用汇编语言编程，涉及到 Linux 内核提供的系统调用机制。这些系统调用是操作系统内置的库函数，提供诸如读取键盘输入以及将输出显示到屏幕之类的功能。\n当用户程序发起系统调用时，内核将立即挂起该程序，进而通过驱动程序让相关硬件完成用户程序所发起的任务请求，最后，将控制权交还给用户程序。\n 注意：驱动程序的驱动二字，形象的描述了内核对硬件的控制\n 在汇编语言中发起系统调用，需要向EAX寄存器写入相应调用的函数编号(也即：操作码OPCODE)，同时设置其他几个寄存器的值作为实际参数，一切准备停当后，指令INT发送一个软中断，内核收到中断请求后接受参数并执行相应的库函数。简单直接。\n来写我们的第壹个汇编程序吧——美玉有瑕 还是从著名的例子——$$Hello, world! $$ 开始，我们的汇编程序将把这个让无数程序员产生我已经学会这种语言了的错觉的字符串打印到标准输出上。\n首先，在数据段定义一个msg变量，并赋给其一个字符串类型的值作为我们程序的输出。而在代码段中，通过编写全局标签_start:，告诉内核我们(写的诗)程序开始的地方(没有远方)\n实际参数通过以下寄存器传给内核：\n EDX存储字符串的长度(字节数) ECX存储字符串的首地址(定义在数据段中的msg变量加载到内存后所在的位置) EBX存储字符串写操作的目标文件——本例中是STDOUT  数据类型和实际参数的含义可以在函数定义中查到。",
+  "description" : "Index-0 原址：https:\/\/asmtutor.com\/ 环境：nasm on x64 linux TL;DR 动机：程序员——多掌握几门计算机语言，还是有好处的 主题：汇编语言——",
   "inLanguage" : "zh-cn",
-  "wordCount":  5970 ,
+  "wordCount":  15808 ,
   "datePublished" : "2020-08-01T16:29:01",
   "dateModified" : "2020-08-01T16:29:01",
   "image" : "https:\/\/newlooper.github.io\/images\/site\/avatar-icon.png",
@@ -96,37 +79,14 @@ TL;DR   动机：程序员——多掌握几门计算机语言，还是有好处
 </script>
 
 <meta property="og:title" content="Learn Assembly Language 汇编语言学习(拙译)" />
-<meta property="og:description" content="Index-0 原址：https://asmtutor.com/
-环境：nasm on x64 linux
-TL;DR   动机：程序员——多掌握几门计算机语言，还是有好处的
-  主题：汇编语言——有其不可替代的作用
-  呈示：天下语言逾千——汇编笑看沉舟侧畔
-  展开：欲知程序真相——反编译难，反汇编易
-  再现：大道器也不器——初见时如茶味甘苦，洞悉后若灌顶醍醐；原以为听多说多皆已昨，忽回首似曾相识又如陌；罢，风流不在谈峰健，相对无言味更长……
-    文章作者自己说 This project was put together to teach myself NASM assembly language on linux.
-欸~，原来是很窄众的哦。呵呵。
-写的虽然通俗，但依然能感到其面向的并不是毫无编程基础的人群，所谓“某子不能隐真恶”，无论怎样努力的将大量概念、原理、知识安排到看似聊天般的文字中，这里都要提醒读者注意，提防因为好奇心而陷入递归学习的泥潭……
-  Lesson 1 Hello, world! 背景知识 汇编语言是一种低级语言，汇编程序员与底层硬件之间唯一的接口只有内核本身。用汇编语言编程，涉及到 Linux 内核提供的系统调用机制。这些系统调用是操作系统内置的库函数，提供诸如读取键盘输入以及将输出显示到屏幕之类的功能。
-当用户程序发起系统调用时，内核将立即挂起该程序，进而通过驱动程序让相关硬件完成用户程序所发起的任务请求，最后，将控制权交还给用户程序。
- 注意：驱动程序的驱动二字，形象的描述了内核对硬件的控制
- 在汇编语言中发起系统调用，需要向EAX寄存器写入相应调用的函数编号(也即：操作码OPCODE)，同时设置其他几个寄存器的值作为实际参数，一切准备停当后，指令INT发送一个软中断，内核收到中断请求后接受参数并执行相应的库函数。简单直接。
-来写我们的第壹个汇编程序吧——美玉有瑕 还是从著名的例子——$$Hello, world! $$ 开始，我们的汇编程序将把这个让无数程序员产生我已经学会这种语言了的错觉的字符串打印到标准输出上。
-首先，在数据段定义一个msg变量，并赋给其一个字符串类型的值作为我们程序的输出。而在代码段中，通过编写全局标签_start:，告诉内核我们(写的诗)程序开始的地方(没有远方)
-实际参数通过以下寄存器传给内核：
- EDX存储字符串的长度(字节数) ECX存储字符串的首地址(定义在数据段中的msg变量加载到内存后所在的位置) EBX存储字符串写操作的目标文件——本例中是STDOUT  数据类型和实际参数的含义可以在函数定义中查到。">
+<meta property="og:description" content="Index-0 原址：https://asmtutor.com/ 环境：nasm on x64 linux TL;DR 动机：程序员——多掌握几门计算机语言，还是有好处的 主题：汇编语言——">
 <meta property="og:image" content="https://newlooper.github.io/images/site/avatar-icon.png" />
 <meta property="og:url" content="https://newlooper.github.io/post/trans/learn-assembly-language/" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Looper 的博客" />
 
   <meta name="twitter:title" content="Learn Assembly Language 汇编语言学习(拙译)" />
-  <meta name="twitter:description" content="Index-0 原址：https://asmtutor.com/
-环境：nasm on x64 linux
-TL;DR   动机：程序员——多掌握几门计算机语言，还是有好处的
-  主题：汇编语言——有其不可替代的作用
-  呈示：天下语言逾千——汇编笑看沉舟侧畔
-  展开：欲知程序真相——反编译难，反汇编易
-  再现：大道器也不器——初见时如茶味甘苦，洞悉后若灌顶醍醐；原以为听多说多皆已昨，忽回首似 …">
+  <meta name="twitter:description" content="Index-0 原址：https://asmtutor.com/ 环境：nasm on x64 linux TL;DR 动机：程序员——多掌握几门计算机语言，还是有好处的 主题：汇编语言——">
   <meta name="twitter:image" content="https://newlooper.github.io/images/site/avatar-icon.png" />
   <meta name="twitter:card" content="summary" />
   <link href='https://newlooper.github.io/img/favicon.ico' rel='icon' type='image/x-icon'/>
@@ -139,6 +99,35 @@ TL;DR   动机：程序员——多掌握几门计算机语言，还是有好处
 .container {
     width: 1400px;
     min-width: 1400px;
+}
+article.blog-post {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+article.blog-post > blockquote {
+    font-family: 'Lora', 'Times New Roman', serif;
+}
+article.blog-post img {
+    display: block;
+    margin-top: 1em;
+    margin-right: auto;
+    margin-bottom: 1em;
+    margin-left: auto;
+    max-width: 100%;
+}
+article.blog-post table {
+    margin: auto;
+    width: 90%;
+    margin-bottom: 0.5em;
+    box-shadow: 2px 2px 3px rgba(0,0,0,.125);
+}
+article.blog-post blockquote {
+    margin: 1em 0;
+    padding: 10px 20px;
+    position: relative;
+    color: rgba(52,73,94,.8);
+    background-color: rgba(248,245,236,.6);
+    border-left: 5px solid #eee;
+    box-shadow: 1px 1px 2px rgba(0,0,0,.125);
 }
 </style>
 
@@ -263,7 +252,7 @@ TL;DR   动机：程序员——多掌握几门计算机语言，还是有好处
   
   
   
-    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;5970&nbsp;个字
+    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;15808&nbsp;个字
   
   
     
@@ -373,7 +362,7 @@ Segmentation fault
 <p>与告诉内核<strong>一个程序从哪里开始</strong>同样重要的是：<strong>程序在哪里结束</strong>。这正是上一课中我们的程序所缺少的步骤。因为这个重要步骤的缺失，在我们调用完<code>sys_write</code>，内核把控制权交还给我们的程序之后，程序继续顺序执行内存中紧挨在<code>int     80h</code>之后的地址中的&quot;指令&rdquo;(天知道那一刻那里存的是啥)，我们不知道内核将执行什么指令，但显然在我们的例子中内核噎住了，并且不高兴(非正常)的替我们终止了进程，严肃的招待了我们一个：<code>Segmentation fault</code></p>
 <p>在程序的末尾调用<code>sys_exit</code>吧！</p>
 <h3 id="开写我们的第贰个汇编程序善始善终">开写我们的第贰个汇编程序——善始善终</h3>
-<p><code>sys_exit</code>的定义简单明了。在 Linux 系统调用表中，操作码<code>OPCODE 1</code>被分配给了她，同时她比<code>sys_write</code>节省一些，调用她只需要传一个实参</p>
+<p><code>sys_exit</code>的定义简单明了。在<a href="http://faculty.nps.edu/cseagle/assembly/sys_call.html">Linux 系统调用表</a>中，操作码<code>OPCODE 1</code>被分配给了她，同时她比<code>sys_write</code>节省一些，调用她只需要传一个参数</p>
 <div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="cp"># https:</span><span class="c1">//github.com/torvalds/linux/blob/master/include/linux/syscalls.h
 </span><span class="c1"></span><span class="n">asmlinkage</span> <span class="kt">long</span> <span class="nf">sys_exit</span><span class="p">(</span><span class="kt">int</span> <span class="n">error_code</span><span class="p">);</span>
 </code></pre></div><p>她要被要这样调：</p>
@@ -1668,8 +1657,52 @@ $ ./create
 </blockquote>
 <hr>
 <h2 id="lesson-23-文件操作write">Lesson 23 文件操作——Write</h2>
+<p>基于上一节的程序，我们调用<code>sys_write</code>将内容写到新创建的文件。</p>
+<p><code>sys_write</code>需要的 3 个参数由以下寄存器提供</p>
+<ul>
+<li>要写入的字节数载入<code>EDX</code></li>
+<li>要写入内容的指针载入<code>ECX</code></li>
+<li>文件描述符载入<code>EBX</code></li>
+</ul>
+<p>OPCODE 12 载入<code>EAX</code>，熟悉的套路，<code>INT 80h</code> 开调。留意，我们首先通过将文件名传给<code>sys_creat</code>，进而从<code>EAX</code>中得到文件描述符。</p>
+<h3 id="我们的第贰拾叁个汇编程序握素怀铅">我们的第贰拾叁个汇编程序——握素怀铅</h3>
+<div class="highlight"><pre class="chroma"><code class="language-asm" data-lang="asm"><span class="c">; Write
+</span><span class="c">; Compile with: nasm -f elf write.asm
+</span><span class="c">; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 write.o -o write
+</span><span class="c">; Run with: ./write
+</span><span class="c"></span> 
+<span class="err">%</span><span class="nf">include</span>    <span class="err">&#39;</span><span class="no">functions.asm</span><span class="err">&#39;</span>
+ 
+<span class="nf">SECTION</span> <span class="no">.data</span>
+<span class="nf">filename</span> <span class="no">db</span> <span class="err">&#39;</span><span class="no">readme.txt</span><span class="err">&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="no">h</span>    <span class="c">; the filename to create
+</span><span class="c"></span><span class="no">contents</span> <span class="no">db</span> <span class="err">&#39;</span><span class="no">Hello</span> <span class="no">world</span><span class="p">!</span><span class="err">&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="no">h</span>  <span class="c">; the contents to write
+</span><span class="c"></span> 
+<span class="no">SECTION</span> <span class="no">.text</span>
+<span class="nf">global</span>  <span class="no">_start</span>
+ 
+<span class="nl">_start:</span>
+ 
+    <span class="nf">mov</span>     <span class="no">ecx</span><span class="p">,</span> <span class="mi">0777</span>           <span class="c">; code continues from lesson 22
+</span><span class="c"></span>    <span class="no">mov</span>     <span class="no">ebx</span><span class="p">,</span> <span class="no">filename</span>
+    <span class="nf">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="mi">8</span>
+    <span class="nf">int</span>     <span class="mi">80</span><span class="no">h</span>
+ 
+    <span class="nf">mov</span>     <span class="no">edx</span><span class="p">,</span> <span class="mi">12</span>             <span class="c">; number of bytes to write - one for each letter of our contents string
+</span><span class="c"></span>    <span class="no">mov</span>     <span class="no">ecx</span><span class="p">,</span> <span class="no">contents</span>       <span class="c">; move the memory address of our contents string into ecx
+</span><span class="c"></span>    <span class="no">mov</span>     <span class="no">ebx</span><span class="p">,</span> <span class="no">eax</span>            <span class="c">; move the file descriptor of the file we created into ebx
+</span><span class="c"></span>    <span class="no">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="mi">4</span>              <span class="c">; invoke SYS_WRITE (kernel opcode 4)
+</span><span class="c"></span>    <span class="no">int</span>     <span class="mi">80</span><span class="no">h</span>                 <span class="c">; call the kernel
+</span><span class="c"></span> 
+    <span class="no">call</span>    <span class="no">quit</span>                <span class="c">; call our quit function
+</span></code></pre></div><div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ nasm -f elf write.asm
+$ ld -m elf_i386 write.o -o write
+$ ./write
+</code></pre></div><blockquote>
+<p>提示：执行完打开 readme.txt 看看吧，该有 Hello, World! 才对</p>
+</blockquote>
 <hr>
 <h2 id="lesson-24-文件操作open">Lesson 24 文件操作——Open</h2>
+<p>继续扩展前面的程序，这次轮到<code>sys_open</code>登场。</p>
 <hr>
 <h2 id="lesson-25-文件操作read">Lesson 25 文件操作——Read</h2>
 <hr>
