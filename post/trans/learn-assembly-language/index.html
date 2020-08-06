@@ -76,7 +76,7 @@ TL;DR   动机：程序员——多掌握几门计算机语言，还是有好处
   "headline": "Learn Assembly Language 汇编语言学习(拙译)",
   "description" : "Index-0 原址：https:\/\/asmtutor.com\/\n环境：nasm on x64 linux\nTL;DR   动机：程序员——多掌握几门计算机语言，还是有好处的\n  主题：汇编语言——有其不可替代的作用\n  呈示：天下语言逾千——汇编笑看沉舟侧畔\n  展开：欲知程序真相——反编译难，反汇编易\n  再现：大道器也不器——初见时如茶味甘苦，洞悉后若灌顶醍醐；原以为听多说多皆已昨，忽回首似曾相识又如陌；罢，风流不在谈峰健，相对无言味更长……\n    文章作者自己说 This project was put together to teach myself NASM assembly language on linux.\n欸~，原来是很窄众的哦。呵呵。\n写的虽然通俗，但依然能感到其面向的并不是毫无编程基础的人群，所谓“某子不能隐真恶”，无论怎样努力的将大量概念、原理、知识安排到看似聊天般的文字中，这里都要提醒读者注意，提防因为好奇心而陷入递归学习的泥潭……\n  Lesson 1 Hello, world! 背景知识 汇编语言是一种低级语言，汇编程序员与底层硬件之间唯一的接口只有内核本身。用汇编语言编程，涉及到 Linux 内核提供的系统调用机制。这些系统调用是操作系统内置的库函数，提供诸如读取键盘输入以及将输出显示到屏幕之类的功能。\n当用户程序发起系统调用时，内核将立即挂起该程序，进而通过驱动程序让相关硬件完成用户程序所发起的任务请求，最后，将控制权交还给用户程序。\n 注意：驱动程序的驱动二字，形象的描述了内核对硬件的控制\n 在汇编语言中发起系统调用，需要向EAX寄存器写入相应调用的函数编号(也即：操作码OPCODE)，同时设置其他几个寄存器的值作为实际参数，一切准备停当后，指令INT发送一个软中断，内核收到中断请求后接受参数并执行相应的库函数。简单直接。\n来写我们的第壹个汇编程序吧——美玉有瑕 还是从著名的例子——$$Hello, world! $$ 开始，我们的汇编程序将把这个让无数程序员产生我已经学会这种语言了的错觉的字符串打印到标准输出上。\n首先，在数据段定义一个msg变量，并赋给其一个字符串类型的值作为我们程序的输出。而在代码段中，通过编写全局标签_start:，告诉内核我们(写的诗)程序开始的地方(没有远方)\n实际参数通过以下寄存器传给内核：\n EDX存储字符串的长度(字节数) ECX存储字符串的首地址(定义在数据段中的msg变量加载到内存后所在的位置) EBX存储字符串写操作的目标文件——本例中是STDOUT  数据类型和实际参数的含义可以在函数定义中查到。",
   "inLanguage" : "zh-cn",
-  "wordCount":  4755 ,
+  "wordCount":  5970 ,
   "datePublished" : "2020-08-01T16:29:01",
   "dateModified" : "2020-08-01T16:29:01",
   "image" : "https:\/\/newlooper.github.io\/images\/site\/avatar-icon.png",
@@ -263,7 +263,7 @@ TL;DR   动机：程序员——多掌握几门计算机语言，还是有好处
   
   
   
-    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;4755&nbsp;个字
+    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;5970&nbsp;个字
   
   
     
@@ -1395,14 +1395,277 @@ Jumping to finished label.
 Inside subroutine <span class="s2">&#34;finished&#34;</span>.
 </code></pre></div><hr>
 <h2 id="lesson-18-fizzbuzz-游戏">Lesson 18 FizzBuzz 游戏</h2>
-<hr>
+<p>FizzBuzz——老外在学校里教孩子除法的一组游戏。玩法：</p>
+<ul>
+<li>玩家轮流计算从<code>1</code>到<code>100</code>的整数，</li>
+<li>遇到<code>3的倍数</code>就换成 Fizz，</li>
+<li>遇到<code>5的倍数</code>就换成 Buzz，</li>
+<li>遇到<code>3和5的公倍数</code>就换成 FizzBuzz。</li>
+</ul>
+<p>神奇的是这个儿童游戏已经成为计算机编程工作事实上的标准面试题之一，原因在于该题可以轻松的过滤掉连简单的逻辑门都构造不好的候选人。。。</p>
+<h3 id="让我们的第拾捌个汇编程序来挑战一下大道至简">让我们的第拾捌个汇编程序来挑战一下——大道至简</h3>
+<p>解题办法不止一种，有些语言提供了非常简单而优雅的方案。然而大都是躲不过 if 语句的；可能还会含有 else，这取决于是否利用了某些数学性质，如：既能被 3 整除也能被 5 整除的数必然可以被 3 * 5 = 15 整除。</p>
+<p>本篇的汇编实现，我们提供如下的方案：两个级联的 if 语句判断是否打印 Fizz 和/或 Buzz，以及一个 else 语句打印其他数字。每个输出都占一行，100个数字都处理完，程序退出。</p>
+<p>functions.asm 略</p>
+<div class="highlight"><pre class="chroma"><code class="language-asm" data-lang="asm"><span class="c">; Fizzbuzz
+</span><span class="c">; Compile with: nasm -f elf fizzbuzz.asm
+</span><span class="c">; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 fizzbuzz.o -o fizzbuzz
+</span><span class="c">; Run with: ./fizzbuzz
+</span><span class="c"></span> 
+<span class="err">%</span><span class="nf">include</span>        <span class="err">&#39;</span><span class="no">functions.asm</span><span class="err">&#39;</span>
+ 
+<span class="nf">SECTION</span> <span class="no">.data</span>
+<span class="nf">fizz</span>        <span class="no">db</span>      <span class="err">&#39;</span><span class="no">Fizz</span><span class="err">&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="no">h</span>     <span class="c">; a message string
+</span><span class="c"></span><span class="no">buzz</span>        <span class="no">db</span>      <span class="err">&#39;</span><span class="no">Buzz</span><span class="err">&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="no">h</span>     <span class="c">; a message string
+</span><span class="c"></span> 
+<span class="no">SECTION</span> <span class="no">.text</span>
+<span class="nf">global</span>  <span class="no">_start</span>
+ 
+<span class="nl">_start:</span>
+ 
+    <span class="nf">mov</span>     <span class="no">esi</span><span class="p">,</span> <span class="mi">0</span>          <span class="c">; initialise our checkFizz boolean variable
+</span><span class="c"></span>    <span class="no">mov</span>     <span class="no">edi</span><span class="p">,</span> <span class="mi">0</span>          <span class="c">; initialise our checkBuzz boolean variable
+</span><span class="c"></span>    <span class="no">mov</span>     <span class="no">ecx</span><span class="p">,</span> <span class="mi">0</span>          <span class="c">; initialise our counter variable
+</span><span class="c"></span> 
+<span class="no">nextNumber</span><span class="p">:</span>
+    <span class="nf">inc</span>     <span class="no">ecx</span>             <span class="c">; increment our counter variable
+</span><span class="c"></span> 
+<span class="no">.checkFizz</span>
+    <span class="nf">mov</span>     <span class="no">edx</span><span class="p">,</span> <span class="mi">0</span>          <span class="c">; clear the edx register - this will hold our remainder after division
+</span><span class="c"></span>    <span class="no">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="no">ecx</span>        <span class="c">; move the value of our counter into eax for division
+</span><span class="c"></span>    <span class="no">mov</span>     <span class="no">ebx</span><span class="p">,</span> <span class="mi">3</span>          <span class="c">; move our number to divide by into ebx (in this case the value is 3)
+</span><span class="c"></span>    <span class="no">div</span>     <span class="no">ebx</span>             <span class="c">; divide eax by ebx
+</span><span class="c"></span>    <span class="no">mov</span>     <span class="no">edi</span><span class="p">,</span> <span class="no">edx</span>        <span class="c">; move our remainder into edi (our checkFizz boolean variable)
+</span><span class="c"></span>    <span class="no">cmp</span>     <span class="no">edi</span><span class="p">,</span> <span class="mi">0</span>          <span class="c">; compare if the remainder is zero (meaning the counter divides by 3)
+</span><span class="c"></span>    <span class="no">jne</span>     <span class="no">.checkBuzz</span>      <span class="c">; if the remainder is not equal to zero jump to local label checkBuzz
+</span><span class="c"></span>    <span class="no">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="no">fizz</span>       <span class="c">; else move the address of our fizz string into eax for printing
+</span><span class="c"></span>    <span class="no">call</span>    <span class="no">sprint</span>          <span class="c">; call our string printing function
+</span><span class="c"></span> 
+<span class="no">.checkBuzz</span><span class="p">:</span>
+    <span class="nf">mov</span>     <span class="no">edx</span><span class="p">,</span> <span class="mi">0</span>          <span class="c">; clear the edx register - this will hold our remainder after division
+</span><span class="c"></span>    <span class="no">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="no">ecx</span>        <span class="c">; move the value of our counter into eax for division
+</span><span class="c"></span>    <span class="no">mov</span>     <span class="no">ebx</span><span class="p">,</span> <span class="mi">5</span>          <span class="c">; move our number to divide by into ebx (in this case the value is 5)
+</span><span class="c"></span>    <span class="no">div</span>     <span class="no">ebx</span>             <span class="c">; divide eax by ebx
+</span><span class="c"></span>    <span class="no">mov</span>     <span class="no">esi</span><span class="p">,</span> <span class="no">edx</span>        <span class="c">; move our remainder into edi (our checkBuzz boolean variable)
+</span><span class="c"></span>    <span class="no">cmp</span>     <span class="no">esi</span><span class="p">,</span> <span class="mi">0</span>          <span class="c">; compare if the remainder is zero (meaning the counter divides by 5)
+</span><span class="c"></span>    <span class="no">jne</span>     <span class="no">.checkInt</span>       <span class="c">; if the remainder is not equal to zero jump to local label checkInt
+</span><span class="c"></span>    <span class="no">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="no">buzz</span>       <span class="c">; else move the address of our buzz string into eax for printing
+</span><span class="c"></span>    <span class="no">call</span>    <span class="no">sprint</span>          <span class="c">; call our string printing function
+</span><span class="c"></span> 
+<span class="no">.checkInt</span><span class="p">:</span>
+    <span class="nf">cmp</span>     <span class="no">edi</span><span class="p">,</span> <span class="mi">0</span>          <span class="c">; edi contains the remainder after the division in checkFizz
+</span><span class="c"></span>    <span class="no">je</span>     <span class="no">.continue</span>        <span class="c">; if equal (counter divides by 3) skip printing the integer
+</span><span class="c"></span>    <span class="no">cmp</span>     <span class="no">esi</span><span class="p">,</span> <span class="mi">0</span>          <span class="c">; esi contains the remainder after the division in checkBuzz
+</span><span class="c"></span>    <span class="no">je</span>     <span class="no">.continue</span>        <span class="c">; if equal (counter divides by 5) skip printing the integer
+</span><span class="c"></span>    <span class="no">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="no">ecx</span>        <span class="c">; else move the value in ecx (our counter) into eax for printing
+</span><span class="c"></span>    <span class="no">call</span>    <span class="no">iprint</span>          <span class="c">; call our integer printing function
+</span><span class="c"></span> 
+<span class="no">.continue</span><span class="p">:</span>
+    <span class="nf">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="mi">0</span><span class="no">Ah</span>        <span class="c">; move an ascii linefeed character into eax
+</span><span class="c"></span>    <span class="no">push</span>    <span class="no">eax</span>             <span class="c">; push the address of eax onto the stack for printing
+</span><span class="c"></span>    <span class="no">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="no">esp</span>        <span class="c">; get the stack pointer (address on the stack of our linefeed char)
+</span><span class="c"></span>    <span class="no">call</span>    <span class="no">sprint</span>          <span class="c">; call our string printing function to print a line feed
+</span><span class="c"></span>    <span class="no">pop</span>     <span class="no">eax</span>             <span class="c">; pop the stack so we don&#39;t waste resources
+</span><span class="c"></span>    <span class="no">cmp</span>     <span class="no">ecx</span><span class="p">,</span> <span class="mi">100</span>        <span class="c">; compare if our counter is equal to 100
+</span><span class="c"></span>    <span class="no">jne</span>     <span class="no">nextNumber</span>      <span class="c">; if not equal jump to the start of the loop
+</span><span class="c"></span> 
+    <span class="no">call</span>    <span class="no">quit</span>            <span class="c">; else call our quit function
+</span></code></pre></div><div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ nasm -f elf fizzbuzz.asm
+$ ld -m elf_i386 fizzbuzz.o -o fizzbuzz
+$ ./fizzbuzz
+<span class="m">1</span>
+<span class="m">2</span>
+Fizz
+<span class="m">4</span>
+Buzz
+Fizz
+<span class="m">7</span>
+<span class="m">8</span>
+Fizz
+Buzz
+<span class="m">11</span>
+Fizz
+<span class="m">13</span>
+<span class="m">14</span>
+FizzBuzz
+<span class="m">16</span>
+.
+.
+.
+</code></pre></div><hr>
 <h2 id="lesson-19-执行命令">Lesson 19 执行命令</h2>
-<hr>
+<h3 id="再一次背景知识">再一次，背景知识</h3>
+<p>通过指定的要运行的命令，调用<code>EXEC</code>一族的函数将启动一个新进程来替换当前的。本节，我们将使用<code>sys_execve</code>系统调用，启动 linux 下的程序<code>/bin/echo</code>，来替换我们程序运行中的进程，我们让<code>/bin/echo</code>来输出&quot;Hello,World!&rdquo;</p>
+<h3 id="命名约定">命名约定</h3>
+<p>这一族的函数都以<code>exec</code>开头，后面跟着的字母含义如下：</p>
+<ul>
+<li>E，指向环境变量指针的数组，传给进程镜像</li>
+<li>L，命令行参数分别传给函数</li>
+<li>P，使用<code>PATH</code>环境变量查找路径参数中的命令名并执行</li>
+<li>V，命令行参数作为指针数组传递给函数</li>
+</ul>
+<h3 id="第拾玖个汇编程序委重投艰">第拾玖个汇编程序——委重投艰</h3>
+<p>V 和 E 后缀的函数，意味着我们需要按如下格式传递参数：</p>
+<ul>
+<li>第一个参数是要被执行的命令的字符串，</li>
+<li>后面跟着该命令的参数数组，</li>
+<li>最后是新进程将用到的环境变量的数组。</li>
+</ul>
+<p>当我们调用一个简单的命令时，不将任何特殊的环境变量传递给新进程，而是传递 0h (NULL)。</p>
+<p>命令的参数和环境变量都必须用指针的数组来传递。因此，在定义完字符串后，我们定义了一个包含变量名的null终结(0h结尾)的结构体(数组)。这样，就准备好了应传给<code>sys_execve</code>的所有东西。一旦调用成功，新进程将替换我们的进程，输出返回给了终端。</p>
+<p>functions.asm 略</p>
+<div class="highlight"><pre class="chroma"><code class="language-asm" data-lang="asm"><span class="c">; Execute
+</span><span class="c">; Compile with: nasm -f elf execute.asm
+</span><span class="c">; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 execute.o -o execute
+</span><span class="c">; Run with: ./execute
+</span><span class="c"></span> 
+<span class="err">%</span><span class="nf">include</span>        <span class="err">&#39;</span><span class="no">functions.asm</span><span class="err">&#39;</span>
+ 
+<span class="nf">SECTION</span> <span class="no">.data</span>
+<span class="nf">command</span>         <span class="no">db</span>      <span class="err">&#39;/</span><span class="no">bin</span><span class="err">/</span><span class="no">echo</span><span class="err">&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="no">h</span>     <span class="c">; command to execute
+</span><span class="c"></span><span class="no">arg1</span>            <span class="no">db</span>      <span class="err">&#39;</span><span class="no">Hello</span> <span class="no">World</span><span class="p">!</span><span class="err">&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="no">h</span>
+<span class="nf">arguments</span>       <span class="no">dd</span>      <span class="no">command</span>
+                <span class="nf">dd</span>      <span class="no">arg1</span>                <span class="c">; arguments to pass to commandline (in this case just one)
+</span><span class="c"></span>                <span class="no">dd</span>      <span class="mi">0</span><span class="no">h</span>                  <span class="c">; end the struct
+</span><span class="c"></span><span class="no">environment</span>     <span class="no">dd</span>      <span class="mi">0</span><span class="no">h</span>                  <span class="c">; arguments to pass as environment variables (inthis case none) end the struct
+</span><span class="c"></span> 
+<span class="no">SECTION</span> <span class="no">.text</span>
+<span class="nf">global</span>  <span class="no">_start</span>
+ 
+<span class="nl">_start:</span>
+ 
+    <span class="nf">mov</span>     <span class="no">edx</span><span class="p">,</span> <span class="no">environment</span>    <span class="c">; address of environment variables
+</span><span class="c"></span>    <span class="no">mov</span>     <span class="no">ecx</span><span class="p">,</span> <span class="no">arguments</span>      <span class="c">; address of the arguments to pass to the commandline
+</span><span class="c"></span>    <span class="no">mov</span>     <span class="no">ebx</span><span class="p">,</span> <span class="no">command</span>        <span class="c">; address of the file to execute
+</span><span class="c"></span>    <span class="no">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="mi">11</span>             <span class="c">; invoke SYS_EXECVE (kernel opcode 11)
+</span><span class="c"></span>    <span class="no">int</span>     <span class="mi">80</span><span class="no">h</span>
+ 
+    <span class="nf">call</span>    <span class="no">quit</span>                <span class="c">; call our quit function
+</span></code></pre></div><div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ nasm -f elf execute.asm
+$ ld -m elf_i386 execute.o -o execute
+$ ./execute
+Hello World!
+</code></pre></div><blockquote>
+<p>提示：不妨试试其他命令</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-asm" data-lang="asm"><span class="nf">SECTION</span> <span class="no">.data</span>
+<span class="nf">command</span>         <span class="no">db</span>      <span class="err">&#39;/</span><span class="no">bin</span><span class="err">/</span><span class="no">ls</span><span class="err">&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="no">h</span>       <span class="c">; command to execute
+</span><span class="c"></span><span class="no">arg1</span>            <span class="no">db</span>      <span class="err">&#39;</span><span class="p">-</span><span class="no">l</span><span class="err">&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="no">h</span>
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-asm" data-lang="asm"><span class="nf">SECTION</span> <span class="no">.data</span>
+<span class="nf">command</span>         <span class="no">db</span>      <span class="err">&#39;/</span><span class="no">bin</span><span class="err">/</span><span class="no">sleep</span><span class="err">&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="no">h</span>    <span class="c">; command to execute
+</span><span class="c"></span><span class="no">arg1</span>            <span class="no">db</span>      <span class="err">&#39;</span><span class="mi">5</span><span class="err">&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="no">h</span>
+</code></pre></div><hr>
 <h2 id="lesson-20-process-forking">Lesson 20 Process Forking</h2>
-<hr>
+<h3 id="重入背景知识">重入，背景知识</h3>
+<p>本节引入著名的<code>sys_fork</code>。这个调用不是替换，而是复制我们的进程。该调用不接受任何参数，只要在当前进程中调用，那么新进程就会被创建。新进程与原进程并发执行。</p>
+<p>通过检测<code>EAX</code>中的值，来判断当前是处于父进程还是子进程中。父进程返回一个正整数；子进程中<code>EAX</code>为 0。以此可以对于父子进程进行分支逻辑。</p>
+<p>基于以上事实，我们在父子进程中打印不同的消息。</p>
+<blockquote>
+<p>注意：每个进程需要各自安全退出</p>
+</blockquote>
+<h3 id="第贰拾个汇编程序委重投艰">第贰拾个汇编程序——委重投艰</h3>
+<div class="highlight"><pre class="chroma"><code class="language-asm" data-lang="asm"><span class="c">; Fork
+</span><span class="c">; Compile with: nasm -f elf fork.asm
+</span><span class="c">; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 fork.o -o fork
+</span><span class="c">; Run with: ./fork
+</span><span class="c"></span> 
+<span class="err">%</span><span class="nf">include</span>        <span class="err">&#39;</span><span class="no">functions.asm</span><span class="err">&#39;</span>
+ 
+<span class="nf">SECTION</span> <span class="no">.data</span>
+<span class="nf">childMsg</span>        <span class="no">db</span>      <span class="err">&#39;</span><span class="no">This</span> <span class="no">is</span> <span class="no">the</span> <span class="no">child</span> <span class="no">process</span><span class="err">&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="no">h</span>     <span class="c">; a message string
+</span><span class="c"></span><span class="no">parentMsg</span>       <span class="no">db</span>      <span class="err">&#39;</span><span class="no">This</span> <span class="no">is</span> <span class="no">the</span> <span class="no">parent</span> <span class="no">process</span><span class="err">&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="no">h</span>    <span class="c">; a message string
+</span><span class="c"></span> 
+<span class="no">SECTION</span> <span class="no">.text</span>
+<span class="nf">global</span>  <span class="no">_start</span>
+ 
+<span class="nl">_start:</span>
+ 
+    <span class="nf">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="mi">2</span>              <span class="c">; invoke SYS_FORK (kernel opcode 2)
+</span><span class="c"></span>    <span class="no">int</span>     <span class="mi">80</span><span class="no">h</span>
+ 
+    <span class="nf">cmp</span>     <span class="no">eax</span><span class="p">,</span> <span class="mi">0</span>              <span class="c">; if eax is zero we are in the child process
+</span><span class="c"></span>    <span class="no">jz</span>      <span class="no">child</span>               <span class="c">; jump if eax is zero to child label
+</span><span class="c"></span> 
+<span class="no">parent</span><span class="p">:</span>
+    <span class="nf">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="no">parentMsg</span>      <span class="c">; inside our parent process move parentMsg into eax
+</span><span class="c"></span>    <span class="no">call</span>    <span class="no">sprintLF</span>            <span class="c">; call our string printing with linefeed function
+</span><span class="c"></span> 
+    <span class="no">call</span>    <span class="no">quit</span>                <span class="c">; quit the parent process
+</span><span class="c"></span> 
+<span class="no">child</span><span class="p">:</span>
+    <span class="nf">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="no">childMsg</span>       <span class="c">; inside our child process move childMsg into eax
+</span><span class="c"></span>    <span class="no">call</span>    <span class="no">sprintLF</span>            <span class="c">; call our string printing with linefeed function
+</span><span class="c"></span> 
+    <span class="no">call</span>    <span class="no">quit</span>                <span class="c">; quit the child process
+</span></code></pre></div><div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ nasm -f elf fork.asm
+$ ld -m elf_i386 fork.o -o fork
+$ ./fork
+This is the parent process
+This is the child process
+</code></pre></div><hr>
 <h2 id="lesson-21-输出时间">Lesson 21 输出时间</h2>
-<hr>
+<p>在 NASM 中，生成一个 unix 时间戳只需简单的向内核调用<code>sys_time</code>，也即：调用表中的 OPCODE 13。不需要参数，返回的<a href="https://en.wikipedia.org/wiki/Unix_time">UNIX 纪元时间</a>保存在<code>EAX</code>寄存器中</p>
+<h3 id="第贰拾个汇编程序只争朝夕">第贰拾个汇编程序——只争朝夕</h3>
+<div class="highlight"><pre class="chroma"><code class="language-asm" data-lang="asm"><span class="c">; Time
+</span><span class="c">; Compile with: nasm -f elf time.asm
+</span><span class="c">; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 time.o -o time
+</span><span class="c">; Run with: ./time
+</span><span class="c"></span> 
+<span class="err">%</span><span class="nf">include</span>        <span class="err">&#39;</span><span class="no">functions.asm</span><span class="err">&#39;</span>
+ 
+<span class="nf">SECTION</span> <span class="no">.data</span>
+<span class="nf">msg</span>        <span class="no">db</span>      <span class="err">&#39;</span><span class="no">Seconds</span> <span class="no">since</span> <span class="no">Jan</span> <span class="mi">01</span> <span class="mi">1970</span><span class="p">:</span> <span class="err">&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="no">h</span>     <span class="c">; a message string
+</span><span class="c"></span> 
+<span class="no">SECTION</span> <span class="no">.text</span>
+<span class="nf">global</span>  <span class="no">_start</span>
+ 
+<span class="nl">_start:</span>
+ 
+    <span class="nf">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="no">msg</span>        <span class="c">; move our message string into eax for printing
+</span><span class="c"></span>    <span class="no">call</span>    <span class="no">sprint</span>          <span class="c">; call our string printing function
+</span><span class="c"></span> 
+    <span class="no">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="mi">13</span>         <span class="c">; invoke SYS_TIME (kernel opcode 13)
+</span><span class="c"></span>    <span class="no">int</span>     <span class="mi">80</span><span class="no">h</span>             <span class="c">; call the kernel
+</span><span class="c"></span> 
+    <span class="no">call</span>    <span class="no">iprintLF</span>        <span class="c">; call our integer printing function with linefeed
+</span><span class="c"></span>    <span class="no">call</span>    <span class="no">quit</span>            <span class="c">; call our quit function
+</span></code></pre></div><div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ nasm -f elf time.asm
+$ ld -m elf_i386 time.o -o <span class="nb">time</span>
+$ ./time
+Seconds since Jan <span class="m">01</span> 1970: <span class="m">1374995660</span>
+</code></pre></div><hr>
 <h2 id="lesson-22-文件操作create">Lesson 22 文件操作——Create</h2>
+<h3 id="相关背景">相关背景</h3>
+<p>文件操作在 Linux 系统中涉及到一小股系统调用，包括：创建、更新、删除。这些函数都必须作用于<a href="https://en.wikipedia.org/wiki/File_descriptor">文件描述符</a>——系统中用于标识文件的一个唯一的、非负整数。</p>
+<h3 id="我们的第贰拾贰个汇编程序本立道生">我们的第贰拾贰个汇编程序——本立道生</h3>
+<p>首先登场的是用于创建文件的<code>sys_creat</code>。在后面的课程中，将在同一程序上不断扩展。最终，我们将有一个包含文件的创建、更新、打开、关闭和删除的完整功能的程序。</p>
+<div class="highlight"><pre class="chroma"><code class="language-asm" data-lang="asm"><span class="c">; Create
+</span><span class="c">; Compile with: nasm -f elf create.asm
+</span><span class="c">; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 create.o -o create
+</span><span class="c">; Run with: ./create
+</span><span class="c"></span> 
+<span class="err">%</span><span class="nf">include</span>    <span class="err">&#39;</span><span class="no">functions.asm</span><span class="err">&#39;</span>
+ 
+<span class="nf">SECTION</span> <span class="no">.data</span>
+<span class="nf">filename</span> <span class="no">db</span> <span class="err">&#39;</span><span class="no">readme.txt</span><span class="err">&#39;</span><span class="p">,</span>       <span class="c">; the filename to create
+</span><span class="c"></span> 
+<span class="no">SECTION</span> <span class="no">.text</span>
+<span class="nf">global</span>  <span class="no">_start</span>
+ 
+<span class="nl">_start:</span>
+ 
+    <span class="nf">mov</span>     <span class="no">ecx</span><span class="p">,</span> <span class="mi">0777</span>           <span class="c">; set all permissions to read, write, execute
+</span><span class="c"></span>    <span class="no">mov</span>     <span class="no">ebx</span><span class="p">,</span> <span class="no">filename</span>       <span class="c">; filename we will create
+</span><span class="c"></span>    <span class="no">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="mi">8</span>              <span class="c">; invoke SYS_CREAT (kernel opcode 8)
+</span><span class="c"></span>    <span class="no">int</span>     <span class="mi">80</span><span class="no">h</span>                 <span class="c">; call the kernel
+</span><span class="c"></span> 
+    <span class="no">call</span>    <span class="no">quit</span>                <span class="c">; call our quit function
+</span></code></pre></div><div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ nasm -f elf create.asm
+$ ld -m elf_i386 create.o -o create
+$ ./create
+</code></pre></div><blockquote>
+<p>提示：“没有消息就是好消息”，文件 readme.txt 将出现在与程序相同的目录中</p>
+</blockquote>
 <hr>
 <h2 id="lesson-23-文件操作write">Lesson 23 文件操作——Write</h2>
 <hr>
