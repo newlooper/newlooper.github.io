@@ -747,41 +747,41 @@ Special character on input, which is recognized if the ICANON flag is set. When 
 <p>嗯，规范中也是都写清楚了的，是终端 I/O 工作模式相关的内容(欸~就不能只有一种键盘，一种鼠标，一种显示器，一种系统，一种接口么。。。)，EOF 在其中只是很小的一部分。可以看看国内这哥们儿的一篇文章：<a href="https://www.cnblogs.com/nufangrensheng/p/3575752.html">终端 I/O 之综述</a>，弄清楚终端 I/O 的故事，有助于我们正向的理解终端处理用户输入的各种策略。</p>
 <p>最后一例：代码取自我翻译的一个老外的汇编教程，原址：https://asmtutor.com/</p>
 <p>高级语言看真相，总是隔着层纱，我们需要定性的结论</p>
-<div class="highlight"><pre class="chroma"><code class="language-asm" data-lang="asm"><span class="c">; Hello World Program (Getting input)
-</span><span class="c">; Compile with: nasm -f elf helloworld-input.asm
-</span><span class="c">; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 helloworld-input.o -o helloworld-input
-</span><span class="c">; Run with: ./helloworld-input
-</span><span class="c"></span> 
-<span class="err">%</span><span class="nf">include</span>        <span class="err">&#39;</span><span class="no">functions.asm</span><span class="err">&#39;</span>
+<div class="highlight"><pre class="chroma"><code class="language-nasm" data-lang="nasm"><span class="c1">; Hello World Program (Getting input)</span>
+<span class="c1">; Compile with: nasm -f elf helloworld-input.asm</span>
+<span class="c1">; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 helloworld-input.o -o helloworld-input</span>
+<span class="c1">; Run with: ./helloworld-input</span>
+<span class="cp"> 
+</span><span class="cp">%include        &#39;functions.asm&#39;
+</span><span class="cp"></span> 
+<span class="k">SECTION</span> <span class="nv">.data</span>
+<span class="nf">msg1</span>        <span class="nv">db</span>      <span class="s">&#39;Please enter your name: &#39;</span><span class="p">,</span> <span class="mh">0h</span>      <span class="c1">; message string asking user for input</span>
+<span class="nf">msg2</span>        <span class="nv">db</span>      <span class="s">&#39;Hello, &#39;</span><span class="p">,</span> <span class="mh">0h</span>                       <span class="c1">; message string to use after user has entered their name</span>
  
-<span class="nf">SECTION</span> <span class="no">.data</span>
-<span class="nf">msg1</span>        <span class="no">db</span>      <span class="err">&#39;</span><span class="no">Please</span> <span class="no">enter</span> <span class="no">your</span> <span class="no">name</span><span class="p">:</span> <span class="err">&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="no">h</span>      <span class="c">; message string asking user for input
-</span><span class="c"></span><span class="no">msg2</span>        <span class="no">db</span>      <span class="err">&#39;</span><span class="no">Hello</span><span class="p">,</span> <span class="err">&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="no">h</span>                       <span class="c">; message string to use after user has entered their name
-</span><span class="c"></span> 
-<span class="no">SECTION</span> <span class="no">.bss</span>
-<span class="nl">sinput:</span>     <span class="nf">resb</span>    <span class="mi">255</span>                                 <span class="c">; reserve a 255 byte space in memory for the users input string
-</span><span class="c"></span> 
-<span class="no">SECTION</span> <span class="no">.text</span>
-<span class="nf">global</span>  <span class="no">_start</span>
+<span class="k">SECTION</span> <span class="nv">.bss</span>
+<span class="nl">sinput:</span>     <span class="kd">resb</span>    <span class="mi">255</span>                                 <span class="c1">; reserve a 255 byte space in memory for the users input string</span>
+ 
+<span class="k">SECTION</span> <span class="nv">.text</span>
+<span class="k">global</span>  <span class="nv">_start</span>
  
 <span class="nl">_start:</span>
  
-    <span class="nf">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="no">msg1</span>
-    <span class="nf">call</span>    <span class="no">sprint</span>
+    <span class="nf">mov</span>     <span class="nb">eax</span><span class="p">,</span> <span class="nv">msg1</span>
+    <span class="nf">call</span>    <span class="nb">sp</span><span class="nv">rint</span>
  
-    <span class="nf">mov</span>     <span class="no">edx</span><span class="p">,</span> <span class="mi">255</span>        <span class="c">; number of bytes to read
-</span><span class="c"></span>    <span class="no">mov</span>     <span class="no">ecx</span><span class="p">,</span> <span class="no">sinput</span>     <span class="c">; reserved space to store our input (known as a buffer)
-</span><span class="c"></span>    <span class="no">mov</span>     <span class="no">ebx</span><span class="p">,</span> <span class="mi">0</span>          <span class="c">; read from the STDIN file
-</span><span class="c"></span>    <span class="no">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="mi">3</span>          <span class="c">; invoke SYS_READ (kernel opcode 3)
-</span><span class="c"></span>    <span class="no">int</span>     <span class="mi">80</span><span class="no">h</span>
+    <span class="nf">mov</span>     <span class="nb">edx</span><span class="p">,</span> <span class="mi">255</span>        <span class="c1">; number of bytes to read</span>
+    <span class="nf">mov</span>     <span class="nb">ecx</span><span class="p">,</span> <span class="nb">si</span><span class="nv">nput</span>     <span class="c1">; reserved space to store our input (known as a buffer)</span>
+    <span class="nf">mov</span>     <span class="nb">ebx</span><span class="p">,</span> <span class="mi">0</span>          <span class="c1">; read from the STDIN file</span>
+    <span class="nf">mov</span>     <span class="nb">eax</span><span class="p">,</span> <span class="mi">3</span>          <span class="c1">; invoke SYS_READ (kernel opcode 3)</span>
+    <span class="nf">int</span>     <span class="mh">80h</span>
  
-    <span class="nf">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="no">msg2</span>
-    <span class="nf">call</span>    <span class="no">sprint</span>
+    <span class="nf">mov</span>     <span class="nb">eax</span><span class="p">,</span> <span class="nv">msg2</span>
+    <span class="nf">call</span>    <span class="nb">sp</span><span class="nv">rint</span>
  
-    <span class="nf">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="no">sinput</span>     <span class="c">; move our buffer into eax (Note: input contains a linefeed)
-</span><span class="c"></span>    <span class="no">call</span>    <span class="no">sprint</span>          <span class="c">; call our print function
-</span><span class="c"></span> 
-    <span class="no">call</span>    <span class="no">quit</span>
+    <span class="nf">mov</span>     <span class="nb">eax</span><span class="p">,</span> <span class="nb">si</span><span class="nv">nput</span>     <span class="c1">; move our buffer into eax (Note: input contains a linefeed)</span>
+    <span class="nf">call</span>    <span class="nb">sp</span><span class="nv">rint</span>          <span class="c1">; call our print function</span>
+ 
+    <span class="nf">call</span>    <span class="nv">quit</span>
 </code></pre></div><div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ nasm -f elf helloworld-input.asm
 $ ld -m elf_i386 helloworld-input.o -o helloworld-input
 $ ./helloworld-input
