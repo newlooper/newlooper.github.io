@@ -59,7 +59,7 @@
   "headline": "Learn Assembly Language 汇编语言学习(拙译)",
   "description" : "Index-0 原址：https:\/\/asmtutor.com\/ 环境：nasm on x64 linux TL;DR 动机：程序员——多掌握几门计算机语言，还是有好处的 主题：汇编语言——",
   "inLanguage" : "zh-cn",
-  "wordCount":  23090 ,
+  "wordCount":  23097 ,
   "datePublished" : "2020-08-01T16:29:01",
   "dateModified" : "2020-08-01T16:29:01",
   "image" : "https:\/\/newlooper.github.io\/images\/site\/avatar-icon.png",
@@ -97,8 +97,8 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" /><link rel="stylesheet" href="https://newlooper.github.io/css/syntax.css" /><link rel="stylesheet" href="https://newlooper.github.io/css/codeblock.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/default-skin/default-skin.min.css" integrity="sha384-iD0dNku6PYSIQLyfTOpB06F2KCZJAKLOThS5HRe8b3ibhdEQ6eKsFf/EeFxdOt5R" crossorigin="anonymous"><style>
 .container {
-    width: 1400px;
-    min-width: 1400px;
+    width: 1500px;
+    min-width: 1500px;
 }
 article.blog-post {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
@@ -128,6 +128,25 @@ article.blog-post blockquote {
     background-color: rgba(248,245,236,.6);
     border-left: 5px solid #eee;
     box-shadow: 1px 1px 2px rgba(0,0,0,.125);
+}
+aside.toc {
+    float: right;
+    padding: 6px;
+    padding-right: 20px;
+    margin: 0;
+    margin-left: 10px;
+    margin-bottom: 10px;
+    border: solid 1px #d3d3d3;
+    font-size: 12px;
+}
+
+aside.toc ul {
+    padding-inline-start: 20px;
+    list-style: circle;
+}
+
+aside.toc a {
+    color: #666;
 }
 </style>
 
@@ -252,7 +271,7 @@ article.blog-post blockquote {
   
   
   
-    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;23090&nbsp;个字
+    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;23097&nbsp;个字
   
   
     
@@ -277,6 +296,50 @@ article.blog-post blockquote {
   <div class="row">
     <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
       <article role="main" class="blog-post">
+	  <aside class="toc">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#index-0">Index-0</a></li>
+    <li><a href="#tldr">TL;DR</a></li>
+    <li><a href="#lesson-1-hello-world">Lesson 1 Hello, world!</a></li>
+    <li><a href="#lesson-2-程序退出的正确姿势">Lesson 2 程序退出的正确姿势</a></li>
+    <li><a href="#lesson-3-计算字符串长度">Lesson 3 计算字符串长度</a></li>
+    <li><a href="#lesson-4-子例程">Lesson 4 子例程</a></li>
+    <li><a href="#lesson-5-外部包含文件">Lesson 5 外部包含文件</a></li>
+    <li><a href="#lesson-6-null-终止符">Lesson 6 NULL 终止符</a></li>
+    <li><a href="#lesson-7-换行">Lesson 7 换行</a></li>
+    <li><a href="#lesson-8-命令行参数">Lesson 8 命令行参数</a></li>
+    <li><a href="#lesson-9-处理用户输出">Lesson 9 处理用户输出</a></li>
+    <li><a href="#lesson-10-数到十">Lesson 10 数到十</a></li>
+    <li><a href="#lesson-11-数到十-itoa">Lesson 11 数到十 (itoa)</a></li>
+    <li><a href="#lesson-12-计算加法">Lesson 12 计算——加法</a></li>
+    <li><a href="#lesson-13-计算减法">Lesson 13 计算——减法</a></li>
+    <li><a href="#lesson-14-计算乘法">Lesson 14 计算——乘法</a></li>
+    <li><a href="#lesson-15-计算除法">Lesson 15 计算——除法</a></li>
+    <li><a href="#lesson-16-计算atoi">Lesson 16 计算——atoi</a></li>
+    <li><a href="#lesson-17-命名空间">Lesson 17 命名空间</a></li>
+    <li><a href="#lesson-18-fizzbuzz-游戏">Lesson 18 FizzBuzz 游戏</a></li>
+    <li><a href="#lesson-19-执行命令">Lesson 19 执行命令</a></li>
+    <li><a href="#lesson-20-process-forking">Lesson 20 Process Forking</a></li>
+    <li><a href="#lesson-21-输出时间">Lesson 21 输出时间</a></li>
+    <li><a href="#lesson-22-文件操作create">Lesson 22 文件操作——Create</a></li>
+    <li><a href="#lesson-23-文件操作write">Lesson 23 文件操作——Write</a></li>
+    <li><a href="#lesson-24-文件操作open">Lesson 24 文件操作——Open</a></li>
+    <li><a href="#lesson-25-文件操作read">Lesson 25 文件操作——Read</a></li>
+    <li><a href="#lesson-26-文件操作close">Lesson 26 文件操作——Close</a></li>
+    <li><a href="#lesson-27-文件操作seek">Lesson 27 文件操作——Seek</a></li>
+    <li><a href="#lesson-28-文件操作delete">Lesson 28 文件操作——Delete</a></li>
+    <li><a href="#lesson-29-套接字create">Lesson 29 套接字——Create</a></li>
+    <li><a href="#lesson-30-套接字bind">Lesson 30 套接字——Bind</a></li>
+    <li><a href="#lesson-31-套接字listen">Lesson 31 套接字——Listen</a></li>
+    <li><a href="#lesson-32-套接字accept">Lesson 32 套接字——Accept</a></li>
+    <li><a href="#lesson-33-套接字read">Lesson 33 套接字——Read</a></li>
+    <li><a href="#lesson-34-套接字write">Lesson 34 套接字——Write</a></li>
+    <li><a href="#lesson-35-套接字close">Lesson 35 套接字——Close</a></li>
+    <li><a href="#lesson-36-套接字下载网页">Lesson 36 套接字——下载网页</a></li>
+  </ul>
+</nav>
+      </aside>
         <h2 id="index-0">Index-0</h2>
 <p>原址：https://asmtutor.com/<br>
 环境：nasm on x64 linux</p>
@@ -299,11 +362,9 @@ article.blog-post blockquote {
 </li>
 </ul>
 <hr>
-<blockquote>
-<p>文章作者自己说 <em>This project was put together to teach myself NASM assembly language on linux.</em></p>
-<p>欸~，原来是很窄众的哦。呵呵。</p>
+<p>原文作者自己说 『<em>This project was put together to teach myself NASM assembly language on linux.</em>』</p>
+<p>欸~，原来是很窄众的哦。</p>
 <p>写的虽然通俗，但依然能感到其面向的并不是毫无编程基础的人群，所谓“某子不能隐真恶”，无论怎样努力的将大量概念、原理、知识安排到看似聊天般的文字中，这里都要提醒读者注意，提防因为好奇心而陷入递归学习的泥潭……</p>
-</blockquote>
 <hr>
 <h2 id="lesson-1-hello-world">Lesson 1 Hello, world!</h2>
 <h3 id="背景知识">背景知识</h3>
