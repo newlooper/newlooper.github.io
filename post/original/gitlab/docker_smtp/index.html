@@ -7,7 +7,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
-  <title>Looper 的博客 - Looper 的博客</title>
+  <title>GitLab on Docker 配置 SMTP 服务 - Looper 的博客</title>
+  <meta name="description" content="起因 gitlab 官方 docker 容器部署完毕。容器中的服务越少越好，所以使用外部 SMTP 发送邮件。 环境 撰写此文时： Docker 17.06.1-ce GitLab Community Edition 9.5.2 ab97415 步骤 网易 163 邮箱 授权码设置 协议开启与服务">
   <meta name="author" content="Dylan Cheng"/><script type="application/ld+json">
 {
     "@context": "http://schema.org",
@@ -28,14 +29,64 @@
   
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "https:\/\/newlooper.github.io\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "https:\/\/newlooper.github.io\/post\/original\/gitlab\/docker_smtp\/",
+          "name": "Git lab on docker 配置 s m t p 服务"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "Dylan Cheng"
+  },
+  "headline": "GitLab on Docker 配置 SMTP 服务",
+  "description" : "起因 gitlab 官方 docker 容器部署完毕。容器中的服务越少越好，所以使用外部 SMTP 发送邮件。 环境 撰写此文时： Docker 17.06.1-ce GitLab Community Edition 9.5.2 ab97415 步骤 网易 163 邮箱 授权码设置 协议开启与服务",
+  "inLanguage" : "zh-cn",
+  "wordCount":  193 ,
+  "datePublished" : "2017-09-03T13:34:45",
+  "dateModified" : "2017-09-03T13:34:45",
+  "image" : "https:\/\/newlooper.github.io\/images\/site\/avatar-icon.png",
+  "keywords" : [ "" ],
+  "mainEntityOfPage" : "https:\/\/newlooper.github.io\/post\/original\/gitlab\/docker_smtp\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "https:\/\/newlooper.github.io\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "https:\/\/newlooper.github.io\/images\/site\/avatar-icon.png",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
 
-<meta property="og:title" content="Looper 的博客" />
+<meta property="og:title" content="GitLab on Docker 配置 SMTP 服务" />
+<meta property="og:description" content="起因 gitlab 官方 docker 容器部署完毕。容器中的服务越少越好，所以使用外部 SMTP 发送邮件。 环境 撰写此文时： Docker 17.06.1-ce GitLab Community Edition 9.5.2 ab97415 步骤 网易 163 邮箱 授权码设置 协议开启与服务">
 <meta property="og:image" content="https://newlooper.github.io/images/site/avatar-icon.png" />
-<meta property="og:url" content="https://newlooper.github.io/" />
+<meta property="og:url" content="https://newlooper.github.io/post/original/gitlab/docker_smtp/" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Looper 的博客" />
 
-  <meta name="twitter:title" content="Looper 的博客" />
+  <meta name="twitter:title" content="GitLab on Docker 配置 SMTP 服务" />
+  <meta name="twitter:description" content="起因 gitlab 官方 docker 容器部署完毕。容器中的服务越少越好，所以使用外部 SMTP 发送邮件。 环境 撰写此文时： Docker 17.06.1-ce GitLab Community Edition 9.5.2 ab97415 步骤 网易 163 邮箱 授权码设置 协议开启与服务">
   <meta name="twitter:image" content="https://newlooper.github.io/images/site/avatar-icon.png" />
   <meta name="twitter:card" content="summary" />
   <link href='https://newlooper.github.io/img/favicon.ico' rel='icon' type='image/x-icon'/>
@@ -206,202 +257,14 @@ aside.toc a {
       <div class="container">
         <div class="row">
           <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-            <div class="page-heading">
+            <div class="post-heading">
               
-                <h1>Looper 的博客</h1>
-              
-              
-                <hr class="small">
+                <h1>GitLab on Docker 配置 SMTP 服务</h1>
               
               
-                
-                  <span class="page-subheading">——穷居闹市无人问，富在深山有远亲</span>
-                
               
               
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
-
-
-    
-  <div role="main" class="container">
-    <div class="row">
-      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-        
-
-        <div class="posts-list">
-          
-          
-            <article class="post-preview">
-    <a href="https://newlooper.github.io/post/original/cs/io/eof/">
-        <h2 class="post-title">EOF，到底怎么回事</h2>
-        
-        
-        
-    </a>
-
-    <p class="post-meta">
-        <span class="post-meta">
-  
-  
-  <i class="fas fa-calendar"></i>&nbsp;发表于 2020-08-03
-  
-  
-  
-    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;9808&nbsp;个字
-  
-  
-    
-      &nbsp;|&nbsp;<i class="fas fa-user"></i>&nbsp;Dylan Cheng
-    
-  
-  
-</span>
-
-
-    </p>
-    <div class="post-entry">
-        
-        TL;DR 首先，确未想到，为说清楚这个玩意儿，居然要用不少的篇幅；其次，当涉及对一些概念、原理的追溯时，递归到多深的地步，也不容易拿捏；好在，写这些
-        <a href="https://newlooper.github.io/post/original/cs/io/eof/" class="post-read-more">[阅读全文]</a>
-        
-    </div>
-
-    
-
-</article>
-          
-            <article class="post-preview">
-    <a href="https://newlooper.github.io/post/trans/learn-assembly-language/">
-        <h2 class="post-title">Learn Assembly Language 汇编语言学习(拙译)</h2>
-        
-        
-        
-    </a>
-
-    <p class="post-meta">
-        <span class="post-meta">
-  
-  
-  <i class="fas fa-calendar"></i>&nbsp;发表于 2020-08-01
-  
-  
-  
-    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;23097&nbsp;个字
-  
-  
-    
-      &nbsp;|&nbsp;<i class="fas fa-user"></i>&nbsp;Dylan Cheng
-    
-  
-  
-</span>
-
-
-    </p>
-    <div class="post-entry">
-        
-        Index-0 原址：https://asmtutor.com/ 环境：nasm on x64 linux TL;DR 动机：程序员——多掌握几门计算机语言，还是有好处的 主题：汇编语言——
-        <a href="https://newlooper.github.io/post/trans/learn-assembly-language/" class="post-read-more">[阅读全文]</a>
-        
-    </div>
-
-    
-
-</article>
-          
-            <article class="post-preview">
-    <a href="https://newlooper.github.io/post/original/cs/vm/wsl/migrate_distributions/">
-        <h2 class="post-title">WSL2 迁移 Linux 发行版</h2>
-        
-        
-        
-    </a>
-
-    <p class="post-meta">
-        <span class="post-meta">
-  
-  
-  <i class="fas fa-calendar"></i>&nbsp;发表于 2020-08-01
-  
-  
-  
-    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;252&nbsp;个字
-  
-  
-    
-      &nbsp;|&nbsp;<i class="fas fa-user"></i>&nbsp;Dylan Cheng
-    
-  
-  
-</span>
-
-
-    </p>
-    <div class="post-entry">
-        
-        意图 备份还原 迁移 节省 C 盘空间 …… 导出 wsl.exe --export &lt;DistributionName&gt; &lt;FileName&gt; 导入 wsl.exe --import &lt;DistributionName&gt; &lt;InstallLocation&gt; &lt;FileName&gt; 提示：导入之后，执行 wsl -l -v 查看运行版本，如果是 1 的话，可以执行 wsl &ndash;set-version &lt;DistributionName&gt; 2 更新到 2 WSL 默
-        <a href="https://newlooper.github.io/post/original/cs/vm/wsl/migrate_distributions/" class="post-read-more">[阅读全文]</a>
-        
-    </div>
-
-    
-
-</article>
-          
-            <article class="post-preview">
-    <a href="https://newlooper.github.io/post/original/cs/os/memory/memory_paging/">
-        <h2 class="post-title">分页内存地址转换点滴</h2>
-        
-        
-        
-    </a>
-
-    <p class="post-meta">
-        <span class="post-meta">
-  
-  
-  <i class="fas fa-calendar"></i>&nbsp;发表于 2020-06-22
-  
-  
-  
-    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;1000&nbsp;个字
-  
-  
-    
-      &nbsp;|&nbsp;<i class="fas fa-user"></i>&nbsp;Dylan Cheng
-    
-  
-  
-</span>
-
-
-    </p>
-    <div class="post-entry">
-        
-        环境与条件：CPU 和操作系统都为 32 位，主存按字节编址 一、页大小的确定 一言以蔽之——在页表所占内存和页内填充内存的耗费上做取舍、折中 以下极端情
-        <a href="https://newlooper.github.io/post/original/cs/os/memory/memory_paging/" class="post-read-more">[阅读全文]</a>
-        
-    </div>
-
-    
-
-</article>
-          
-            <article class="post-preview">
-    <a href="https://newlooper.github.io/post/original/gitlab/docker_smtp/">
-        <h2 class="post-title">GitLab on Docker 配置 SMTP 服务</h2>
-        
-        
-        
-    </a>
-
-    <p class="post-meta">
-        <span class="post-meta">
+                <span class="post-meta">
   
   
   <i class="fas fa-calendar"></i>&nbsp;发表于 2017-09-03
@@ -419,34 +282,126 @@ aside.toc a {
 </span>
 
 
-    </p>
-    <div class="post-entry">
-        
-        起因 gitlab 官方 docker 容器部署完毕。容器中的服务越少越好，所以使用外部 SMTP 发送邮件。 环境 撰写此文时： Docker 17.06.1-ce GitLab Community Edition 9.5.2 ab97415 步骤 网易 163 邮箱 授权码设置 协议开启与服务
-        <a href="https://newlooper.github.io/post/original/gitlab/docker_smtp/" class="post-read-more">[阅读全文]</a>
-        
-    </div>
-
-    
-
-</article>
-          
+              
+            </div>
+          </div>
         </div>
-
-        
       </div>
     </div>
-  </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        <aside class="toc">
+          <nav id="TableOfContents">
+  <ul>
+    <li><a href="#起因">起因</a></li>
+    <li><a href="#环境">环境</a></li>
+    <li><a href="#步骤">步骤</a></li>
+    <li><a href="#参考">参考</a></li>
+  </ul>
+</nav>
+        </aside>
+        <h2 id="起因">起因</h2>
+<p>gitlab 官方 docker 容器部署完毕。容器中的服务越少越好，所以使用外部 SMTP 发送邮件。</p>
+<h2 id="环境">环境</h2>
+<p>撰写此文时：</p>
+<ul>
+<li>Docker 17.06.1-ce</li>
+<li>GitLab Community Edition 9.5.2 ab97415</li>
+</ul>
+<h2 id="步骤">步骤</h2>
+<h3 id="网易-163-邮箱">网易 163 邮箱</h3>
+<h4 id="授权码设置">授权码设置</h4>
+<p><img src="/images/post/original/gitlab_163mail_smtp/1.png" alt="image"></p>
+<h4 id="协议开启与服务器地址">协议开启与服务器地址</h4>
+<p><img src="/images/post/original/gitlab_163mail_smtp/2.png" alt="image"></p>
+<h3 id="容器中的-etcgitlabgitlabrb">容器中的 /etc/gitlab/gitlab.rb</h3>
+<div class="highlight"><pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1">### Email Settings</span>
+<span class="c1"># gitlab_rails[&#39;gitlab_email_enabled&#39;] = true</span>
+<span class="n">gitlab_rails</span><span class="o">[</span><span class="s1">&#39;gitlab_email_from&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="s1">&#39;&lt;yourname&gt;@163.com&#39;</span>
+<span class="c1"># gitlab_rails[&#39;gitlab_email_display_name&#39;] = &#39;Example&#39;</span>
+<span class="c1"># gitlab_rails[&#39;gitlab_email_reply_to&#39;] = &#39;noreply@example.com&#39;</span>
+<span class="c1"># gitlab_rails[&#39;gitlab_email_subject_suffix&#39;] = &#39;&#39;</span>
+<span class="n">gitlab_rails</span><span class="o">[</span><span class="s1">&#39;smtp_enable&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="kp">true</span>
+<span class="n">gitlab_rails</span><span class="o">[</span><span class="s1">&#39;smtp_address&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="s2">&#34;smtp.163.com&#34;</span>
+<span class="n">gitlab_rails</span><span class="o">[</span><span class="s1">&#39;smtp_port&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="mi">994</span>
+<span class="n">gitlab_rails</span><span class="o">[</span><span class="s1">&#39;smtp_user_name&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="s2">&#34;&lt;yourname&gt;@163.com&#34;</span>
+<span class="n">gitlab_rails</span><span class="o">[</span><span class="s1">&#39;smtp_password&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="s2">&#34;&lt;your 163 auth code&gt;&#34;</span>
+<span class="n">gitlab_rails</span><span class="o">[</span><span class="s1">&#39;smtp_domain&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="s2">&#34;163.com&#34;</span>
+<span class="n">gitlab_rails</span><span class="o">[</span><span class="s1">&#39;smtp_authentication&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="ss">:login</span>
+<span class="n">gitlab_rails</span><span class="o">[</span><span class="s1">&#39;smtp_enable_starttls_auto&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="kp">false</span>
+<span class="n">gitlab_rails</span><span class="o">[</span><span class="s1">&#39;smtp_tls&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="kp">true</span>
+<span class="c1">###! **Can be: &#39;none&#39;, &#39;peer&#39;, &#39;client_once&#39;, &#39;fail_if_no_peer_cert&#39;**</span>
+<span class="c1">###! Docs: http://api.rubyonrails.org/classes/ActionMailer/Base.html</span>
+<span class="n">gitlab_rails</span><span class="o">[</span><span class="s1">&#39;smtp_openssl_verify_mode&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="s1">&#39;peer&#39;</span>
+</code></pre></div><h4 id="注意事项">注意事项</h4>
+<p><code>gitlab_rails['gitlab_email_from']</code> 和 <code>gitlab_rails['smtp_user_name']</code> 一致</p>
+<p>以下三项：改变其中一项设置，其他项需匹配</p>
+<ul>
+<li>gitlab_rails[&lsquo;smtp_enable_starttls_auto&rsquo;] = false</li>
+<li>gitlab_rails[&lsquo;smtp_tls&rsquo;] = true</li>
+<li>gitlab_rails[&lsquo;smtp_port&rsquo;] = 994</li>
+</ul>
+<p>配置完毕：</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">gitlab-ctl reconfigure
+</code></pre></div><h2 id="参考">参考</h2>
+<p><a href="https://docs.gitlab.com/omnibus/docker/README.html">https://docs.gitlab.com/omnibus/docker/README.html</a></p>
+<p><a href="https://docs.gitlab.com/omnibus/settings/smtp.html">https://docs.gitlab.com/omnibus/settings/smtp.html</a></p>
+<p><a href="http://wap.mail.163.com/xm/static/html/163_symbian_2.html">http://wap.mail.163.com/xm/static/html/163_symbian_2.html</a></p>
+
+
+        
+
+        
+
+        
+          
+
+          
+        
+      </article>
 
       
-    <div class="page-meta">
-  
-  
-  
+        <ul class="pager blog-pager">
+          
+          
+            <li class="next">
+              <a href="https://newlooper.github.io/post/original/cs/os/memory/memory_paging/" data-toggle="tooltip" data-placement="top" title="分页内存地址转换点滴">后一篇 &rarr;</a>
+            </li>
+          
+        </ul>
+      
+
+
+      
+        
+          
+          <div class="disqus-comments">                  
+            <button id="show-comments" class="btn btn-default" type="button">显示 <span class="disqus-comment-count" data-disqus-url="https://newlooper.github.io/post/original/gitlab/docker_smtp">则评论</span></button>
+            <div id="disqus_thread"></div>
+
+            <script type="text/javascript">
+              var disqus_config = function () {
+              this.page.url = 'https:\/\/newlooper.github.io\/post\/original\/gitlab\/docker_smtp';
+            };
+
+          </script>
+          </div>
+          
+        
+        
+      
+
+    </div>
+  </div>
 </div>
 
-
-  
+      
 <footer>
   <div class="container">
     <div class="row">
@@ -463,7 +418,7 @@ aside.toc a {
               </li>
           
           <li>
-            <a href="/index.xml" title="RSS">
+            <a href="" title="RSS">
               <span class="fa-stack fa-lg">
                 <i class="fas fa-circle fa-stack-2x"></i>
                 <i class="fas fa-rss fa-stack-1x fa-inverse"></i>

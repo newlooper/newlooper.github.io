@@ -59,7 +59,7 @@
   "headline": "EOF，到底怎么回事",
   "description" : "TL;DR 首先，确未想到，为说清楚这个玩意儿，居然要用不少的篇幅；其次，当涉及对一些概念、原理的追溯时，递归到多深的地步，也不容易拿捏；好在，写这些",
   "inLanguage" : "zh-cn",
-  "wordCount":  9802 ,
+  "wordCount":  9808 ,
   "datePublished" : "2020-08-03T15:52:41",
   "dateModified" : "2020-08-03T15:52:41",
   "image" : "https:\/\/newlooper.github.io\/images\/site\/avatar-icon.png",
@@ -271,7 +271,7 @@ aside.toc a {
   
   
   
-    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;9802&nbsp;个字
+    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;9808&nbsp;个字
   
   
     
@@ -296,8 +296,8 @@ aside.toc a {
   <div class="row">
     <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
       <article role="main" class="blog-post">
-	  <aside class="toc">
-        <nav id="TableOfContents">
+        <aside class="toc">
+          <nav id="TableOfContents">
   <ul>
     <li><a href="#tldr">TL;DR</a></li>
     <li><a href="#section-0">section-0</a></li>
@@ -307,7 +307,7 @@ aside.toc a {
     <li><a href="#section-nan">section-NaN</a></li>
   </ul>
 </nav>
-      </aside>
+        </aside>
         <h2 id="tldr">TL;DR</h2>
 <p><em>首先，确未想到，为说清楚这个玩意儿，居然要用不少的篇幅；其次，当涉及对一些概念、原理的追溯时，递归到多深的地步，也不容易拿捏；好在，写这些文字主要是为了将来碰到某些反直觉的情况时可以有个快捷解答；最后若能得到碰巧逛到这里的同仁指点迷津，纠正错误，互通有无，就算赚到了 :-)</em></p>
 <p><em>希望读完此文，能够消除一些关于 EOF 的疑惑，再碰到关于她的一些争论时，大家能够相视一笑。</em></p>
@@ -829,9 +829,9 @@ Hello, Dylan
 <p>.</p>
 <p>.</p>
 <p>.</p>
-<p>我们多留一些空间，给出比较重要的结论：</p>
+<p>我们多空出一些空间，给出比较重要的结论：</p>
 <p>EOF 对于在整个阻塞读过程中的系统、终端、用户程序来说，至关重要。因而关于 EOF 的众多描述，往往是系统、终端、程序和 EOF 放一堆儿全搓了。这容易产生系统和终端的 EOF 和某种语言定义的 EOF 是一回事的错觉。</p>
-<p>而实际上——操作系统并不管也根本不必知道某种计算机语言所定义的 EOF；他只是和终端配合，识别出由某种组合键击标识的他俩所认识的 EOF。当满足条件时结束阻塞，终端和系统按自己的逻辑处理后将控制权返给某种语言的库函数，库函数此时有 100% 解释权，比如：出错就直接捏一个自己定义的 EOF 返回(也就是说，在库函数按自己的逻辑解释系统的返回之前，压根儿还没有他定义的 EOF 什么事呢)。</p>
+<p>而实际上——操作系统并不关心也不必知道某种计算机语言所定义的 EOF 是什么样子；他只是和终端配合，识别出由某种组合键击标识的他俩所认识的 EOF。当满足条件时结束阻塞，终端和系统按自己的逻辑处理后将控制权返给某种语言的库函数，库函数此时有 100% 解释权，比如：出错就直接捏一个自己定义的 EOF 返回(也就是说，在库函数按自己的逻辑解释系统的返回之前，压根儿就没有语言自己定义的 EOF 什么事呢)。</p>
 <p>.</p>
 <p>.</p>
 <p>.</p>

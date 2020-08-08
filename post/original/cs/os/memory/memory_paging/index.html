@@ -7,7 +7,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
-  <title>Looper 的博客 - Looper 的博客</title>
+  <title>分页内存地址转换点滴 - Looper 的博客</title>
+  <meta name="description" content="环境与条件：CPU 和操作系统都为 32 位，主存按字节编址 一、页大小的确定 一言以蔽之——在页表所占内存和页内填充内存的耗费上做取舍、折中 以下极端情">
   <meta name="author" content="Dylan Cheng"/><script type="application/ld+json">
 {
     "@context": "http://schema.org",
@@ -28,14 +29,64 @@
   
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "https:\/\/newlooper.github.io\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "https:\/\/newlooper.github.io\/post\/original\/cs\/os\/memory\/memory_paging\/",
+          "name": "分页内存地址转换点滴"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "Dylan Cheng"
+  },
+  "headline": "分页内存地址转换点滴",
+  "description" : "环境与条件：CPU 和操作系统都为 32 位，主存按字节编址 一、页大小的确定 一言以蔽之——在页表所占内存和页内填充内存的耗费上做取舍、折中 以下极端情",
+  "inLanguage" : "zh-cn",
+  "wordCount":  1000 ,
+  "datePublished" : "2020-06-22T09:28:07",
+  "dateModified" : "2020-06-22T09:28:07",
+  "image" : "https:\/\/newlooper.github.io\/images\/site\/avatar-icon.png",
+  "keywords" : [ "" ],
+  "mainEntityOfPage" : "https:\/\/newlooper.github.io\/post\/original\/cs\/os\/memory\/memory_paging\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "https:\/\/newlooper.github.io\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "https:\/\/newlooper.github.io\/images\/site\/avatar-icon.png",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
 
-<meta property="og:title" content="Looper 的博客" />
+<meta property="og:title" content="分页内存地址转换点滴" />
+<meta property="og:description" content="环境与条件：CPU 和操作系统都为 32 位，主存按字节编址 一、页大小的确定 一言以蔽之——在页表所占内存和页内填充内存的耗费上做取舍、折中 以下极端情">
 <meta property="og:image" content="https://newlooper.github.io/images/site/avatar-icon.png" />
-<meta property="og:url" content="https://newlooper.github.io/" />
+<meta property="og:url" content="https://newlooper.github.io/post/original/cs/os/memory/memory_paging/" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Looper 的博客" />
 
-  <meta name="twitter:title" content="Looper 的博客" />
+  <meta name="twitter:title" content="分页内存地址转换点滴" />
+  <meta name="twitter:description" content="环境与条件：CPU 和操作系统都为 32 位，主存按字节编址 一、页大小的确定 一言以蔽之——在页表所占内存和页内填充内存的耗费上做取舍、折中 以下极端情">
   <meta name="twitter:image" content="https://newlooper.github.io/images/site/avatar-icon.png" />
   <meta name="twitter:card" content="summary" />
   <link href='https://newlooper.github.io/img/favicon.ico' rel='icon' type='image/x-icon'/>
@@ -206,163 +257,14 @@ aside.toc a {
       <div class="container">
         <div class="row">
           <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-            <div class="page-heading">
+            <div class="post-heading">
               
-                <h1>Looper 的博客</h1>
-              
-              
-                <hr class="small">
+                <h1>分页内存地址转换点滴</h1>
               
               
-                
-                  <span class="page-subheading">——穷居闹市无人问，富在深山有远亲</span>
-                
               
               
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
-
-
-    
-  <div role="main" class="container">
-    <div class="row">
-      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-        
-
-        <div class="posts-list">
-          
-          
-            <article class="post-preview">
-    <a href="https://newlooper.github.io/post/original/cs/io/eof/">
-        <h2 class="post-title">EOF，到底怎么回事</h2>
-        
-        
-        
-    </a>
-
-    <p class="post-meta">
-        <span class="post-meta">
-  
-  
-  <i class="fas fa-calendar"></i>&nbsp;发表于 2020-08-03
-  
-  
-  
-    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;9808&nbsp;个字
-  
-  
-    
-      &nbsp;|&nbsp;<i class="fas fa-user"></i>&nbsp;Dylan Cheng
-    
-  
-  
-</span>
-
-
-    </p>
-    <div class="post-entry">
-        
-        TL;DR 首先，确未想到，为说清楚这个玩意儿，居然要用不少的篇幅；其次，当涉及对一些概念、原理的追溯时，递归到多深的地步，也不容易拿捏；好在，写这些
-        <a href="https://newlooper.github.io/post/original/cs/io/eof/" class="post-read-more">[阅读全文]</a>
-        
-    </div>
-
-    
-
-</article>
-          
-            <article class="post-preview">
-    <a href="https://newlooper.github.io/post/trans/learn-assembly-language/">
-        <h2 class="post-title">Learn Assembly Language 汇编语言学习(拙译)</h2>
-        
-        
-        
-    </a>
-
-    <p class="post-meta">
-        <span class="post-meta">
-  
-  
-  <i class="fas fa-calendar"></i>&nbsp;发表于 2020-08-01
-  
-  
-  
-    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;23097&nbsp;个字
-  
-  
-    
-      &nbsp;|&nbsp;<i class="fas fa-user"></i>&nbsp;Dylan Cheng
-    
-  
-  
-</span>
-
-
-    </p>
-    <div class="post-entry">
-        
-        Index-0 原址：https://asmtutor.com/ 环境：nasm on x64 linux TL;DR 动机：程序员——多掌握几门计算机语言，还是有好处的 主题：汇编语言——
-        <a href="https://newlooper.github.io/post/trans/learn-assembly-language/" class="post-read-more">[阅读全文]</a>
-        
-    </div>
-
-    
-
-</article>
-          
-            <article class="post-preview">
-    <a href="https://newlooper.github.io/post/original/cs/vm/wsl/migrate_distributions/">
-        <h2 class="post-title">WSL2 迁移 Linux 发行版</h2>
-        
-        
-        
-    </a>
-
-    <p class="post-meta">
-        <span class="post-meta">
-  
-  
-  <i class="fas fa-calendar"></i>&nbsp;发表于 2020-08-01
-  
-  
-  
-    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;252&nbsp;个字
-  
-  
-    
-      &nbsp;|&nbsp;<i class="fas fa-user"></i>&nbsp;Dylan Cheng
-    
-  
-  
-</span>
-
-
-    </p>
-    <div class="post-entry">
-        
-        意图 备份还原 迁移 节省 C 盘空间 …… 导出 wsl.exe --export &lt;DistributionName&gt; &lt;FileName&gt; 导入 wsl.exe --import &lt;DistributionName&gt; &lt;InstallLocation&gt; &lt;FileName&gt; 提示：导入之后，执行 wsl -l -v 查看运行版本，如果是 1 的话，可以执行 wsl &ndash;set-version &lt;DistributionName&gt; 2 更新到 2 WSL 默
-        <a href="https://newlooper.github.io/post/original/cs/vm/wsl/migrate_distributions/" class="post-read-more">[阅读全文]</a>
-        
-    </div>
-
-    
-
-</article>
-          
-            <article class="post-preview">
-    <a href="https://newlooper.github.io/post/original/cs/os/memory/memory_paging/">
-        <h2 class="post-title">分页内存地址转换点滴</h2>
-        
-        
-        
-    </a>
-
-    <p class="post-meta">
-        <span class="post-meta">
+                <span class="post-meta">
   
   
   <i class="fas fa-calendar"></i>&nbsp;发表于 2020-06-22
@@ -380,73 +282,210 @@ aside.toc a {
 </span>
 
 
-    </p>
-    <div class="post-entry">
-        
-        环境与条件：CPU 和操作系统都为 32 位，主存按字节编址 一、页大小的确定 一言以蔽之——在页表所占内存和页内填充内存的耗费上做取舍、折中 以下极端情
-        <a href="https://newlooper.github.io/post/original/cs/os/memory/memory_paging/" class="post-read-more">[阅读全文]</a>
-        
-    </div>
-
-    
-
-</article>
-          
-            <article class="post-preview">
-    <a href="https://newlooper.github.io/post/original/gitlab/docker_smtp/">
-        <h2 class="post-title">GitLab on Docker 配置 SMTP 服务</h2>
-        
-        
-        
-    </a>
-
-    <p class="post-meta">
-        <span class="post-meta">
-  
-  
-  <i class="fas fa-calendar"></i>&nbsp;发表于 2017-09-03
-  
-  
-  
-    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;193&nbsp;个字
-  
-  
-    
-      &nbsp;|&nbsp;<i class="fas fa-user"></i>&nbsp;Dylan Cheng
-    
-  
-  
-</span>
-
-
-    </p>
-    <div class="post-entry">
-        
-        起因 gitlab 官方 docker 容器部署完毕。容器中的服务越少越好，所以使用外部 SMTP 发送邮件。 环境 撰写此文时： Docker 17.06.1-ce GitLab Community Edition 9.5.2 ab97415 步骤 网易 163 邮箱 授权码设置 协议开启与服务
-        <a href="https://newlooper.github.io/post/original/gitlab/docker_smtp/" class="post-read-more">[阅读全文]</a>
-        
-    </div>
-
-    
-
-</article>
-          
+              
+            </div>
+          </div>
         </div>
-
-        
       </div>
     </div>
-  </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        <aside class="toc">
+          <nav id="TableOfContents">
+  <ul>
+    <li><a href="#一页大小的确定">一、页大小的确定</a></li>
+    <li><a href="#二页大小--页内偏移量位数">二、页大小 &amp; 页内偏移量位数</a></li>
+    <li><a href="#三页大小--页框大小--页表项数--物理内存块数">三、页大小 &amp; 页框大小 &amp; 页表项数 &amp; 物理内存块数</a></li>
+    <li><a href="#四页表项大小及其存储内容">四、页表项大小及其存储内容</a></li>
+    <li><a href="#五线性地址-物理地址转换过程">五、线性地址-&gt;物理地址转换过程</a></li>
+  </ul>
+</nav>
+        </aside>
+        <p>环境与条件：CPU 和操作系统都为 32 位，主存按字节编址</p>
+<h2 id="一页大小的确定">一、页大小的确定</h2>
+<blockquote>
+<p>一言以蔽之——在<code>页表所占内存</code>和<code>页内填充内存</code>的耗费上做取舍、折中</p>
+</blockquote>
+<p>以下极端情况的对比，用以阐明为什么要取舍、折中</p>
+<p>A、页面大小 = 1Byte</p>
+<ul>
+<li>颗粒度到达极致细微、系统永远不必为页面填充不需要的内存</li>
+<li>但页表项目达到 2^32 个，占用了整个内存</li>
+</ul>
+<p>B、页面大小 = 4GBytes</p>
+<ul>
+<li>每当新进程启动时，都需要将 4G 内存交换到磁盘</li>
+<li>页表中只有一个条目，因此几乎不占用任何内存</li>
+</ul>
+<p>因此：</p>
+<blockquote>
+<p>x86 设计人员发现 4K 大小的页面是很好的庸点</p>
+</blockquote>
+<p>当然，随着 CPU 地址总线位数的扩张，系统中物理内存的膨胀，4K 也并不是总是合适的大小。</p>
+<h2 id="二页大小--页内偏移量位数">二、页大小 &amp; 页内偏移量位数</h2>
+<blockquote>
+<p>已确定页大小，可算出页内偏移量需要多少位，如常见的页面尺寸 <code>4K = 4096Bytes</code></p>
+</blockquote>
+<p>$$ \log_{2}{4096} = 12，即：需要12_{bits}  $$</p>
+<blockquote>
+<p>已知页内偏移量占用 12 位，则可算出页大小</p>
+</blockquote>
+<p>$$ 2^{12} = 4096_{Bytes} $$</p>
+<p>页内偏移范围：</p>
+<table>
+<thead>
+<tr>
+<th align="right">BIN</th>
+<th align="right">HEX</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="right">000000000000</td>
+<td align="right">0x0000</td>
+</tr>
+<tr>
+<td align="right">000000000001</td>
+<td align="right">0x0001</td>
+</tr>
+<tr>
+<td align="right">&hellip;</td>
+<td align="right">&hellip;</td>
+</tr>
+<tr>
+<td align="right">111111111111</td>
+<td align="right">0x0FFF</td>
+</tr>
+</tbody>
+</table>
+<h2 id="三页大小--页框大小--页表项数--物理内存块数">三、页大小 &amp; 页框大小 &amp; 页表项数 &amp; 物理内存块数</h2>
+<p>$$
+\begin{array}{l}
+物理内存块数 = \frac{物理内存(寻址范围)\equiv 2^{N}}{页大小}，其中 N = 地址总线条数
+\end{array}
+$$
+$$
+有：页大小 \equiv 页框大小，且：页表项数 \equiv物理内存块数
+$$</p>
+<h2 id="四页表项大小及其存储内容">四、页表项大小及其存储内容</h2>
+<blockquote>
+<p>一个页表项的大小(即：占用二进制位数)，至少要能容纳<code>块号最大的物理内存块首地址的位数</code></p>
+</blockquote>
+<p>例如：32 位地址总线</p>
+<p>$$
+\begin{array}{l}
+寻址范围： 2 ^{32} = 4294967296_{Bytes} = 4G_{Bytes}
+\end{array}
+$$
+$$
+页面大小(即：页框大小) = 4096_{Bytes} = 4K_{Bytes}
+$$
+$$
+则，页框数 = \frac{4G}{4K} = \frac{2 ^{32}}{2^{12}} = 2^{32-12} = 2^{20}
+$$</p>
+<p>物理内存块号范围：</p>
+<table>
+<thead>
+<tr>
+<th align="right">BIN</th>
+<th align="right">HEX</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="right">00000000000000000000</td>
+<td align="right">0x00000</td>
+</tr>
+<tr>
+<td align="right">00000000000000000001</td>
+<td align="right">0x00001</td>
+</tr>
+<tr>
+<td align="right">&hellip;</td>
+<td align="right">&hellip;</td>
+</tr>
+<tr>
+<td align="right">11111111111111111111</td>
+<td align="right">0xFFFFF</td>
+</tr>
+</tbody>
+</table>
+<p>即：页表项中指向物理内存块号部分需要 <code>20bits</code>，而 <code>2Bytes = 2 * 8bits = 16bits</code>，不够；至少需要 <code>3Bytes = 3 * 8bits = 24bits</code>，就是说占 3 个字节浪费的 bit 最少。然而，需要额外考虑：</p>
+<ul>
+<li>页表项需要连续内存存储，但 3 不是 2 的整数次幂，按页面对其无法严密填满单个页面</li>
+<li>内存页除了地址，还有读写性质、运行级别等等属性需要占用 bit</li>
+<li>避免内存管理本身使用的内存过多</li>
+</ul>
+<p>等等因素，所以<code>一般页表项大小</code>取 <code>4Bytes</code> 共 <code>32bits</code>。</p>
+<p>高 20 位(31-12)给了块号，低 12 位(11-0)被用来存放内存页属性，详见下图 PTE(Page-Table Entry)部分</p>
+<p><img src="/images/post/original/cs/os/memory/memory_paging/1.png" alt="image"></p>
+<h2 id="五线性地址-物理地址转换过程">五、线性地址-&gt;物理地址转换过程</h2>
+<ol>
+<li>进程访问某个逻辑地址时，MMU 将逻辑地址分为页号 Pn 和页内地址 offset</li>
+<li>页号大于页表长度，越界错误</li>
+<li>页表项的地址 PTE = 页表起始地址 PTB + [页号 Pn * 表项大小 sizeof(PTE)]，从而得到对应的物理块号 Pb</li>
+<li>页和物理块的大小是一致的，所以：页内地址 = 块内地址</li>
+<li>最终的物理地址 PA = 物理块号 Pb * 页大小 sizeof(Page) + 页内地址 offset</li>
+</ol>
+
+
+        
+
+        
+
+        
+          
+
+          
+        
+      </article>
 
       
-    <div class="page-meta">
-  
-  
-  
+        <ul class="pager blog-pager">
+          
+            <li class="previous">
+              <a href="https://newlooper.github.io/post/original/gitlab/docker_smtp/" data-toggle="tooltip" data-placement="top" title="GitLab on Docker 配置 SMTP 服务">&larr; 前一篇</a>
+            </li>
+          
+          
+            <li class="next">
+              <a href="https://newlooper.github.io/post/original/cs/vm/wsl/migrate_distributions/" data-toggle="tooltip" data-placement="top" title="WSL2 迁移 Linux 发行版">后一篇 &rarr;</a>
+            </li>
+          
+        </ul>
+      
+
+
+      
+        
+          
+          <div class="disqus-comments">                  
+            <button id="show-comments" class="btn btn-default" type="button">显示 <span class="disqus-comment-count" data-disqus-url="https://newlooper.github.io/post/original/cs/os/memory/memory_paging">则评论</span></button>
+            <div id="disqus_thread"></div>
+
+            <script type="text/javascript">
+              var disqus_config = function () {
+              this.page.url = 'https:\/\/newlooper.github.io\/post\/original\/cs\/os\/memory\/memory_paging';
+            };
+
+          </script>
+          </div>
+          
+        
+        
+      
+
+    </div>
+  </div>
 </div>
 
-
-  
+      
 <footer>
   <div class="container">
     <div class="row">
@@ -463,7 +502,7 @@ aside.toc a {
               </li>
           
           <li>
-            <a href="/index.xml" title="RSS">
+            <a href="" title="RSS">
               <span class="fa-stack fa-lg">
                 <i class="fas fa-circle fa-stack-2x"></i>
                 <i class="fas fa-rss fa-stack-1x fa-inverse"></i>

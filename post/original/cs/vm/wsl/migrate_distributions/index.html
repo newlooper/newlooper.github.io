@@ -7,7 +7,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
-  <title>Looper 的博客 - Looper 的博客</title>
+  <title>WSL2 迁移 Linux 发行版 - Looper 的博客</title>
+  <meta name="description" content="意图 备份还原 迁移 节省 C 盘空间 …… 导出 wsl.exe --export &lt;DistributionName&gt; &lt;FileName&gt; 导入 wsl.exe --import &lt;DistributionName&gt; &lt;InstallLocation&gt; &lt;FileName&gt; 提示：导入之后，执行 wsl -l -v 查看运行版本，如果是 1 的话，可以执行 wsl &ndash;set-version &lt;DistributionName&gt; 2 更新到 2 WSL 默">
   <meta name="author" content="Dylan Cheng"/><script type="application/ld+json">
 {
     "@context": "http://schema.org",
@@ -28,14 +29,64 @@
   
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "https:\/\/newlooper.github.io\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "https:\/\/newlooper.github.io\/post\/original\/cs\/vm\/wsl\/migrate_distributions\/",
+          "name": "W s l2 迁移 linux 发行版"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "Dylan Cheng"
+  },
+  "headline": "WSL2 迁移 Linux 发行版",
+  "description" : "意图 备份还原 迁移 节省 C 盘空间 …… 导出 wsl.exe --export \u0026lt;DistributionName\u0026gt; \u0026lt;FileName\u0026gt; 导入 wsl.exe --import \u0026lt;DistributionName\u0026gt; \u0026lt;InstallLocation\u0026gt; \u0026lt;FileName\u0026gt; 提示：导入之后，执行 wsl -l -v 查看运行版本，如果是 1 的话，可以执行 wsl \u0026ndash;set-version \u0026lt;DistributionName\u0026gt; 2 更新到 2 WSL 默",
+  "inLanguage" : "zh-cn",
+  "wordCount":  252 ,
+  "datePublished" : "2020-08-01T12:19:50",
+  "dateModified" : "2020-08-01T12:19:50",
+  "image" : "https:\/\/newlooper.github.io\/images\/site\/avatar-icon.png",
+  "keywords" : [ "" ],
+  "mainEntityOfPage" : "https:\/\/newlooper.github.io\/post\/original\/cs\/vm\/wsl\/migrate_distributions\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "https:\/\/newlooper.github.io\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "https:\/\/newlooper.github.io\/images\/site\/avatar-icon.png",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
 
-<meta property="og:title" content="Looper 的博客" />
+<meta property="og:title" content="WSL2 迁移 Linux 发行版" />
+<meta property="og:description" content="意图 备份还原 迁移 节省 C 盘空间 …… 导出 wsl.exe --export &lt;DistributionName&gt; &lt;FileName&gt; 导入 wsl.exe --import &lt;DistributionName&gt; &lt;InstallLocation&gt; &lt;FileName&gt; 提示：导入之后，执行 wsl -l -v 查看运行版本，如果是 1 的话，可以执行 wsl &ndash;set-version &lt;DistributionName&gt; 2 更新到 2 WSL 默">
 <meta property="og:image" content="https://newlooper.github.io/images/site/avatar-icon.png" />
-<meta property="og:url" content="https://newlooper.github.io/" />
+<meta property="og:url" content="https://newlooper.github.io/post/original/cs/vm/wsl/migrate_distributions/" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Looper 的博客" />
 
-  <meta name="twitter:title" content="Looper 的博客" />
+  <meta name="twitter:title" content="WSL2 迁移 Linux 发行版" />
+  <meta name="twitter:description" content="意图 备份还原 迁移 节省 C 盘空间 …… 导出 wsl.exe --export &lt;DistributionName&gt; &lt;FileName&gt; 导入 wsl.exe --import &lt;DistributionName&gt; &lt;InstallLocation&gt; &lt;FileName&gt; 提示：导入之后，执行 wsl -l -v 查看运行版本，如 …">
   <meta name="twitter:image" content="https://newlooper.github.io/images/site/avatar-icon.png" />
   <meta name="twitter:card" content="summary" />
   <link href='https://newlooper.github.io/img/favicon.ico' rel='icon' type='image/x-icon'/>
@@ -206,124 +257,14 @@ aside.toc a {
       <div class="container">
         <div class="row">
           <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-            <div class="page-heading">
+            <div class="post-heading">
               
-                <h1>Looper 的博客</h1>
-              
-              
-                <hr class="small">
+                <h1>WSL2 迁移 Linux 发行版</h1>
               
               
-                
-                  <span class="page-subheading">——穷居闹市无人问，富在深山有远亲</span>
-                
               
               
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
-
-
-    
-  <div role="main" class="container">
-    <div class="row">
-      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-        
-
-        <div class="posts-list">
-          
-          
-            <article class="post-preview">
-    <a href="https://newlooper.github.io/post/original/cs/io/eof/">
-        <h2 class="post-title">EOF，到底怎么回事</h2>
-        
-        
-        
-    </a>
-
-    <p class="post-meta">
-        <span class="post-meta">
-  
-  
-  <i class="fas fa-calendar"></i>&nbsp;发表于 2020-08-03
-  
-  
-  
-    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;9808&nbsp;个字
-  
-  
-    
-      &nbsp;|&nbsp;<i class="fas fa-user"></i>&nbsp;Dylan Cheng
-    
-  
-  
-</span>
-
-
-    </p>
-    <div class="post-entry">
-        
-        TL;DR 首先，确未想到，为说清楚这个玩意儿，居然要用不少的篇幅；其次，当涉及对一些概念、原理的追溯时，递归到多深的地步，也不容易拿捏；好在，写这些
-        <a href="https://newlooper.github.io/post/original/cs/io/eof/" class="post-read-more">[阅读全文]</a>
-        
-    </div>
-
-    
-
-</article>
-          
-            <article class="post-preview">
-    <a href="https://newlooper.github.io/post/trans/learn-assembly-language/">
-        <h2 class="post-title">Learn Assembly Language 汇编语言学习(拙译)</h2>
-        
-        
-        
-    </a>
-
-    <p class="post-meta">
-        <span class="post-meta">
-  
-  
-  <i class="fas fa-calendar"></i>&nbsp;发表于 2020-08-01
-  
-  
-  
-    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;23097&nbsp;个字
-  
-  
-    
-      &nbsp;|&nbsp;<i class="fas fa-user"></i>&nbsp;Dylan Cheng
-    
-  
-  
-</span>
-
-
-    </p>
-    <div class="post-entry">
-        
-        Index-0 原址：https://asmtutor.com/ 环境：nasm on x64 linux TL;DR 动机：程序员——多掌握几门计算机语言，还是有好处的 主题：汇编语言——
-        <a href="https://newlooper.github.io/post/trans/learn-assembly-language/" class="post-read-more">[阅读全文]</a>
-        
-    </div>
-
-    
-
-</article>
-          
-            <article class="post-preview">
-    <a href="https://newlooper.github.io/post/original/cs/vm/wsl/migrate_distributions/">
-        <h2 class="post-title">WSL2 迁移 Linux 发行版</h2>
-        
-        
-        
-    </a>
-
-    <p class="post-meta">
-        <span class="post-meta">
+                <span class="post-meta">
   
   
   <i class="fas fa-calendar"></i>&nbsp;发表于 2020-08-01
@@ -341,112 +282,122 @@ aside.toc a {
 </span>
 
 
-    </p>
-    <div class="post-entry">
-        
-        意图 备份还原 迁移 节省 C 盘空间 …… 导出 wsl.exe --export &lt;DistributionName&gt; &lt;FileName&gt; 导入 wsl.exe --import &lt;DistributionName&gt; &lt;InstallLocation&gt; &lt;FileName&gt; 提示：导入之后，执行 wsl -l -v 查看运行版本，如果是 1 的话，可以执行 wsl &ndash;set-version &lt;DistributionName&gt; 2 更新到 2 WSL 默
-        <a href="https://newlooper.github.io/post/original/cs/vm/wsl/migrate_distributions/" class="post-read-more">[阅读全文]</a>
-        
-    </div>
-
-    
-
-</article>
-          
-            <article class="post-preview">
-    <a href="https://newlooper.github.io/post/original/cs/os/memory/memory_paging/">
-        <h2 class="post-title">分页内存地址转换点滴</h2>
-        
-        
-        
-    </a>
-
-    <p class="post-meta">
-        <span class="post-meta">
-  
-  
-  <i class="fas fa-calendar"></i>&nbsp;发表于 2020-06-22
-  
-  
-  
-    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;1000&nbsp;个字
-  
-  
-    
-      &nbsp;|&nbsp;<i class="fas fa-user"></i>&nbsp;Dylan Cheng
-    
-  
-  
-</span>
-
-
-    </p>
-    <div class="post-entry">
-        
-        环境与条件：CPU 和操作系统都为 32 位，主存按字节编址 一、页大小的确定 一言以蔽之——在页表所占内存和页内填充内存的耗费上做取舍、折中 以下极端情
-        <a href="https://newlooper.github.io/post/original/cs/os/memory/memory_paging/" class="post-read-more">[阅读全文]</a>
-        
-    </div>
-
-    
-
-</article>
-          
-            <article class="post-preview">
-    <a href="https://newlooper.github.io/post/original/gitlab/docker_smtp/">
-        <h2 class="post-title">GitLab on Docker 配置 SMTP 服务</h2>
-        
-        
-        
-    </a>
-
-    <p class="post-meta">
-        <span class="post-meta">
-  
-  
-  <i class="fas fa-calendar"></i>&nbsp;发表于 2017-09-03
-  
-  
-  
-    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;193&nbsp;个字
-  
-  
-    
-      &nbsp;|&nbsp;<i class="fas fa-user"></i>&nbsp;Dylan Cheng
-    
-  
-  
-</span>
-
-
-    </p>
-    <div class="post-entry">
-        
-        起因 gitlab 官方 docker 容器部署完毕。容器中的服务越少越好，所以使用外部 SMTP 发送邮件。 环境 撰写此文时： Docker 17.06.1-ce GitLab Community Edition 9.5.2 ab97415 步骤 网易 163 邮箱 授权码设置 协议开启与服务
-        <a href="https://newlooper.github.io/post/original/gitlab/docker_smtp/" class="post-read-more">[阅读全文]</a>
-        
-    </div>
-
-    
-
-</article>
-          
+              
+            </div>
+          </div>
         </div>
-
-        
       </div>
     </div>
-  </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        <aside class="toc">
+          <nav id="TableOfContents">
+  <ul>
+    <li><a href="#意图">意图</a></li>
+    <li><a href="#导出">导出</a></li>
+    <li><a href="#导入">导入</a></li>
+    <li><a href="#wsl-默认登录用户"><strong>WSL 默认登录用户</strong></a></li>
+    <li><a href="#参考">参考</a></li>
+  </ul>
+</nav>
+        </aside>
+        <h2 id="意图">意图</h2>
+<ul>
+<li>
+<p>备份还原</p>
+</li>
+<li>
+<p>迁移</p>
+</li>
+<li>
+<p>节省 C 盘空间</p>
+</li>
+<li>
+<p>……</p>
+</li>
+</ul>
+<h2 id="导出">导出</h2>
+<div class="highlight"><pre class="chroma"><code class="language-fallback" data-lang="fallback">wsl.exe --export &lt;DistributionName&gt; &lt;FileName&gt;
+</code></pre></div><h2 id="导入">导入</h2>
+<div class="highlight"><pre class="chroma"><code class="language-fallback" data-lang="fallback">wsl.exe --import &lt;DistributionName&gt; &lt;InstallLocation&gt; &lt;FileName&gt;
+</code></pre></div><blockquote>
+<p>提示：导入之后，执行 wsl -l -v 查看运行版本，如果是 1 的话，可以执行 wsl &ndash;set-version &lt;DistributionName&gt; 2 更新到 2</p>
+</blockquote>
+<h2 id="wsl-默认登录用户"><strong>WSL 默认登录用户</strong></h2>
+<p>如果迁移完毕后发现默认登录用户被置为：root，或者想要手动指定默认的登录用户，可以按如下操作设置：</p>
+<p>注册表项：</p>
+<blockquote>
+<p>HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Lxss</p>
+</blockquote>
+<p>其中的 DefaultUid 一项，设置为对应子系统中的 Linux UID，UID 可以登录进 WSL 获取</p>
+<p>或者：</p>
+<p>这里有一个老外提供的，只需提供用户名，不需要登录也能设置 DefaultUid 的 powershell 函数，注意该用户必须存在于子系统中</p>
+<blockquote>
+<p>Function WSL-SetDefaultUser ($distro, $user) { Get-ItemProperty Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Lxss*\ DistributionName | Where-Object -Property DistributionName -eq $distro | Set-ItemProperty -Name DefaultUid -Value ((wsl -d $distro -u $user -e id -u) | Out-String); };</p>
+<p>WSL-SetDefaultUser &lt;DistributionName&gt; &lt;username&gt;</p>
+</blockquote>
+<h2 id="参考">参考</h2>
+<p><a href="https://docs.microsoft.com/en-us/windows/wsl/install-win10">https://docs.microsoft.com/en-us/windows/wsl/install-win10</a></p>
+<p><a href="https://github.com/microsoft/WSL/issues/3974">https://github.com/microsoft/WSL/issues/3974</a></p>
+
+
+        
+
+        
+
+        
+          
+
+          
+        
+      </article>
 
       
-    <div class="page-meta">
-  
-  
-  
+        <ul class="pager blog-pager">
+          
+            <li class="previous">
+              <a href="https://newlooper.github.io/post/original/cs/os/memory/memory_paging/" data-toggle="tooltip" data-placement="top" title="分页内存地址转换点滴">&larr; 前一篇</a>
+            </li>
+          
+          
+            <li class="next">
+              <a href="https://newlooper.github.io/post/trans/learn-assembly-language/" data-toggle="tooltip" data-placement="top" title="Learn Assembly Language 汇编语言学习(拙译)">后一篇 &rarr;</a>
+            </li>
+          
+        </ul>
+      
+
+
+      
+        
+          
+          <div class="disqus-comments">                  
+            <button id="show-comments" class="btn btn-default" type="button">显示 <span class="disqus-comment-count" data-disqus-url="https://newlooper.github.io/post/original/cs/vm/wsl/migrate_distributions">则评论</span></button>
+            <div id="disqus_thread"></div>
+
+            <script type="text/javascript">
+              var disqus_config = function () {
+              this.page.url = 'https:\/\/newlooper.github.io\/post\/original\/cs\/vm\/wsl\/migrate_distributions';
+            };
+
+          </script>
+          </div>
+          
+        
+        
+      
+
+    </div>
+  </div>
 </div>
 
-
-  
+      
 <footer>
   <div class="container">
     <div class="row">
@@ -463,7 +414,7 @@ aside.toc a {
               </li>
           
           <li>
-            <a href="/index.xml" title="RSS">
+            <a href="" title="RSS">
               <span class="fa-stack fa-lg">
                 <i class="fas fa-circle fa-stack-2x"></i>
                 <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
