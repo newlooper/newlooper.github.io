@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Theory on Looper 的博客</title>
+    <link>https://newlooper.github.io/categories/theory/</link>
+    <description>Recent content in Theory on Looper 的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Mon, 22 Jun 2020 09:28:07 +0800</lastBuildDate>
+    
+	<atom:link href="https://newlooper.github.io/categories/theory/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>分页内存地址转换点滴</title>
+      <link>https://newlooper.github.io/post/original/cs/os/memory/memory_paging/</link>
+      <pubDate>Mon, 22 Jun 2020 09:28:07 +0800</pubDate>
+      
+      <guid>https://newlooper.github.io/post/original/cs/os/memory/memory_paging/</guid>
+      <description>环境与条件：CPU 和操作系统都为 32 位，主存按字节编址 一、页大小的确定 一言以蔽之——在页表所占内存和页内填充内存的耗费上做取舍、折中 以下极端情</description>
+    </item>
+    
+  </channel>
+</rss>

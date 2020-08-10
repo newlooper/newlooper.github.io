@@ -3,6 +3,21 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://newlooper.github.io/categories/</loc>
+    <lastmod>2020-08-03T15:52:41+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://newlooper.github.io/categories/concept/</loc>
+    <lastmod>2020-08-03T15:52:41+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://newlooper.github.io/tags/eof/</loc>
+    <lastmod>2020-08-03T15:52:41+08:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://newlooper.github.io/post/original/cs/io/eof/</loc>
     <lastmod>2020-08-03T15:52:41+08:00</lastmod>
   </url>
@@ -18,8 +33,53 @@
   </url>
   
   <url>
+    <loc>https://newlooper.github.io/tags/programming/</loc>
+    <lastmod>2020-08-03T15:52:41+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://newlooper.github.io/tags/</loc>
+    <lastmod>2020-08-03T15:52:41+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://newlooper.github.io/tags/terminal/</loc>
+    <lastmod>2020-08-03T15:52:41+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://newlooper.github.io/tags/assembly-language/</loc>
+    <lastmod>2020-08-01T16:29:01+08:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://newlooper.github.io/post/trans/learn-assembly-language/</loc>
     <lastmod>2020-08-01T16:29:01+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://newlooper.github.io/tags/nasm/</loc>
+    <lastmod>2020-08-01T16:29:01+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://newlooper.github.io/categories/translation/</loc>
+    <lastmod>2020-08-01T16:29:01+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://newlooper.github.io/categories/tricks/</loc>
+    <lastmod>2020-08-01T12:19:50+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://newlooper.github.io/tags/vm/</loc>
+    <lastmod>2020-08-01T12:19:50+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://newlooper.github.io/tags/wsl/</loc>
+    <lastmod>2020-08-01T12:19:50+08:00</lastmod>
   </url>
   
   <url>
@@ -28,8 +88,33 @@
   </url>
   
   <url>
+    <loc>https://newlooper.github.io/tags/memory/</loc>
+    <lastmod>2020-06-22T09:28:07+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://newlooper.github.io/tags/os/</loc>
+    <lastmod>2020-06-22T09:28:07+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://newlooper.github.io/categories/theory/</loc>
+    <lastmod>2020-06-22T09:28:07+08:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://newlooper.github.io/post/original/cs/os/memory/memory_paging/</loc>
     <lastmod>2020-06-22T09:28:07+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://newlooper.github.io/tags/docker/</loc>
+    <lastmod>2017-09-03T13:34:45+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://newlooper.github.io/tags/gitlab/</loc>
+    <lastmod>2017-09-03T13:34:45+08:00</lastmod>
   </url>
   
   <url>
@@ -38,11 +123,8 @@
   </url>
   
   <url>
-    <loc>https://newlooper.github.io/categories/</loc>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.github.io/tags/</loc>
+    <loc>https://newlooper.github.io/tags/smtp/</loc>
+    <lastmod>2017-09-03T13:34:45+08:00</lastmod>
   </url>
   
 </urlset>
