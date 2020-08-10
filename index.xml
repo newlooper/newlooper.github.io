@@ -6,6 +6,8 @@
     <description>Recent content on Looper 的博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
+    <managingEditor>newlooper@gmail.com (Dylan Cheng)</managingEditor>
+    <webMaster>newlooper@gmail.com (Dylan Cheng)</webMaster>
     <lastBuildDate>Mon, 03 Aug 2020 15:52:41 +0800</lastBuildDate>
     
 	<atom:link href="https://newlooper.github.io/index.xml" rel="self" type="application/rss+xml" />
@@ -15,7 +17,7 @@
       <title>EOF，到底怎么回事</title>
       <link>https://newlooper.github.io/post/original/cs/io/eof/</link>
       <pubDate>Mon, 03 Aug 2020 15:52:41 +0800</pubDate>
-      
+      <author>newlooper@gmail.com (Dylan Cheng)</author>
       <guid>https://newlooper.github.io/post/original/cs/io/eof/</guid>
       <description>TL;DR 首先，确未想到，为说清楚这个玩意儿，居然要用不少的篇幅；其次，当涉及对一些概念、原理的追溯时，递归到多深的地步，也不容易拿捏；好在，写这些</description>
     </item>
@@ -24,7 +26,7 @@
       <title>Learn Assembly Language 汇编语言学习(拙译)</title>
       <link>https://newlooper.github.io/post/trans/learn-assembly-language/</link>
       <pubDate>Sat, 01 Aug 2020 16:29:01 +0800</pubDate>
-      
+      <author>newlooper@gmail.com (Dylan Cheng)</author>
       <guid>https://newlooper.github.io/post/trans/learn-assembly-language/</guid>
       <description>Index-0 原址：https://asmtutor.com/ 环境：nasm on x64 linux TL;DR 动机：程序员——多掌握几门计算机语言，还是有好处的 主题：汇编语言——</description>
     </item>
@@ -33,7 +35,7 @@
       <title>WSL2 迁移 Linux 发行版</title>
       <link>https://newlooper.github.io/post/original/cs/vm/wsl/migrate_distributions/</link>
       <pubDate>Sat, 01 Aug 2020 12:19:50 +0800</pubDate>
-      
+      <author>newlooper@gmail.com (Dylan Cheng)</author>
       <guid>https://newlooper.github.io/post/original/cs/vm/wsl/migrate_distributions/</guid>
       <description>意图 备份还原 迁移 节省 C 盘空间 …… 导出 wsl.exe --export &amp;lt;DistributionName&amp;gt; &amp;lt;FileName&amp;gt; 导入 wsl.exe --import &amp;lt;DistributionName&amp;gt; &amp;lt;InstallLocation&amp;gt; &amp;lt;FileName&amp;gt; 提示：导入之后，执行 wsl -l -v 查看运行版本，如果是 1 的话，可以执行 wsl &amp;ndash;set-version &amp;lt;DistributionName&amp;gt; 2 更新到 2 WSL 默</description>
     </item>
@@ -42,7 +44,7 @@
       <title>分页内存地址转换点滴</title>
       <link>https://newlooper.github.io/post/original/cs/os/memory/memory_paging/</link>
       <pubDate>Mon, 22 Jun 2020 09:28:07 +0800</pubDate>
-      
+      <author>newlooper@gmail.com (Dylan Cheng)</author>
       <guid>https://newlooper.github.io/post/original/cs/os/memory/memory_paging/</guid>
       <description>环境与条件：CPU 和操作系统都为 32 位，主存按字节编址 一、页大小的确定 一言以蔽之——在页表所占内存和页内填充内存的耗费上做取舍、折中 以下极端情</description>
     </item>
@@ -51,7 +53,7 @@
       <title>GitLab on Docker 配置 SMTP 服务</title>
       <link>https://newlooper.github.io/post/original/gitlab/docker_smtp/</link>
       <pubDate>Sun, 03 Sep 2017 13:34:45 +0800</pubDate>
-      
+      <author>newlooper@gmail.com (Dylan Cheng)</author>
       <guid>https://newlooper.github.io/post/original/gitlab/docker_smtp/</guid>
       <description>起因 gitlab 官方 docker 容器部署完毕。容器中的服务越少越好，所以使用外部 SMTP 发送邮件。 环境 撰写此文时： Docker 17.06.1-ce GitLab Community Edition 9.5.2 ab97415 步骤 网易 163 邮箱 授权码设置 协议开启与服务</description>
     </item>

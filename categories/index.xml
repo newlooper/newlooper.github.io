@@ -6,6 +6,8 @@
     <description>Recent content in Categories on Looper 的博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
+    <managingEditor>newlooper@gmail.com (Dylan Cheng)</managingEditor>
+    <webMaster>newlooper@gmail.com (Dylan Cheng)</webMaster>
     <lastBuildDate>Mon, 03 Aug 2020 15:52:41 +0800</lastBuildDate>
     
 	<atom:link href="https://newlooper.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
@@ -15,7 +17,7 @@
       <title>Concept</title>
       <link>https://newlooper.github.io/categories/concept/</link>
       <pubDate>Mon, 03 Aug 2020 15:52:41 +0800</pubDate>
-      
+      <author>newlooper@gmail.com (Dylan Cheng)</author>
       <guid>https://newlooper.github.io/categories/concept/</guid>
       <description></description>
     </item>
@@ -24,7 +26,7 @@
       <title>Translation</title>
       <link>https://newlooper.github.io/categories/translation/</link>
       <pubDate>Sat, 01 Aug 2020 16:29:01 +0800</pubDate>
-      
+      <author>newlooper@gmail.com (Dylan Cheng)</author>
       <guid>https://newlooper.github.io/categories/translation/</guid>
       <description></description>
     </item>
@@ -33,7 +35,7 @@
       <title>Tricks</title>
       <link>https://newlooper.github.io/categories/tricks/</link>
       <pubDate>Sat, 01 Aug 2020 12:19:50 +0800</pubDate>
-      
+      <author>newlooper@gmail.com (Dylan Cheng)</author>
       <guid>https://newlooper.github.io/categories/tricks/</guid>
       <description></description>
     </item>
@@ -42,7 +44,7 @@
       <title>Theory</title>
       <link>https://newlooper.github.io/categories/theory/</link>
       <pubDate>Mon, 22 Jun 2020 09:28:07 +0800</pubDate>
-      
+      <author>newlooper@gmail.com (Dylan Cheng)</author>
       <guid>https://newlooper.github.io/categories/theory/</guid>
       <description></description>
     </item>
