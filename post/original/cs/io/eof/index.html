@@ -59,7 +59,7 @@
   "headline": "EOF，到底怎么回事",
   "description" : "TL;DR 首先，确未想到，为说清楚这个玩意儿，居然要用不少的篇幅；其次，当涉及对一些概念、原理的追溯时，递归到多深的地步，也不容易拿捏；好在，写这些",
   "inLanguage" : "zh-cn",
-  "wordCount":  9860 ,
+  "wordCount":  9866 ,
   "datePublished" : "2020-08-03T15:52:41",
   "dateModified" : "2020-08-03T15:52:41",
   "image" : "https:\/\/newlooper.github.io\/images\/site\/avatar-icon.png",
@@ -282,7 +282,7 @@ if (!doNotTrack) {
   
   
   
-    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;9860&nbsp;个字
+    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;9866&nbsp;个字
   
   
     
@@ -737,13 +737,14 @@ aBc
 	<span class="k">for</span> <span class="p">{</span>
 		<span class="nx">c</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nf">ReadByte</span><span class="p">()</span>
 		<span class="k">if</span> <span class="nx">err</span> <span class="o">==</span> <span class="nx">io</span><span class="p">.</span><span class="nx">EOF</span> <span class="p">{</span>
-			<span class="k">break</span>
+			<span class="c1">// println(&#34;\tchar|&#34;, line, &#34;\t&#34;, c) // 注意 Go 对于这种情况下 c 值的处理
+</span><span class="c1"></span>			<span class="k">break</span>
 		<span class="p">}</span>
 		<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
 			<span class="nb">panic</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
 		<span class="p">}</span>
-		<span class="nb">println</span><span class="p">(</span><span class="s">&#34;\tchar-&#34;</span><span class="p">,</span> <span class="nx">line</span><span class="p">,</span> <span class="s">&#34;\t&#34;</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span> <span class="c1">// 人家都用 fmt.xxx，就你特殊。嘛，为了省点内存，免得逃逸了:-)
-</span><span class="c1"></span>		<span class="nx">line</span><span class="o">++</span>
+		<span class="nb">println</span><span class="p">(</span><span class="s">&#34;\tchar-&#34;</span><span class="p">,</span> <span class="nx">line</span><span class="p">,</span> <span class="s">&#34;\t&#34;</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span>
+		<span class="nx">line</span><span class="o">++</span>
 	<span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div><blockquote>
@@ -770,10 +771,10 @@ aBc
 		char-13         <span class="m">10</span>
 </code></pre></div><p>可以看到，不同平台下的终端对待 ENTER 的行为是一致的，但对待文件结束标记却不同</p>
 <ul>
-<li>Windows 下输入 CTRL-Z，并不会有响应，必须等 ENTER 后，才进入判断和处理流程( EOF 跑回车前头去了？错。后文详述)</li>
-<li>Linux 下只要输入 CTRL-D，就会立刻进入处理流程( EOF 变成回车了？错。后文详述)</li>
+<li>Windows 下输入 CTRL-Z，并不会有响应，必须等 ENTER 后，才进入判断和处理流程( EOF 跑 ENTER 前头去了？No。后文详述)</li>
+<li>Linux 下只要输入 CTRL-D，就会立刻进入处理流程( EOF 变成 ENTER 了？No。后文详述)</li>
 </ul>
-<p>还没完，记得之前的例子，我们曾用某种输入方式让那个 PHP 程序在 Windows 下输出了我们输入的 CTRL-Z，那么对于我们的这个 GO 程序，是否适用呢？很遗憾，GO 并不把 EOF 当作有效输入返回给用户程序，无论在哪个平台。</p>
+<p>还没完，记得之前的例子，我们曾用某种输入方式让那个 PHP 程序在 Windows 下打印了我们输入的 CTRL-Z 的码值，那么对于这个 GO 程序，是否适用呢？很遗憾，GO 并不把 EOF 当作有效输入返回给用户程序，无论在哪个平台；可以通过取消上面代码中 io.EOF 判断块中的注释来验证这点。</p>
 <p>虽然无法让 GO 打印出我们通过终端输入的 EOF 的码值，但前面的方法(先输入一些内容，不回车直接给 EOF)的确改变了文件结尾标记的默认行为，下面解释其原理：</p>
 <p>在 <a href="https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/contents.html">The Open Group Base Specifications Issue 7, 2018 edition</a>(如果感觉这玩意儿名字陌生，他还有另一个名字：POSIX。虽然也可能像我一样，久闻其名，却不知其全貌，但起码比第一个名字脸熟多了)的<a href="https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap11.html#tag_11">11.1.9 Special Characters</a>中，关于 EOF 的描述：</p>
 <blockquote>

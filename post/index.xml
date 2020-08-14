@@ -50,6 +50,15 @@
     </item>
     
     <item>
+      <title>The GNU ed line editor [译]</title>
+      <link>https://newlooper.github.io/post/trans/cs/editor/ed/</link>
+      <pubDate>Fri, 12 Jun 2020 17:20:59 +0800</pubDate>
+      <author>newlooper@gmail.com (Dylan Cheng)</author>
+      <guid>https://newlooper.github.io/post/trans/cs/editor/ed/</guid>
+      <description>GNU ed 手册 (version 1.16, 2020-02-20). 原址：https://www.gnu.org/software/ed/manual/ed_manual.html 概览: ed 概览 行</description>
+    </item>
+    
+    <item>
       <title>GitLab on Docker 配置 SMTP 服务</title>
       <link>https://newlooper.github.io/post/original/gitlab/docker_smtp/</link>
       <pubDate>Sun, 03 Sep 2017 13:34:45 +0800</pubDate>

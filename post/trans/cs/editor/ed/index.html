@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="zh-cn" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>The GNU ed line editor [译] - Looper 的博客</title>
+  <meta name="description" content="GNU ed 手册 (version 1.16, 2020-02-20). 原址：https://www.gnu.org/software/ed/manual/ed_manual.html 概览: ed 概览 行">
+  <meta name="author" content="Dylan Cheng"/><script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "Looper 的博客",
+    
+    "url": "https:\/\/newlooper.github.io\/"
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "https:\/\/newlooper.github.io\/"
+  
+  
+  
+  
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "https:\/\/newlooper.github.io\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "https:\/\/newlooper.github.io\/post\/trans\/cs\/editor\/ed\/",
+          "name": "The g n u ed line editor [译]"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "Dylan Cheng"
+  },
+  "headline": "The GNU ed line editor [译]",
+  "description" : "GNU ed 手册 (version 1.16, 2020-02-20). 原址：https:\/\/www.gnu.org\/software\/ed\/manual\/ed_manual.html 概览: ed 概览 行",
+  "inLanguage" : "zh-cn",
+  "wordCount":  9476 ,
+  "datePublished" : "2020-06-12T17:20:59",
+  "dateModified" : "2020-06-12T17:20:59",
+  "image" : "https:\/\/newlooper.github.io\/images\/site\/avatar-icon.png",
+  "keywords" : [ "Editor, Unix" ],
+  "mainEntityOfPage" : "https:\/\/newlooper.github.io\/post\/trans\/cs\/editor\/ed\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "https:\/\/newlooper.github.io\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "https:\/\/newlooper.github.io\/images\/site\/avatar-icon.png",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
+
+<meta property="og:title" content="The GNU ed line editor [译]" />
+<meta property="og:description" content="GNU ed 手册 (version 1.16, 2020-02-20). 原址：https://www.gnu.org/software/ed/manual/ed_manual.html 概览: ed 概览 行">
+<meta property="og:image" content="https://newlooper.github.io/images/site/avatar-icon.png" />
+<meta property="og:url" content="https://newlooper.github.io/post/trans/cs/editor/ed/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Looper 的博客" />
+
+  <meta name="twitter:title" content="The GNU ed line editor [译]" />
+  <meta name="twitter:description" content="GNU ed 手册 (version 1.16, 2020-02-20). 原址：https://www.gnu.org/software/ed/manual/ed_manual.html 概览: ed 概览 行">
+  <meta name="twitter:image" content="https://newlooper.github.io/images/site/avatar-icon.png" />
+  <meta name="twitter:card" content="summary" />
+  <link href='https://newlooper.github.io/img/favicon.ico' rel='icon' type='image/x-icon'/>
+  <meta name="generator" content="Hugo 0.74.3" />
+  <link rel="alternate" href="https://newlooper.github.io/index.xml" type="application/rss+xml" title="Looper 的博客"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css" integrity="sha384-9eLZqc9ds8eNjO3TmqPeYcDj8n+Qfa4nuSiGYa6DjLNcv9BtN69ZIulL9+8CqC9Y" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"><link rel="stylesheet" href="https://newlooper.github.io/css/main.css" /><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" /><link rel="stylesheet" href="https://newlooper.github.io/css/syntax.css" /><link rel="stylesheet" href="https://newlooper.github.io/css/codeblock.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/default-skin/default-skin.min.css" integrity="sha384-iD0dNku6PYSIQLyfTOpB06F2KCZJAKLOThS5HRe8b3ibhdEQ6eKsFf/EeFxdOt5R" crossorigin="anonymous"><style>
+.container {
+    width: 1500px;
+    min-width: 1500px;
+}
+article.blog-post {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+article.blog-post > blockquote {
+    font-family: 'Lora', 'Times New Roman', serif;
+}
+article.blog-post img {
+    display: block;
+    margin-top: 1em;
+    margin-right: auto;
+    margin-bottom: 1em;
+    margin-left: auto;
+    max-width: 100%;
+}
+article.blog-post table {
+    margin: auto;
+    width: 90%;
+    margin-bottom: 0.5em;
+    box-shadow: 2px 2px 3px rgba(0,0,0,.125);
+}
+article.blog-post blockquote {
+    margin: 1em 0;
+    padding: 10px 20px;
+    position: relative;
+    color: rgba(52,73,94,.8);
+    background-color: rgba(248,245,236,.6);
+    border-left: 5px solid #eee;
+    box-shadow: 1px 1px 2px rgba(0,0,0,.125);
+}
+aside.toc {
+    float: right;
+    padding: 6px;
+    padding-right: 20px;
+    margin: 0;
+    margin-left: 10px;
+    margin-bottom: 10px;
+    border: solid 1px #d3d3d3;
+    font-size: 12px;
+}
+
+aside.toc ul {
+    padding-inline-start: 20px;
+    list-style: circle;
+}
+
+aside.toc a {
+    color: #666;
+}
+</style>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-175169252-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">切换导航</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="https://newlooper.github.io/">Looper 的博客</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+        
+
+        
+
+        
+      </ul>
+    </div>
+
+    
+      <div class="avatar-container">
+        <div class="avatar-img-border">
+          <a title="Looper 的博客" href="https://newlooper.github.io/">
+            <img class="avatar-img" src="https://newlooper.github.io/images/site/avatar-icon.png" alt="Looper 的博客" />
+          </a>
+        </div>
+      </div>
+    
+
+  </div>
+</nav>
+
+
+
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+  
+  
+  
+
+
+
+
+
+
+  
+
+  <header class="header-section ">
+    
+    <div class="intro-header no-img">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="post-heading">
+              
+                <h1>The GNU ed line editor [译]</h1>
+              
+              
+              
+              
+                <span class="post-meta">
+  
+  
+  <i class="fas fa-calendar"></i>&nbsp;发表于 2020-06-12
+  
+  
+  
+    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;9476&nbsp;个字
+  
+  
+    
+      &nbsp;|&nbsp;<i class="fas fa-user"></i>&nbsp;Dylan Cheng
+    
+  
+  
+</span>
+
+
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        <aside class="toc">
+          <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-概览">1 概览</a></li>
+    <li><a href="#2-行编辑简介">2 行编辑简介</a></li>
+    <li><a href="#3-调用-ed">3 调用 ed</a></li>
+    <li><a href="#4-行寻址">4 行寻址</a></li>
+    <li><a href="#5-正则表达式">5 正则表达式</a></li>
+    <li><a href="#6-命令">6 命令</a></li>
+    <li><a href="#7-限制">7 限制</a></li>
+    <li><a href="#8-诊断">8 诊断</a></li>
+    <li><a href="#9-报告-bugs">9 报告 bugs</a></li>
+  </ul>
+</nav>
+        </aside>
+        <p>GNU ed 手册 (version 1.16, 2020-02-20).</p>
+<p>原址：<a href="https://www.gnu.org/software/ed/manual/ed_manual.html">https://www.gnu.org/software/ed/manual/ed_manual.html</a></p>
+<ul>
+<li>概览: ed 概览</li>
+<li>行编辑简介: GNU ed 起步</li>
+<li>调用 ed: 命令行界面</li>
+<li>行寻址: 在缓冲区中指定行/范围</li>
+<li>正则表达式: 文本选择模式</li>
+<li>命令: GNU ed 识别命令</li>
+<li>限制: GNU ed 的固有局限性</li>
+<li>诊断: GNU ed 错误处理</li>
+<li>问题: 报告 bugs</li>
+<li><a href="https://www.gnu.org/software/ed/manual/ed_manual.html#GNU-Free-Documentation-License">GNU Free Documentation License</a>: How you can copy and share this manual</li>
+</ul>
+<blockquote>
+<p>Copyright © 1993, 1994, 2006-2020 Free Software Foundation, Inc.
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.3 or any later version published by the Free Software Foundation; with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.</p>
+</blockquote>
+<h2 id="1-概览">1 概览</h2>
+<p>GNU <strong>ed</strong> 是一种基于行的文本编辑器。它以交互方式或通过 Shell 脚本对文本文件进行：创建、显示、修改等操作。<strong>ed</strong> 的受限版本(<strong>red</strong>)只能编辑当前目录中的文件且无法执行 Shell 命令。<strong>ed</strong> 是 Unix 中广泛使用的原始编辑器，因此某种意义上可以说：<strong>ed</strong> 是事实上的&quot;标准&rdquo;。但是，在大多数情况下，它已被 GNU <strong>Emacs</strong> 或 GNU <strong>Moe</strong> 等全屏编辑器取代。</p>
+<p>GNU <strong>ed</strong> 基于 Brian W. Kernighan 和  P. J. Plauger 在1981年 Addison-Wesley 的著作&quot;Software Tools in Pascal&quot;中描述的编辑器算法。</p>
+<p>如果在调用 <strong>ed</strong> 时附加 <em>file</em> 参数，则会将对应文件的副本读入编辑器的缓冲区。对副本进行更改，不影响文件本身。退出时，所有未用<code>'w'</code>命令&quot;明确保存&quot;的变更将被丢弃。</p>
+<p><strong>ed</strong> 有两种不同的模式：<strong>command</strong> 命令模式和 <strong>input</strong> 输入模式。刚启动时，<strong>ed</strong> 处于命令模式。在这种模式下，从标准输入读取命令，并执行命令以操作编辑器缓冲区的内容。典型的命令可能如下所示：</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">,s/old/new/g
+</code></pre></div><p>用 <em>new</em> 替换字符串 <em>old</em> 的<strong>所有</strong>出现。</p>
+<p>当输入诸如：<code>'a'</code>追加，<code>'i'</code>插入，<code>'c'</code>修改等命令时，就进入输入模式。这是将文本添加到文件的主要方法。在这种模式下，命令将不可用。此时的标准输入直接写入编辑器缓冲区。一个行由结尾的<code>&lt;换行符&gt;</code>字符表示。输入模式可通过在整行中输入一个单独的句点<code>'.'</code>结束。</p>
+<p>所有 <strong>ed</strong> 命令都应用于整行或行的范围。例如：<code>'d'</code>删除行；<code>'m'</code>移动行……等等。如上例所示，可以通过替换命令仅修改行的一部分内容。但是，<code>'s'</code>命令依然是整行上执行的。</p>
+<p>一般的，<strong>ed</strong> 命令有如下组成部分：零个或多个行地址，后跟单个字符命令和可能的附加参数；即，命令结构为：
+$$
+[address[,address]]command[parameters]
+$$
+地址标识出行或行的范围。如果给出的地址少于命令接受的地址，则使用默认地址。</p>
+<h2 id="2-行编辑简介">2 行编辑简介</h2>
+<p><strong>ed</strong> 的作者是 Ken Thompson 和 Dennis Ritchie，该工具伴随 Unix 操作系统一起创建。Thompson 和 Ritchie 已经在其中添加了模式匹配功能(请参阅<a href="https://www.gnu.org/software/ed/manual/ed_manual.html#Regular-expressions">正则表达式</a>)，这是对其前身——更复杂、可编程的 <strong>QED</strong> 的改进。</p>
+<p>就本教程而言，建议具备 Unix Shell 和 sh 的基本知识，因为 <strong>ed</strong> 与他们紧密关联。(有关 bash 的详细信息，请参见 <a href="http://www.gnu.org/software/bash/manual/">bash 手册</a>)。</p>
+<p>行编辑器和全屏编辑器的主要区别在于：全屏编辑器可对用户命令做出即时反馈，而行编辑器有时要在输入上花较长时间才能看到效果。显然，即时反馈的优势在于，如果犯了错，可以在产生更严重的破坏之前及时纠正。在 <strong>ed</strong> 中编辑则需要更多的策略和前瞻性；但是一旦熟练掌握了其应用，效率收益颇高。</p>
+<p>许多 <strong>ed</strong> 命令语法与其他 Unix 实用程序也通用。</p>
+<p>与 Shell 程序一样，<code>&lt;RETURN&gt;</code>(回车键)输入一行。因此，当我们在 <strong>ed</strong> 中说&quot;输入&quot;命令或某些文本时，暗示<code>&lt;RETURN&gt;</code>在每一行的末尾。在键入<code>&lt;RETURN&gt;</code>之前，可以通过键入<code>&lt;BACKSPACE&gt;</code>来向后擦除字符，或者键入<code>&lt;CONTROL&gt;-u</code>(即，按住CONTROL 键并键入 u)以擦除整行来对行进行校正。</p>
+<p>刚打开 <strong>ed</strong> 的时候，它会等待我们的指令，但不像 Shell 那样有提示符。因此，我们从让 <strong>ed</strong> 显示提示符开始，使用<code>&lt;P&gt;</code>提示符)命令：</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ed 
+P 
+*
+</code></pre></div><p>默认情况下，<strong>ed</strong> 使用星号<code>*</code>作为命令提示符，以避免与 Shell 命令提示符<code>$</code>混淆。</p>
+<p>我们可以通过<code>!</code>前缀来运行 Unix Shell 内部的命令(<code>!</code>感叹号，又名 &ldquo;bang&rdquo;)。例如：</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">*!date
+Mon Jun <span class="m">26</span> 10:08:41 PDT <span class="m">2006</span>
+!
+*!for s in hello world<span class="p">;</span> <span class="k">do</span> <span class="nb">echo</span> <span class="nv">$s</span><span class="p">;</span> <span class="k">done</span>
+hello
+world
+!
+*
+</code></pre></div><p>到目前为止，这与在 Unix Shell 中运行命令没有什么不同。现在，假设我们要编辑命令的输出或将其保存到文件中。首先，我们必须将命令输出捕获到一个称为缓冲区的临时位置，以便 <strong>ed</strong> 可以访问。执行 <strong>ed</strong> 的<code>&lt;r&gt;</code>命令(助记符：read)：</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">*r !cal -m
+<span class="m">137</span>
+*
+</code></pre></div><p>这里 <strong>ed</strong> 告诉我们它将 137 个字符读入编辑器缓冲区，即：cal 命令的输出，该命令打印一个简单的 ASCII 日历。要显示缓冲区内容，我们发出<code>&lt;p&gt;</code>(print)命令(不要与大写的<code>&lt;P&gt;</code>提示命令混淆！)。为了指示应打印的缓冲区行范围，我们在命令前加上单独的<code>,</code>(逗号)，这是“整个缓冲区”的简写：</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">*,p
+      June <span class="m">2006</span>
+Mo Tu We Th Fr Sa Su
+          <span class="m">1</span>  <span class="m">2</span>  <span class="m">3</span>  <span class="m">4</span>
+ <span class="m">5</span>  <span class="m">6</span>  <span class="m">7</span>  <span class="m">8</span>  <span class="m">9</span> <span class="m">10</span> <span class="m">11</span>
+<span class="m">12</span> <span class="m">13</span> <span class="m">14</span> <span class="m">15</span> <span class="m">16</span> <span class="m">17</span> <span class="m">18</span>
+<span class="m">19</span> <span class="m">20</span> <span class="m">21</span> <span class="m">22</span> <span class="m">23</span> <span class="m">24</span> <span class="m">25</span>
+<span class="m">26</span> <span class="m">27</span> <span class="m">28</span> <span class="m">29</span> <span class="m">30</span>
+
+*
+</code></pre></div><p>现在，让我们将缓冲区内容写入名为 junk 的文件，使用<code>&lt;w&gt;</code>(write)命令：</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">*w junk
+<span class="m">137</span> 
+*
+</code></pre></div><p>毋须多言，时常将缓冲区内容写入文件是一个好习惯，因为当我们退出时，对缓冲区的未保存变更将丢失。</p>
+<p>下面的示例演示了 <strong>ed</strong> 行编辑的一些基本概念。我们首先创建一个文件 sonnet，引用莎士比亚的十四行诗。与 Shell 一样，所有输入必须后跟一个<code>&lt;newline&gt;</code>字符。命令模式中以 # 开头的命令作为注释，将被忽略。输入模式中 # 开头的行是正文。</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ed
+<span class="c1"># The &#39;a&#39; command is for appending text to the editor buffer.</span>
+a
+No more be grieved at that which thou hast <span class="k">done</span>.
+Roses have thorns, and filvers foutians mud.
+Clouds and eclipses stain both moon and sun,
+And loathsome canker lives in sweetest bud.
+.
+<span class="c1"># Entering a single period on a line returns ed to command mode.</span>
+<span class="c1"># Now write the buffer to the file &#39;sonnet&#39; and quit:</span>
+w sonnet
+<span class="m">183</span>
+<span class="c1"># ed reports the number of characters written.</span>
+q
+$ ls -l
+total <span class="m">2</span>
+-rw-rw-r--    <span class="m">1</span> alm           <span class="m">183</span> Nov <span class="m">10</span> 01:16 sonnet
+$
+</code></pre></div><p>在下一个示例中，我们修正文件中的一些拼写错误。</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ed sonnet
+<span class="m">183</span>
+<span class="c1"># Begin by printing the buffer to the terminal with the &#39;p&#39; command.</span>
+<span class="c1"># The &#39;,&#39; means &#34;all lines&#34;.</span>
+,p
+No more be grieved at that which thou hast <span class="k">done</span>.
+Roses have thorns, and filvers foutians mud.
+Clouds and eclipses stain both moon and sun,
+And loathsome canker lives in sweetest bud.
+<span class="c1"># Select line 2 for editing.</span>
+<span class="m">2</span>
+Roses have thorns, and filvers foutians mud.
+<span class="c1"># Use the substitute command, &#39;s&#39;, to replace &#39;filvers&#39; with &#39;silver&#39;,</span>
+<span class="c1"># and print the result.</span>
+s/filvers/silver/p
+Roses have thorns, and silver foutians mud.
+<span class="c1"># And correct the spelling of &#39;fountains&#39;.</span>
+s/utia/untai/p
+Roses have thorns, and silver fountains mud.
+w sonnet
+<span class="m">183</span>
+q
+$
+</code></pre></div><p><strong>ed</strong> 是基于行的，我们必须告诉它要编辑哪一行或某些范围的行。在上面的示例中，通过指定行号或缓冲区中的序列来执行此操作。另外，我们也可以指定行中的唯一的字符串，例如<code>'/filvers/'</code>，其中<code>/</code>界定了要查找的字符串。随后的命令仅影响选定的行，或者说：当前行。查找到匹配后，替换命令将该行的匹配部分进行替换，语法为<code>'s/old/new/'</code>。</p>
+<p>虽然 <strong>ed</strong> 每行仅接受一个命令，打印命令<code>'p'</code>是一个例外，可以附加到大多数命令的末尾。</p>
+<p>在下一个示例中，我们把标题添加到文件中</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ed sonnet
+<span class="m">183</span>
+a
+Sonnet <span class="c1">#50</span>
+.
+,p
+No more be grieved at that which thou hast <span class="k">done</span>.
+Roses have thorns, and silver fountains mud.
+Clouds and eclipses stain both moon and sun,
+And loathsome canker lives in sweetest bud.
+Sonnet <span class="c1">#50</span>
+<span class="c1"># The title got appended to the end; we should have used &#39;0a&#39;</span>
+<span class="c1"># to append &#34;before the first line&#34;.</span>
+<span class="c1"># Move the title to its proper place.</span>
+5m0p
+Sonnet <span class="c1">#50</span>
+<span class="c1"># The title is now the first line, and the current address has been</span>
+<span class="c1"># set to the address of this line as well.</span>
+,p
+Sonnet <span class="c1">#50</span>
+No more be grieved at that which thou hast <span class="k">done</span>.
+Roses have thorns, and silver fountains mud.
+Clouds and eclipses stain both moon and sun,
+And loathsome canker lives in sweetest bud.
+wq sonnet
+<span class="m">195</span>
+$
+</code></pre></div><p>当用 <strong>ed</strong> 打开一个文件时，当前地址最初设置为该文件最后一行的地址。类似的，移动命令<code>'m'</code>将当前地址设置为最后移动的行的目的地址。</p>
+<p>相关程序或例程是 vi(1), sed(1), regex(3), sh(1)。相关文件有：</p>
+<ul>
+<li>Unix User&rsquo;s Manual Supplementary Documents：12-13</li>
+<li>BW Kernighan 和 PJ Plauger：&ldquo;Software Tools in Pascal&rdquo;，Addison-Wesley，1981</li>
+</ul>
+<h2 id="3-调用-ed">3 调用 ed</h2>
+<p>启动 <strong>ed</strong> 的命令格式为：</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">ed <span class="o">[</span>options<span class="o">]</span> <span class="o">[</span>file<span class="o">]</span>
+<span class="c1"># or</span>
+red <span class="o">[</span>options<span class="o">]</span> <span class="o">[</span>file<span class="o">]</span>
+</code></pre></div><p><em>file</em> 指明被读取的文件的名字。如果文件名以<code>!</code>开头，将被解释为 Shell 命令。这种情况下 <strong>ed</strong> 读取的是<code>sh</code>执行 <em>file</em> 的输出结果。要读取文件名以<code>!</code>开头的文件的内容，需要在<code>!</code>前加上<code>\</code>转义。默认的文件名被设置为 <em>file</em>，除非前缀是<code>!</code>。</p>
+<p><strong>ed</strong> 支持如下选项:</p>
+<p>-h</p>
+<blockquote>
+<p>&ndash;help
+Print an informative help message describing the options and exit.</p>
+</blockquote>
+<p>-V<br>
+&ndash;version</p>
+<blockquote>
+<p>Print the version number of ed on the standard output and exit.
+This version number should be included in all bug reports.</p>
+</blockquote>
+<p>-G<br>
+&ndash;traditional</p>
+<blockquote>
+<p>Forces backwards compatibility. This affects the behavior of the ed commands &lsquo;G&rsquo;, &lsquo;V&rsquo;, &lsquo;f&rsquo;, &lsquo;l&rsquo;, &rsquo;m&rsquo;, &rsquo;t&rsquo; and &lsquo;!!&rsquo;.
+If the default behavior of these commands does not seem familiar, then try invoking ed with this switch.</p>
+</blockquote>
+<p>-l<br>
+&ndash;loose-exit-status</p>
+<blockquote>
+<p>Don&rsquo;t exit with bad status if a command happens to &ldquo;fail&rdquo; (for example if a substitution command finds nothing to replace).
+This can be useful when ed is invoked as the editor for crontab.</p>
+</blockquote>
+<p>-p string<br>
+&ndash;prompt=string</p>
+<blockquote>
+<p>Specifies a command prompt string and turns prompting on. Showing the prompt string may be toggled on and off with the &lsquo;P&rsquo; command.</p>
+</blockquote>
+<p>-r<br>
+&ndash;restricted</p>
+<blockquote>
+<p>Run in restricted mode. This mode disables editing of files out of the current directory and execution of shell commands.</p>
+</blockquote>
+<p>-s<br>
+&ndash;quiet<br>
+&ndash;silent</p>
+<blockquote>
+<p>Suppresses diagnostics, the printing of byte counts by &lsquo;e&rsquo;, &lsquo;E&rsquo;, &lsquo;r&rsquo; and &lsquo;w&rsquo; commands,
+and the &lsquo;!&rsquo; prompt after a &lsquo;!&rsquo; command. This option may be useful if ed&rsquo;s standard input is from a script.</p>
+</blockquote>
+<p>-v<br>
+&ndash;verbose</p>
+<blockquote>
+<p>Verbose mode; prints error explanations. This may be toggled on and off with the &lsquo;H&rsquo; command.
+Exit status: 0 if no errors occurred; otherwise &gt;0.</p>
+</blockquote>
+<h2 id="4-行寻址">4 行寻址</h2>
+<p>地址表示某行在缓冲区中的行号。<strong>ed</strong> 维护着一个当前地址，当没有明确指定地址时，该地址作为默认地址提供给命令。文件读取完毕，当前地址被设置为该文件的最后一行。一般情况下，当前地址总是被设置为一个命令所影响的最后一行的地址。</p>
+<p>一个特例是行号为 0 的行。意为&quot;缓冲区的开头&rdquo;，在任何有意义的地方都有效。</p>
+<p>地址范围由两个地址组成，其间用(<code>,</code>)或(<code>;</code>)分隔。在(<code>;</code>)分隔的范围中，第二个地址被计算前，当前地址(<code>.</code>)被设为第一个地址；当第二个地址包含正则表达式时，这个特性可被用来设置搜索的开始行。第一个地址的值不能超过第二个地址。</p>
+<p>分隔符两边的地址都可以被省略。</p>
+<ul>
+<li>
+<p>若只提供第一个地址，则第二个地址与第一个地址相同。</p>
+</li>
+<li>
+<p>如果只提供第二个地址，则</p>
+<ul>
+<li>以(<code>,</code>)分隔的范围是：<code>1,addr</code>;</li>
+<li>而由(<code>;</code>)分隔的范围是：<code>.,addr</code>。</li>
+</ul>
+</li>
+</ul>
+<p>如果给出 n 个元组的地址，其中 n &gt; 2，则相应的范围由 n 个元组中的最后两个地址确定(1,2,3,<code>4,5</code>)。如果只需要一个地址，则使用最后一个地址。将任意数量的地址分配给需要零个地址的命令将引发错误。</p>
+<p>行地址的构造如下：</p>
+<p>.</p>
+<blockquote>
+<p>The current line (address) in the buffer.</p>
+</blockquote>
+<p>$</p>
+<blockquote>
+<p>The last line in the buffer.</p>
+</blockquote>
+<p>n</p>
+<blockquote>
+<p>The nth line in the buffer, where n is a number in the range &lsquo;0,$&rsquo;.</p>
+</blockquote>
+<p>+n</p>
+<blockquote>
+<p>The nth next line, where n is a non-negative number.</p>
+</blockquote>
+<p>-n</p>
+<blockquote>
+<p>The nth previous line, where n is a non-negative number.</p>
+</blockquote>
+<p>+</p>
+<blockquote>
+<p>The next line. This is equivalent to &lsquo;+1&rsquo; and may be repeated with cumulative effect.</p>
+</blockquote>
+<p>-</p>
+<blockquote>
+<p>The previous line. This is equivalent to &lsquo;-1&rsquo; and may be repeated with cumulative effect.</p>
+</blockquote>
+<p>,</p>
+<blockquote>
+<p>The first through last lines in the buffer. This is equivalent to the address range &lsquo;1,$&rsquo;.</p>
+</blockquote>
+<p>;</p>
+<blockquote>
+<p>The current through last lines in the buffer. This is equivalent to the address range &lsquo;.;$&rsquo;.</p>
+</blockquote>
+<p>/re/</p>
+<blockquote>
+<p>The next line containing the regular expression re.
+The search wraps to the beginning of the buffer and continues down to the current line, if necessary.</p>
+</blockquote>
+<p>?re?</p>
+<blockquote>
+<p>The previous line containing the regular expression re.
+The search wraps to the end of the buffer and continues up to the current line, if necessary.</p>
+</blockquote>
+<p>&lsquo;x</p>
+<blockquote>
+<p>The apostrophe-x character pair addresses the line previously marked by a &lsquo;k&rsquo; (mark) command,
+where &lsquo;x&rsquo; is a lower case letter from the portable character set &lsquo;[a-z]&rsquo;.</p>
+</blockquote>
+<h2 id="5-正则表达式">5 正则表达式</h2>
+<p>正则表达式是用于选择文本的模式。例如：</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">g/string/
+</code></pre></div><p>打印所有包含 <em>string</em> 的行。正则表达式也可以用在<code>'s'</code>替换命令中的匹配文本部分。</p>
+<p>除了字符串字面量外，正则表达式还可以表示字符类，表示&quot;由相应的正则表达式匹配&quot;的字符串。如果正则表达式可以匹配一行中的多个字符串，则最左边的匹配项就是被选则的匹配项。如果正则表达式允许可变数量的匹配字符，则匹配从该位置开始的最长序列。</p>
+<p>一个空的正则表达式(<code>//</code>)等价于上一个匹配的表达式。</p>
+<p>以下符号用来构造正则表达式：</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">c
+Any character c not listed below, including <span class="s1">&#39;{&#39;</span>, <span class="s1">&#39;}&#39;</span>, <span class="s1">&#39;(&#39;</span>, <span class="s1">&#39;)&#39;</span>, <span class="s1">&#39;&lt;&#39;</span> and <span class="s1">&#39;&gt;&#39;</span>, matches itself.
+
+<span class="se">\c</span>
+Any backslash-escaped character c, other than <span class="s1">&#39;{&#39;</span>, <span class="s1">&#39;}&#39;</span>, <span class="s1">&#39;(&#39;</span>, <span class="s1">&#39;)&#39;</span>, <span class="s1">&#39;&lt;&#39;</span>, <span class="s1">&#39;&gt;&#39;</span>, <span class="s1">&#39;b&#39;</span>, <span class="s1">&#39;B&#39;</span>, <span class="s1">&#39;w&#39;</span>, <span class="s1">&#39;W&#39;</span>, <span class="s1">&#39;+&#39;</span> and <span class="s1">&#39;?&#39;</span>, matches itself.
+
+.
+Matches any single character.
+
+<span class="o">[</span>char-class<span class="o">]</span>
+Matches any single character in char-class. 
+To include a <span class="s1">&#39;]&#39;</span> in char-class, it must be the first character. 
+A range of characters may be specified by separating the end characters of the range with a <span class="s1">&#39;-&#39;</span>, 
+e.g., <span class="s1">&#39;a-z&#39;</span> specifies the lower <span class="k">case</span> characters. 
+The following literal expressions can also be used in char-class to specify sets of characters:
+          <span class="o">[</span>:alnum:<span class="o">]</span> <span class="o">[</span>:cntrl:<span class="o">]</span> <span class="o">[</span>:lower:<span class="o">]</span> <span class="o">[</span>:space:<span class="o">]</span>
+          <span class="o">[</span>:alpha:<span class="o">]</span> <span class="o">[</span>:digit:<span class="o">]</span> <span class="o">[</span>:print:<span class="o">]</span> <span class="o">[</span>:upper:<span class="o">]</span>
+          <span class="o">[</span>:blank:<span class="o">]</span> <span class="o">[</span>:graph:<span class="o">]</span> <span class="o">[</span>:punct:<span class="o">]</span> <span class="o">[</span>:xdigit:<span class="o">]</span>
+If <span class="s1">&#39;-&#39;</span> appears as the first or last character of char-class, <span class="k">then</span> it matches itself. 
+All other characters in char-class match themselves.
+
+Patterns in char-class of the form:
+          <span class="o">[</span>.col-elm.<span class="o">]</span>
+          <span class="o">[=</span>col-elm<span class="o">=]</span>
+where col-elm is a collating element are interpreted according to <span class="s1">&#39;locale (5)&#39;</span>. 
+See <span class="s1">&#39;regex (7)&#39;</span> <span class="k">for</span> an explanation of these constructs.
+
+<span class="o">[</span>^char-class<span class="o">]</span>
+Matches any single character, other than newline, not in char-class. char-class is defined as above.
+
+^
+If <span class="s1">&#39;^&#39;</span> is the first character of a regular expression, <span class="k">then</span> it anchors the regular expression to the beginning of a line. 
+Otherwise, it matches itself.
+
+$
+If <span class="s1">&#39;$&#39;</span> is the last character of a regular expression, it anchors the regular expression to the end of a line. 
+Otherwise, it matches itself.
+
+<span class="se">\(</span>re<span class="se">\)</span>
+Defines a <span class="o">(</span>possibly null<span class="o">)</span> subexpression re. Subexpressions may be nested. 
+A subsequent backreference of the form <span class="s1">&#39;\n&#39;</span>, where n is a number in the range <span class="o">[</span>1,9<span class="o">]</span>, 
+expands to the text matched by the nth subexpression. 
+For example, the regular expression <span class="s1">&#39;\(a.c\)\1&#39;</span> matches the string <span class="s1">&#39;abcabc&#39;</span>, 
+but not <span class="s1">&#39;abcadc&#39;</span>. Subexpressions are ordered relative to their left delimiter.
+
+*
+Matches zero or more repetitions of the regular expression immediately preceding it. 
+The regular expression can be either a single character regular expression or a subexpression. 
+If <span class="s1">&#39;*&#39;</span> is the first character of a regular expression or subexpression, <span class="k">then</span> it matches itself. 
+The <span class="s1">&#39;*&#39;</span> operator sometimes yields unexpected results. 
+For example, the regular expression <span class="s1">&#39;b*&#39;</span> matches the beginning of the string <span class="s1">&#39;abbb&#39;</span>, 
+as opposed to the substring <span class="s1">&#39;bbb&#39;</span>, since a null match is the only left-most match.
+
+<span class="se">\{</span>n,m<span class="se">\}</span>
+<span class="se">\{</span>n,<span class="se">\}</span>
+<span class="se">\{</span>n<span class="se">\}</span>
+Matches the single character regular expression or subexpression immediately preceding it at least n and at most m times. 
+If m is omitted, <span class="k">then</span> it matches at least n times. 
+If the comma is also omitted, <span class="k">then</span> it matches exactly n times. 
+If any of these forms occurs first in a regular expression or subexpression, 
+<span class="k">then</span> it is interpreted literally <span class="o">(</span>i.e., the regular expression <span class="s1">&#39;\{2\}&#39;</span> matches the string <span class="s1">&#39;{2}&#39;</span>, and so on<span class="o">)</span>.
+
+<span class="se">\&lt;</span>
+<span class="se">\&gt;</span>
+Anchors the single character regular expression or subexpression immediately following it 
+to the beginning <span class="o">(</span>in the <span class="k">case</span> of <span class="s1">&#39;\&lt;&#39;</span><span class="o">)</span> or ending <span class="o">(</span>in the <span class="k">case</span> of <span class="s1">&#39;\&gt;&#39;</span><span class="o">)</span> of a word, 
+i.e., in ASCII, a maximal string of alphanumeric characters, including the underscore <span class="o">(</span>_<span class="o">)</span>.
+The following extended regular expression operators are preceded by a backslash <span class="s1">&#39;\&#39;</span> 
+to distinguish them from traditional ed syntax. 
+They may be unavailable depending on the particular regex implementation in your system.
+
+<span class="se">\`</span>
+<span class="se">\&#39;</span>
+Unconditionally matches the beginning <span class="s1">&#39;\`&#39;</span> or ending <span class="s1">&#39;\&#39;&#39; of a line.
+</span><span class="s1">
+</span><span class="s1">\?
+</span><span class="s1">Optionally matches the single character regular expression or subexpression immediately preceding it. 
+</span><span class="s1">For example, the regular expression &#39;</span>a<span class="o">[</span>bd<span class="o">]</span><span class="se">\?</span>c<span class="s1">&#39; matches the strings &#39;</span>abc<span class="s1">&#39;, &#39;</span>adc<span class="s1">&#39; and &#39;</span>ac<span class="s1">&#39;. 
+</span><span class="s1">If &#39;</span><span class="se">\?</span><span class="s1">&#39; occurs at the beginning of a regular expressions or subexpression, then it matches a literal &#39;</span>?<span class="s1">&#39;.
+</span><span class="s1">
+</span><span class="s1">\+
+</span><span class="s1">Matches the single character regular expression or subexpression immediately preceding it one or more times. 
+</span><span class="s1">So the regular expression &#39;</span>a<span class="se">\+</span><span class="s1">&#39; is shorthand for &#39;</span>aa*<span class="s1">&#39;. If &#39;</span><span class="se">\+</span><span class="s1">&#39; occurs at the beginning of 
+</span><span class="s1">a regular expression or subexpression, then it matches a literal &#39;</span>+<span class="s1">&#39;.
+</span><span class="s1">
+</span><span class="s1">\b
+</span><span class="s1">Matches the beginning or ending (null string) of a word. 
+</span><span class="s1">Thus the regular expression &#39;</span><span class="se">\b</span>hello<span class="se">\b</span><span class="s1">&#39; is equivalent to &#39;</span><span class="se">\&lt;</span>hello<span class="se">\&gt;</span><span class="s1">&#39;. 
+</span><span class="s1">However, &#39;</span><span class="se">\b\b</span><span class="s1">&#39; is a valid regular expression whereas &#39;</span><span class="se">\&lt;\&gt;</span><span class="err">&#39;</span> is not.
+
+<span class="se">\B</span>
+Matches <span class="o">(</span>a null string<span class="o">)</span> inside a word.
+
+<span class="se">\w</span>
+Matches any character in a word.
+
+<span class="se">\W</span>
+Matches any character not in a word.
+</code></pre></div><h2 id="6-命令">6 命令</h2>
+<p>所有的 <strong>ed</strong> 命令都是单个字符。当然，某些命令需要额外的参数。如果命令的参数跨越多行，则除最后一行外，每行都必须以反斜杠<code>\</code>结尾 。</p>
+<p>通常，每行最多允许一个命令。但是，大多数命令都接受打印后缀，即<code>'p'</code>(打印)，<code>'l'</code>(列表)或<code>'n'</code>(枚举)，以打印受命令影响的最后一行。提供多个打印后缀并不轻便，但是 <strong>ed</strong> 允许非重复打印后缀的任意组合，并结合其效果。如果给出了任何打印后缀，则必须紧随命令之后。</p>
+<p><code>'e'</code>, <code>'E'</code>, <code>'f'</code>, <code>'r'</code> 和<code>'w'</code> 这些命令接收可选的 <em>file</em> 参数，参数与命令之间用一个或多个空格分隔。</p>
+<p>中断(一般为<code>&lt;Control-C&gt;</code>)可以中止当前命令并使编辑器返回命令模式。</p>
+<p><strong>ed</strong> 识别以下命令：默认地址与命令放在一起显示，若未指定地址则在括号中给出地址范围。</p>
+<p>(.)a</p>
+<blockquote>
+<p>在地址标明的行之后将文本追加到缓冲区。地址 0(零) 对该命令有效——它将输入的文本放在缓冲区的开头。命令之后进入输入模式以输入文字。当前地址设置为最后输入的行的地址，否则，设置为地址标明的行。</p>
+</blockquote>
+<p>(.,.)c</p>
+<blockquote>
+<p>改变缓冲区中的行。地址标明的一或多行从缓冲区中被删除，命令后进入输入模式。新输入的文本在所有被删除的行所在的位置插入。当前地址设置为最后输入的行的地址，否则，设置为删除对应行后的地址。如果被删除的行原本就在缓冲区末尾，当前地址被设置为新的最后一行；如果缓冲区中已经没有行，则当前地址被设置为 0。被删除的行被复制到剪切缓冲区。</p>
+</blockquote>
+<p>(.,.)d</p>
+<blockquote>
+<p>从缓冲区中删除地址标识的行。当前地址被设置为删除对应行后的地址；如果被删除的行原本就在缓冲区末尾，当前地址被设置为新的最后一行；如果缓冲区中已经没有行，则当前地址被设置为 0。被删除的行被复制到剪切缓冲区。</p>
+</blockquote>
+<p>e <em>file</em></p>
+<blockquote>
+<p>编辑指定文件，并设置默认文件名。若 <em>file</em> 未指定，则使用默认文件名。缓冲区中的所有行在新文件读取之前被删除。当前地址被设置为缓冲区中的最后一行。</p>
+<p>如果 <em>file</em> 以<code>!</code>为前缀，则被解释为 Shell 命令，并将该命令的输出读入到缓冲区。这种情况下默认文件名无变化。</p>
+<p>若自上次执行<code>'w'</code>命令将缓冲区内容写到文件之后，缓冲区中有任何改变，则该命令打印一个警告。</p>
+</blockquote>
+<p>E file</p>
+<blockquote>
+<p>无条件的打开另一个文件。与<code>'e'</code>命令类似，但是丢弃未保存的改变而无任何警告。</p>
+</blockquote>
+<p>f file</p>
+<blockquote>
+<p>设置默认文件名为：<em>file</em>。如果未指定 <em>file</em>，则打印未转义的默认文件名。</p>
+</blockquote>
+<p>(1,$)g/re/command-list</p>
+<blockquote>
+<p>全局命令。分两步实施。首先，与<code>re</code>匹配的所有行被标记。然后，从头至尾遍历文件，命令列表里的每个命令都会逐个实施到每个标记的行上，当前地址也随着逐行遍历而改变。实施过命令的行被取消标记。当前地址的最终值，被设置为命令列表中最后一条命令影响的最后一行。如果没有匹配的行，当前地址不变。</p>
+<p>命令列表的第一个命令必须于<code>'g'</code>在同一行。其他命令必须各自占一行。多行命令中除了最后一行，其他行必须以反斜杠<code>\</code>结尾。除了<code>'g'</code>,<code>'G'</code>,<code>'v'</code>,<code>'V'</code>，其他命令都可以出现在命令列表中。<code>'.'</code>字符结束<code>'a'</code>,<code>'c'</code>,<code>'i'</code>命令的输入模式，如果<code>'.'</code>在最后一行则可以被省略。默认情况下，命令列表中的单独<code>&lt;newline&gt;</code>等价于<code>'p'</code>命令。如果 <strong>ed</strong> 启动时带了<code>-G</code>参数，则命令列表中的<code>&lt;newline&gt;</code>等价于<code>'.+1p'</code>。</p>
+</blockquote>
+<p>(1,$)G/re/</p>
+<blockquote>
+<p>交互式全局命令。交互式的编辑与<code>re</code>匹配的行。首先打印匹配的行，当前地址设置为该行，然后提示用户输入命令列表。当前地址的最终值为最后一条命令影响的行。如果没有匹配的行，当前地址不变。</p>
+<p>命令列表的格式与<code>'g'</code>命令相同。单独的<code>&lt;newline&gt;</code>相当于不执行任何命令。单独的<code>'&amp;'</code>表示重复上一个非空的命令。</p>
+</blockquote>
+<p>h</p>
+<blockquote>
+<p>帮助。打印上一个错误的解释。</p>
+</blockquote>
+<p>H</p>
+<blockquote>
+<p>错误解释的开关。默认情况下，不打印。建议在执行 <strong>ed</strong> 脚本之前开启以便调试。</p>
+</blockquote>
+<p>(.)i</p>
+<blockquote>
+<p>在地址标识的行之前插入文本。地址 0 对此命令有效，这将导致文本被插入到缓冲区的开头。命令后进入输入模式。当前地址设置为最后输入的行的地址，否则，设置为地址标识的行。</p>
+</blockquote>
+<p>(.,.+1)j</p>
+<blockquote>
+<p>合并地址标识的行，用单一行替换所有被合并的行。如果只给出了一个地址，命令什么也不做。如果有若干行被合并，则被替换的所有行都被复制到剪切缓冲区，且当前地址被设置为合并后的行。否则，当前地址不变。</p>
+</blockquote>
+<p>(.)kx</p>
+<blockquote>
+<p>用小写字母<code>x</code>标记一行。被标记的行可以由对应的小写字母寻址(比如<code>'x</code>)。除非该行被删除或修改，否则标记不会消失。当前地址无变化。</p>
+</blockquote>
+<p>(.,.)l</p>
+<blockquote>
+<p>列表。直白的打印地址标识的行。每行的结尾由<code>$</code>标记，而行内的所有<code>$</code>字符都会添加前导的反斜杠<code>\</code>。特殊字符按照转义序列打印。当前地址被设置为最后打印的行。</p>
+</blockquote>
+<p>(.,.)m(.)</p>
+<blockquote>
+<p>移动缓冲区中的行。地址标识的行被移动到<code>'m'</code>命令右边指定的行的后面。地址 0 对此命令有效，意为将行移动到缓冲区开头。如果目标地址包含在寻址行范围内则报错。当前地址被设置为被移动的最后一行的新地址。</p>
+</blockquote>
+<p>(.,.)n</p>
+<blockquote>
+<p>行号命令。打印地址标识的行，行号作为前导且用<code>&lt;tab&gt;</code>与行文本隔开。当前地址设置为最后被打印的行。</p>
+</blockquote>
+<p>(.,.)p</p>
+<blockquote>
+<p>打印地址标识的行。当前地址设置为最后被打印的行。</p>
+</blockquote>
+<p>P</p>
+<blockquote>
+<p>命令提示符开关。除非通过启动时的<code>'-p'</code>参数指定提示符字符串，否则默认情况下不显示提示符。提示符默认字符为：星号(<code>'*'</code>)</p>
+</blockquote>
+<p>q</p>
+<blockquote>
+<p>退出 <strong>ed</strong>。若自上次执行<code>'w'</code>命令保存缓冲区到文件后，缓冲区中有任何改变则会打印警告信息。</p>
+</blockquote>
+<p>Q</p>
+<blockquote>
+<p>无条件退出 <strong>ed</strong>。与<code>'q'</code>类似，但缓冲区中未保存的改变将丢失而不会提出警告。</p>
+</blockquote>
+<p>($)r file</p>
+<blockquote>
+<p>读取指定文件的内容，追加到地址标识的行后面。如果 <em>file</em> 未指定，则使用默认文件名。如果执行命令前没有默认文件名，则使用 <em>file</em> 作为默认名。否则，默认文件名无变化。地址 0 对此命令有效。意为将读取到的内容放置在缓冲区开头。当前地址被设置为最后读取的行，否则设置为地址标识的行。</p>
+<p>如果 <em>file</em> 以<code>!</code>为前缀，则被解释为 Shell 命令，读取的是脚本执行后的输出。这种情况加默认文件名无变化。</p>
+</blockquote>
+<p>(.,.)s/re/replacement/</p>
+<blockquote>
+<p>替换命令。地址标识范围内与<code>re</code>匹配的部分将被<code>replacment</code>替换。默认情况下，只有第一个匹配被替换。<code>'s'</code>命令可以与后缀<code>'g'</code>,<code>count</code>,<code>'l'</code>以及<code>'p'</code>组合。如果使用了<code>'g'</code>后缀，则所有匹配都会被替换。<code>count</code>后缀(其中：count &gt; 0)，表示只替换 count 个匹配。<code>'g'</code>与<code>count</code>不能同时使用。<code>'l'</code>,<code>'n'</code>和<code>'p'</code>是常见的打印后缀。如果地址标识的行内没有任何替换操作则会报错。当前地址被设置为最后一个出现匹配的行。如果一行被拆分，则看做是每个新行上都发生了替换。若未发生替换，则当前地址不变。最后被修改的一行将被复制到剪切缓冲区。</p>
+<p><code>re</code>和<code>replacement</code>可以由除了<code>&lt;space&gt;</code>和<code>&lt;newline&gt;</code>之外的任何字符界定，<code>'s'</code>命令格式使用的字符详见下文。如果尾部的界定符被省略，则相当于在最后一个受影响的行上执行<code>'p'</code>命令。如果<code>'s'</code>命令是<code>'g'</code>或<code>'v'</code>命令列表的一部分并且不是最后一条命令时，结尾的界定符<code>不能</code>被省略，这是为了避免跟随后的转义新行混淆。</p>
+<p>在<code>replacement</code>中未转义的&rsquo;&amp;&lsquo;代表当前匹配的文本。字符序列<code>\m</code>(其中 m 的区间[1,9])，被替换为第 m 个后向引用表达式。如果对应的后向引用不存在，<code>\m</code>会被替换成空字符串。如果<code>replacement</code>只包含单独的<code>'%'</code>，则表示上一个替换命令使用的<code>replacement</code>。</p>
+<p><code>replacement</code>中，一行可以拆分成多行，新拆分的行需要用<code>\</code>转义。这些在<code>replacement</code>中的<code>\</code>将移除其后字符的特殊含义。</p>
+</blockquote>
+<p>(.,.)s</p>
+<blockquote>
+<p>重复上一个替换命令。这个格式的<code>'s'</code>命令接受<code>'g'</code>和<code>count</code>作为后缀，还包括<code>'p'</code>和<code>'r'</code>后缀。</p>
+<p><code>'g'</code>后缀切换上一个替换命令的<strong>全局</strong>开关，并且重置<code>count</code>的为 1。</p>
+<p><code>'p'</code>后缀则切换上一个替换命令的<strong>打印</strong>开关。</p>
+<p><code>'r'</code>后缀导致命令在上一次<strong>查找的结果</strong>上运行，而不是在<strong>替换过的结果</strong>上运行(如果是在替换后再查找)。</p>
+</blockquote>
+<p>(.,.)t(.)</p>
+<blockquote>
+<p>将地址标识的行复制到命令右边地址标识的行之后。如果目标地址为 0，则意为复制到缓冲区开头。当前地址设置为复制出的最后一行。</p>
+</blockquote>
+<p>u</p>
+<blockquote>
+<p>撤销上一条命令的效果，恢复当前地址为执行命令前的地址。</p>
+<p>全局命令<code>'g'</code>,<code>'G'</code>,<code>'v'</code>和<code>'V'</code>对于 undo 作为单条命令看待。</p>
+<p><code>'u'</code>命令与自己互逆，它只能撤销最后一条命令。</p>
+</blockquote>
+<p>(1,$)v/re/command-list</p>
+<blockquote>
+<p>与<code>'g'</code>类似，但是作用于地址范围内不匹配<code>re</code>的行。</p>
+</blockquote>
+<p>(1,$)V/re/</p>
+<blockquote>
+<p>与<code>'G'</code>类似，但是当遇到地址范围内不匹配<code>re</code>的行会交互式的编辑。</p>
+</blockquote>
+<p>(1,$)w file</p>
+<blockquote>
+<p>将地址标记的行写入文件。目标文件的内容将被覆盖。若未设置默认文件名，则使用目标文件名作为默认名，否则文件名无变化。如果未指定目标文件名，则使用默认文件名。当前地址无变化。</p>
+<p>如果文件名以<code>!</code>为前导，将被解释为 Shell 命令，并且地址标记的行将做为该 Shell 命令的标准输入，这种情况下默认文件名无变化。若试图通过<code>'e'</code>或<code>'q'</code>命令覆盖或丢弃缓冲器内容，缓冲区内容作为 Shell 命令的输入依然会得到警告。</p>
+</blockquote>
+<p>(1,$)wq file</p>
+<blockquote>
+<p>将地址标记的行写入文件，然后退出。</p>
+</blockquote>
+<p>(1,$)W file</p>
+<blockquote>
+<p>追加地址标记的行到文件结尾。与<code>'w'</code>命令类似，除了不会覆盖目标文件的内容。当前地址不变。</p>
+</blockquote>
+<p>(.)x</p>
+<blockquote>
+<p>将剪切缓冲区中的内容放置到地址标记行的后面。当前行被设置为最后拷贝的行。</p>
+</blockquote>
+<p>(.,.)y</p>
+<blockquote>
+<p>拷贝地址标明的行到剪切缓冲区。能覆盖剪切缓冲区命令有：<code>'c'</code>,<code>'d'</code>,<code>'j'</code>,<code>'s'</code>,<code>'y'</code>。当前地址不变。</p>
+</blockquote>
+<p>(.+1)zn</p>
+<blockquote>
+<p>滚动。从地址标记的行开始，一次打印 n 行，并设置窗口大小为 n。若未指定 n，则使用当前窗口大小。窗口的默认大小为屏幕尺寸减去 2 行，若屏幕尺寸无法确定则为 22 行。当前地址设置为最后被打印的行。</p>
+</blockquote>
+<p>!command</p>
+<blockquote>
+<p>执行 Shell 命令。通过<code>sh(1)</code>执行命令。<code>!!</code>表示与上一条相同的命令。<strong>ed</strong> 并不识别反斜杠<code>\</code>转义。但是<code>%</code>将被替换为默认的文件名。当从执行的命令中返回时，将在单独一行打印一个<code>!</code>。当前行的地址不变。</p>
+</blockquote>
+<p>(.,.)#</p>
+<blockquote>
+<p>注释。# 到换行符之间的内容都将被忽略。如果地址由<code>;</code>分隔，则当前地址被设置成<code>;</code>前的地址，否则，当前地址不变。</p>
+</blockquote>
+<p>($)=</p>
+<blockquote>
+<p>打印地址所标记的行号。不改变当前行地址。</p>
+</blockquote>
+<p>(.+1)<code>&lt;newline&gt;</code></p>
+<blockquote>
+<p>空命令。单独打印地址标记的行。单一的<code>&lt;newline&gt;</code>等价于<code>+1p</code>。当前地址设置为被打印的行。</p>
+</blockquote>
+<h2 id="7-限制">7 限制</h2>
+<p>如果终端挂起，<strong>ed</strong> 将试图将缓冲区写入 ed.hup 文件，失败则写入  $HOME/ed.hup。</p>
+<p><strong>ed</strong> 的 <em>file</em> 参数中，任何前导反斜杠<code>\</code>将被解释为字面的意思。比如：<code>ed 'hello\tworld'</code>将编辑名为：&lsquo;hellotworld&rsquo;的文件。</p>
+<p>如果文本文件不以<code>&lt;newline&gt;</code>字符结尾，<strong>ed</strong> 将在读写时追加该字符。在二进制文件中，则不然。一个二进制文件至少要包含一个 ASCII NUL 字符。如果最后一行被修改了，则在写入之前读取空文件(如：/dev/null)可防止将换行符附加到二进制文件中。</p>
+<p>为了跟踪缓冲区中的文本行，<strong>ed</strong> 使用包含行的位置和尺寸的结构体的双向链表。每行的开销为：2个&rsquo;pointers&rsquo;，1个&rsquo;long int&rsquo;，1个&rsquo;int&rsquo;</p>
+<h2 id="8-诊断">8 诊断</h2>
+<p>如果 <strong>ed</strong> 的输入是普通文件或 HEREDOC，则出错就直接退出。其他情况下的错误，<strong>ed</strong> 只是打印一个问号<code>?</code>后返回命令模式。最后一个错误的解释可以通过<code>'h'</code>(help)命令查看。</p>
+<p>如果<code>'u'</code>(undo)出现在全局命令列表中，则命令列表只执行一次。</p>
+<p>首次试图在一个修改过的缓冲区上执行退出命令或编辑另一个文件将报错；再次执行相同命令会成功，但缓冲区中的变更会丢失。</p>
+<h2 id="9-报告-bugs">9 报告 bugs</h2>
+<p><strong>ed</strong> 中可能有 bug。手册中也会有错误或遗漏。如果你报告了，则都会被修正。否则这些错误将永远被遗留在程序中。</p>
+<p>如果你发现了 <strong>ed</strong> 中的 bug，请发送电子邮件到：bug-ed@gnu.org。并注明详细的版本号，这可以通过<code>ed --version</code>查看。</p>
+<hr>
+<p><strong>说明</strong>：</p>
+<ol>
+<li>命令字符的书写并不统一，比如：<code>&lt;p&gt;</code>和<code>'p'</code>都表示打印命令</li>
+</ol>
+
+
+        
+          <div class="blog-tags">
+            
+              <a href="https://newlooper.github.io//tags/editor/">Editor</a>&nbsp;
+            
+              <a href="https://newlooper.github.io//tags/unix/">Unix</a>&nbsp;
+            
+          </div>
+        
+
+        
+
+        
+          
+
+          
+        
+      </article>
+
+      
+        <ul class="pager blog-pager">
+          
+            <li class="previous">
+              <a href="https://newlooper.github.io/post/original/gitlab/docker_smtp/" data-toggle="tooltip" data-placement="top" title="GitLab on Docker 配置 SMTP 服务">&larr; 前一篇</a>
+            </li>
+          
+          
+            <li class="next">
+              <a href="https://newlooper.github.io/post/original/cs/os/memory/memory_paging/" data-toggle="tooltip" data-placement="top" title="分页内存地址转换点滴">后一篇 &rarr;</a>
+            </li>
+          
+        </ul>
+      
+
+
+      
+        
+          
+          <div class="disqus-comments">                  
+            <button id="show-comments" class="btn btn-default" type="button">显示 <span class="disqus-comment-count" data-disqus-url="https://newlooper.github.io/post/trans/cs/editor/ed">则评论</span></button>
+            <div id="disqus_thread"></div>
+
+            <script type="text/javascript">
+              var disqus_config = function () {
+              this.page.url = 'https:\/\/newlooper.github.io\/post\/trans\/cs\/editor\/ed';
+            };
+
+          </script>
+          </div>
+          
+        
+        
+      
+
+    </div>
+  </div>
+</div>
+
+      
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+              <li>
+                <a href="mailto:newlooper@gmail.com" title="Email me">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fas fa-envelope fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+          
+          <li>
+            <a href="" title="RSS">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+        </ul>
+        <p class="credits copyright text-muted">
+          
+            
+              <a href="https://newlooper.github.io">Dylan Cheng</a>
+            
+          
+
+          &nbsp;&bull;&nbsp;&copy;
+          
+            2020
+          
+
+          
+            &nbsp;&bull;&nbsp;
+            <a href="https://newlooper.github.io/">Looper 的博客</a>
+          
+        </p>
+        
+        <p class="credits theme-by text-muted">
+          由 <a href="https://gohugo.io">Hugo v0.74.3</a> 强力驱动 &nbsp;&bull;&nbsp; 主题 <a href="https://github.com/halogenica/beautifulhugo">Beautiful Hugo</a> 移植自 <a href="https://deanattali.com/beautiful-jekyll/">Beautiful Jekyll</a>
+          
+        </p>
+      </div>
+    </div>
+  </div>
+</footer><script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.js" integrity="sha384-K3vbOmF2BtaVai+Qk37uypf7VrgBubhQreNQe9aGsz9lB63dIFiQVlJbr92dw2Lx" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/contrib/auto-render.min.js" integrity="sha384-kmZOZB5ObwgQnS/DuDg6TScgOiWWBiVt0plIRkZCmE6rDZGrEOQeHM5PcHi+nyqe" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="https://newlooper.github.io/js/main.js"></script><script> renderMathInElement(document.body); </script><script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.js" integrity="sha384-QELNnmcmU8IR9ZAykt67vGr9/rZJdHbiWi64V88fCPaOohUlHCqUD/unNN0BXSqy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe-ui-default.min.js" integrity="sha384-m67o7SkQ1ALzKZIFh4CiTA8tmadaujiTa9Vu+nqPSwDOqHrDmxLezTdFln8077+q" crossorigin="anonymous"></script><script src="https://newlooper.github.io/js/load-photoswipe.js"></script>
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+$(function(){
+  $('#show-comments').on('click', function(){
+    var disqus_shortname = 'newlooper';
+      
+    (function() {
+      var disqus = document.createElement('script'); 
+      disqus.type = 'text/javascript'; 
+      disqus.async = true;
+      disqus.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(disqus);
+    })();
+      
+    $(this).hide(); 
+    });
+  });
+      
+</script>
+<script id="dsq-count-scr" src="//newlooper.disqus.com/count.js" async></script>
+
+
+
+
+    
+  </body>
+</html>
+
