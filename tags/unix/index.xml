@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Unix on Looper 的博客</title>
-    <link>https://newlooper.github.io/tags/unix/</link>
+    <link>https://newlooper.win/tags/unix/</link>
     <description>Recent content in Unix on Looper 的博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
@@ -10,15 +10,15 @@
     <webMaster>newlooper@gmail.com (Dylan Cheng)</webMaster>
     <lastBuildDate>Fri, 12 Jun 2020 17:20:59 +0800</lastBuildDate>
     
-	<atom:link href="https://newlooper.github.io/tags/unix/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://newlooper.win/tags/unix/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>The GNU ed line editor [译]</title>
-      <link>https://newlooper.github.io/post/trans/cs/editor/ed/</link>
+      <link>https://newlooper.win/post/trans/cs/editor/ed/</link>
       <pubDate>Fri, 12 Jun 2020 17:20:59 +0800</pubDate>
       <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>https://newlooper.github.io/post/trans/cs/editor/ed/</guid>
+      <guid>https://newlooper.win/post/trans/cs/editor/ed/</guid>
       <description>GNU ed 手册 (version 1.16, 2020-02-20). 原址：https://www.gnu.org/software/ed/manual/ed_manual.html 概览: ed 概览 行</description>
     </item>
     

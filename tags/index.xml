@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on Looper 的博客</title>
-    <link>https://newlooper.github.io/tags/</link>
+    <link>https://newlooper.win/tags/</link>
     <description>Recent content in Tags on Looper 的博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
@@ -10,132 +10,150 @@
     <webMaster>newlooper@gmail.com (Dylan Cheng)</webMaster>
     <lastBuildDate>Mon, 03 Aug 2020 15:52:41 +0800</lastBuildDate>
     
-	<atom:link href="https://newlooper.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://newlooper.win/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>EOF</title>
-      <link>https://newlooper.github.io/tags/eof/</link>
+      <link>https://newlooper.win/tags/eof/</link>
       <pubDate>Mon, 03 Aug 2020 15:52:41 +0800</pubDate>
       <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>https://newlooper.github.io/tags/eof/</guid>
+      <guid>https://newlooper.win/tags/eof/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Programming</title>
-      <link>https://newlooper.github.io/tags/programming/</link>
+      <link>https://newlooper.win/tags/programming/</link>
       <pubDate>Mon, 03 Aug 2020 15:52:41 +0800</pubDate>
       <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>https://newlooper.github.io/tags/programming/</guid>
+      <guid>https://newlooper.win/tags/programming/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Terminal</title>
-      <link>https://newlooper.github.io/tags/terminal/</link>
+      <link>https://newlooper.win/tags/terminal/</link>
       <pubDate>Mon, 03 Aug 2020 15:52:41 +0800</pubDate>
       <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>https://newlooper.github.io/tags/terminal/</guid>
+      <guid>https://newlooper.win/tags/terminal/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Assembly Language</title>
-      <link>https://newlooper.github.io/tags/assembly-language/</link>
+      <link>https://newlooper.win/tags/assembly-language/</link>
       <pubDate>Sat, 01 Aug 2020 16:29:01 +0800</pubDate>
       <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>https://newlooper.github.io/tags/assembly-language/</guid>
+      <guid>https://newlooper.win/tags/assembly-language/</guid>
       <description></description>
     </item>
     
     <item>
       <title>NASM</title>
-      <link>https://newlooper.github.io/tags/nasm/</link>
+      <link>https://newlooper.win/tags/nasm/</link>
       <pubDate>Sat, 01 Aug 2020 16:29:01 +0800</pubDate>
       <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>https://newlooper.github.io/tags/nasm/</guid>
+      <guid>https://newlooper.win/tags/nasm/</guid>
       <description></description>
     </item>
     
     <item>
       <title>VM</title>
-      <link>https://newlooper.github.io/tags/vm/</link>
+      <link>https://newlooper.win/tags/vm/</link>
       <pubDate>Sat, 01 Aug 2020 12:19:50 +0800</pubDate>
       <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>https://newlooper.github.io/tags/vm/</guid>
+      <guid>https://newlooper.win/tags/vm/</guid>
       <description></description>
     </item>
     
     <item>
       <title>WSL</title>
-      <link>https://newlooper.github.io/tags/wsl/</link>
+      <link>https://newlooper.win/tags/wsl/</link>
       <pubDate>Sat, 01 Aug 2020 12:19:50 +0800</pubDate>
       <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>https://newlooper.github.io/tags/wsl/</guid>
+      <guid>https://newlooper.win/tags/wsl/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Memory</title>
-      <link>https://newlooper.github.io/tags/memory/</link>
+      <link>https://newlooper.win/tags/memory/</link>
       <pubDate>Mon, 22 Jun 2020 09:28:07 +0800</pubDate>
       <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>https://newlooper.github.io/tags/memory/</guid>
+      <guid>https://newlooper.win/tags/memory/</guid>
       <description></description>
     </item>
     
     <item>
       <title>OS</title>
-      <link>https://newlooper.github.io/tags/os/</link>
+      <link>https://newlooper.win/tags/os/</link>
       <pubDate>Mon, 22 Jun 2020 09:28:07 +0800</pubDate>
       <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>https://newlooper.github.io/tags/os/</guid>
+      <guid>https://newlooper.win/tags/os/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Editor</title>
-      <link>https://newlooper.github.io/tags/editor/</link>
+      <link>https://newlooper.win/tags/editor/</link>
       <pubDate>Fri, 12 Jun 2020 17:20:59 +0800</pubDate>
       <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>https://newlooper.github.io/tags/editor/</guid>
+      <guid>https://newlooper.win/tags/editor/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Unix</title>
-      <link>https://newlooper.github.io/tags/unix/</link>
+      <link>https://newlooper.win/tags/unix/</link>
       <pubDate>Fri, 12 Jun 2020 17:20:59 +0800</pubDate>
       <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>https://newlooper.github.io/tags/unix/</guid>
+      <guid>https://newlooper.win/tags/unix/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Docker</title>
-      <link>https://newlooper.github.io/tags/docker/</link>
+      <link>https://newlooper.win/tags/docker/</link>
       <pubDate>Sun, 03 Sep 2017 13:34:45 +0800</pubDate>
       <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>https://newlooper.github.io/tags/docker/</guid>
+      <guid>https://newlooper.win/tags/docker/</guid>
       <description></description>
     </item>
     
     <item>
       <title>GitLab</title>
-      <link>https://newlooper.github.io/tags/gitlab/</link>
+      <link>https://newlooper.win/tags/gitlab/</link>
       <pubDate>Sun, 03 Sep 2017 13:34:45 +0800</pubDate>
       <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>https://newlooper.github.io/tags/gitlab/</guid>
+      <guid>https://newlooper.win/tags/gitlab/</guid>
       <description></description>
     </item>
     
     <item>
       <title>SMTP</title>
-      <link>https://newlooper.github.io/tags/smtp/</link>
+      <link>https://newlooper.win/tags/smtp/</link>
       <pubDate>Sun, 03 Sep 2017 13:34:45 +0800</pubDate>
       <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>https://newlooper.github.io/tags/smtp/</guid>
+      <guid>https://newlooper.win/tags/smtp/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Algorithm</title>
+      <link>https://newlooper.win/tags/algorithm/</link>
+      <pubDate>Thu, 02 Feb 2017 17:16:09 +0800</pubDate>
+      <author>newlooper@gmail.com (Dylan Cheng)</author>
+      <guid>https://newlooper.win/tags/algorithm/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Math</title>
+      <link>https://newlooper.win/tags/math/</link>
+      <pubDate>Thu, 02 Feb 2017 17:16:09 +0800</pubDate>
+      <author>newlooper@gmail.com (Dylan Cheng)</author>
+      <guid>https://newlooper.win/tags/math/</guid>
       <description></description>
     </item>
     

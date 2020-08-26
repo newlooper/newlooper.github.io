@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Math on Looper 的博客</title>
+    <link>https://newlooper.win/tags/math/</link>
+    <description>Recent content in Math on Looper 的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <managingEditor>newlooper@gmail.com (Dylan Cheng)</managingEditor>
+    <webMaster>newlooper@gmail.com (Dylan Cheng)</webMaster>
+    <lastBuildDate>Thu, 02 Feb 2017 17:16:09 +0800</lastBuildDate>
+    
+	<atom:link href="https://newlooper.win/tags/math/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>邻位对换法生成全排列</title>
+      <link>https://newlooper.win/post/original/cs/math/permutation/</link>
+      <pubDate>Thu, 02 Feb 2017 17:16:09 +0800</pubDate>
+      <author>newlooper@gmail.com (Dylan Cheng)</author>
+      <guid>https://newlooper.win/post/original/cs/math/permutation/</guid>
+      <description>算法原理 相关算法——插入法 对于集合 $$ S=\{a_1, a_2, &amp;hellip;, a_n\} $$ 若已知前 $n-1$ 个元素的全排列，则 $n$ 个元素的全排列 $$ p_i=\{p_1,p_2,&amp;hellip;,p_{(n-1)!}\} $$ 可以这样生成：将 $a_n$ 插入 $p_i$ 不同位置中，由此，得</description>
+    </item>
+    
+  </channel>
+</rss>
