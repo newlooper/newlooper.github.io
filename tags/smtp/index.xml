@@ -2,23 +2,19 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>SMTP on Looper 的博客</title>
-    <link>https://newlooper.win/tags/smtp/</link>
+    <link>/tags/smtp/</link>
     <description>Recent content in SMTP on Looper 的博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <managingEditor>newlooper@gmail.com (Dylan Cheng)</managingEditor>
     <webMaster>newlooper@gmail.com (Dylan Cheng)</webMaster>
-    <lastBuildDate>Sun, 03 Sep 2017 13:34:45 +0800</lastBuildDate>
-    
-	<atom:link href="https://newlooper.win/tags/smtp/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Sun, 03 Sep 2017 13:34:45 +0800</lastBuildDate><atom:link href="/tags/smtp/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>GitLab on Docker 配置 SMTP 服务</title>
-      <link>https://newlooper.win/post/original/gitlab/docker_smtp/</link>
+      <link>/post/original/gitlab/docker_smtp/</link>
       <pubDate>Sun, 03 Sep 2017 13:34:45 +0800</pubDate>
       <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>https://newlooper.win/post/original/gitlab/docker_smtp/</guid>
+      <guid>/post/original/gitlab/docker_smtp/</guid>
       <description>起因 gitlab 官方 docker 容器部署完毕。容器中的服务越少越好，所以使用外部 SMTP 发送邮件。 环境 撰写此文时： Docker 17.06.1-ce GitLab Community Edition 9.5.2 ab97415 步骤 网易 163 邮箱 授权码设置 协议开启与服务</description>
     </item>
     

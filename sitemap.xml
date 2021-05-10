@@ -1,165 +1,101 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  
   <url>
-    <loc>https://newlooper.win/categories/</loc>
+    <loc>/categories/</loc>
     <lastmod>2020-08-03T15:52:41+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/categories/concept/</loc>
+  </url><url>
+    <loc>/categories/concept/</loc>
     <lastmod>2020-08-03T15:52:41+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/tags/eof/</loc>
+  </url><url>
+    <loc>/tags/eof/</loc>
     <lastmod>2020-08-03T15:52:41+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/post/original/cs/io/eof/</loc>
+  </url><url>
+    <loc>/post/original/cs/io/eof/</loc>
     <lastmod>2020-08-03T15:52:41+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/</loc>
+  </url><url>
+    <loc>/</loc>
     <lastmod>2020-08-03T15:52:41+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/post/</loc>
+  </url><url>
+    <loc>/post/</loc>
     <lastmod>2020-08-03T15:52:41+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/tags/programming/</loc>
+  </url><url>
+    <loc>/tags/programming/</loc>
     <lastmod>2020-08-03T15:52:41+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/tags/</loc>
+  </url><url>
+    <loc>/tags/</loc>
     <lastmod>2020-08-03T15:52:41+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/tags/terminal/</loc>
+  </url><url>
+    <loc>/tags/terminal/</loc>
     <lastmod>2020-08-03T15:52:41+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/tags/assembly-language/</loc>
+  </url><url>
+    <loc>/tags/assembly-language/</loc>
     <lastmod>2020-08-01T16:29:01+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/post/trans/learn-assembly-language/</loc>
+  </url><url>
+    <loc>/post/trans/learn-assembly-language/</loc>
     <lastmod>2020-08-01T16:29:01+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/tags/nasm/</loc>
+  </url><url>
+    <loc>/tags/nasm/</loc>
     <lastmod>2020-08-01T16:29:01+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/categories/translation/</loc>
+  </url><url>
+    <loc>/categories/translation/</loc>
     <lastmod>2020-08-01T16:29:01+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/categories/tricks/</loc>
+  </url><url>
+    <loc>/categories/tricks/</loc>
     <lastmod>2020-08-01T12:19:50+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/tags/vm/</loc>
+  </url><url>
+    <loc>/tags/vm/</loc>
     <lastmod>2020-08-01T12:19:50+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/tags/wsl/</loc>
+  </url><url>
+    <loc>/tags/wsl/</loc>
     <lastmod>2020-08-01T12:19:50+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/post/original/cs/vm/wsl/migrate_distributions/</loc>
+  </url><url>
+    <loc>/post/original/cs/vm/wsl/migrate_distributions/</loc>
     <lastmod>2020-08-01T12:19:50+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/tags/memory/</loc>
+  </url><url>
+    <loc>/tags/memory/</loc>
     <lastmod>2020-06-22T09:28:07+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/tags/os/</loc>
+  </url><url>
+    <loc>/tags/os/</loc>
     <lastmod>2020-06-22T09:28:07+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/categories/theory/</loc>
+  </url><url>
+    <loc>/categories/theory/</loc>
     <lastmod>2020-06-22T09:28:07+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/post/original/cs/os/memory/memory_paging/</loc>
+  </url><url>
+    <loc>/post/original/cs/os/memory/memory_paging/</loc>
     <lastmod>2020-06-22T09:28:07+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/tags/editor/</loc>
+  </url><url>
+    <loc>/tags/editor/</loc>
     <lastmod>2020-06-12T17:20:59+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/categories/manual/</loc>
+  </url><url>
+    <loc>/categories/manual/</loc>
     <lastmod>2020-06-12T17:20:59+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/post/trans/cs/editor/ed/</loc>
+  </url><url>
+    <loc>/post/trans/cs/editor/ed/</loc>
     <lastmod>2020-06-12T17:20:59+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/tags/unix/</loc>
+  </url><url>
+    <loc>/tags/unix/</loc>
     <lastmod>2020-06-12T17:20:59+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/tags/docker/</loc>
+  </url><url>
+    <loc>/tags/docker/</loc>
     <lastmod>2017-09-03T13:34:45+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/tags/gitlab/</loc>
+  </url><url>
+    <loc>/tags/gitlab/</loc>
     <lastmod>2017-09-03T13:34:45+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/post/original/gitlab/docker_smtp/</loc>
+  </url><url>
+    <loc>/post/original/gitlab/docker_smtp/</loc>
     <lastmod>2017-09-03T13:34:45+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/tags/smtp/</loc>
+  </url><url>
+    <loc>/tags/smtp/</loc>
     <lastmod>2017-09-03T13:34:45+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/tags/algorithm/</loc>
+  </url><url>
+    <loc>/tags/algorithm/</loc>
+    <lastmod>2017-02-02T17:16:09+08:00</lastmod>
+  </url><url>
+    <loc>/tags/math/</loc>
+    <lastmod>2017-02-02T17:16:09+08:00</lastmod>
+  </url><url>
+    <loc>/post/original/cs/math/permutation/</loc>
     <lastmod>2017-02-02T17:16:09+08:00</lastmod>
   </url>
-  
-  <url>
-    <loc>https://newlooper.win/tags/math/</loc>
-    <lastmod>2017-02-02T17:16:09+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://newlooper.win/post/original/cs/math/permutation/</loc>
-    <lastmod>2017-02-02T17:16:09+08:00</lastmod>
-  </url>
-  
 </urlset>

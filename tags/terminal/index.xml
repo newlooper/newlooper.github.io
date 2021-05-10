@@ -2,23 +2,19 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Terminal on Looper 的博客</title>
-    <link>https://newlooper.win/tags/terminal/</link>
+    <link>/tags/terminal/</link>
     <description>Recent content in Terminal on Looper 的博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <managingEditor>newlooper@gmail.com (Dylan Cheng)</managingEditor>
     <webMaster>newlooper@gmail.com (Dylan Cheng)</webMaster>
-    <lastBuildDate>Mon, 03 Aug 2020 15:52:41 +0800</lastBuildDate>
-    
-	<atom:link href="https://newlooper.win/tags/terminal/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Mon, 03 Aug 2020 15:52:41 +0800</lastBuildDate><atom:link href="/tags/terminal/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>EOF，到底怎么回事</title>
-      <link>https://newlooper.win/post/original/cs/io/eof/</link>
+      <link>/post/original/cs/io/eof/</link>
       <pubDate>Mon, 03 Aug 2020 15:52:41 +0800</pubDate>
       <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>https://newlooper.win/post/original/cs/io/eof/</guid>
+      <guid>/post/original/cs/io/eof/</guid>
       <description>TL;DR 首先，确未想到，为说清楚这个玩意儿，居然要用不少的篇幅；其次，当涉及对一些概念、原理的追溯时，递归到多深的地步，也不容易拿捏；好在，写这些</description>
     </item>
     

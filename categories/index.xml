@@ -2,59 +2,55 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Categories on Looper 的博客</title>
-    <link>https://newlooper.win/categories/</link>
+    <link>/categories/</link>
     <description>Recent content in Categories on Looper 的博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <managingEditor>newlooper@gmail.com (Dylan Cheng)</managingEditor>
     <webMaster>newlooper@gmail.com (Dylan Cheng)</webMaster>
-    <lastBuildDate>Mon, 03 Aug 2020 15:52:41 +0800</lastBuildDate>
-    
-	<atom:link href="https://newlooper.win/categories/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Mon, 03 Aug 2020 15:52:41 +0800</lastBuildDate><atom:link href="/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Concept</title>
-      <link>https://newlooper.win/categories/concept/</link>
+      <link>/categories/concept/</link>
       <pubDate>Mon, 03 Aug 2020 15:52:41 +0800</pubDate>
       <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>https://newlooper.win/categories/concept/</guid>
+      <guid>/categories/concept/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Translation</title>
-      <link>https://newlooper.win/categories/translation/</link>
+      <link>/categories/translation/</link>
       <pubDate>Sat, 01 Aug 2020 16:29:01 +0800</pubDate>
       <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>https://newlooper.win/categories/translation/</guid>
+      <guid>/categories/translation/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Tricks</title>
-      <link>https://newlooper.win/categories/tricks/</link>
+      <link>/categories/tricks/</link>
       <pubDate>Sat, 01 Aug 2020 12:19:50 +0800</pubDate>
       <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>https://newlooper.win/categories/tricks/</guid>
+      <guid>/categories/tricks/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Theory</title>
-      <link>https://newlooper.win/categories/theory/</link>
+      <link>/categories/theory/</link>
       <pubDate>Mon, 22 Jun 2020 09:28:07 +0800</pubDate>
       <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>https://newlooper.win/categories/theory/</guid>
+      <guid>/categories/theory/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Manual</title>
-      <link>https://newlooper.win/categories/manual/</link>
+      <link>/categories/manual/</link>
       <pubDate>Fri, 12 Jun 2020 17:20:59 +0800</pubDate>
       <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>https://newlooper.win/categories/manual/</guid>
+      <guid>/categories/manual/</guid>
       <description></description>
     </item>
     
