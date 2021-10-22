@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Hugo on Looper 的博客</title>
+    <link>/tags/hugo/</link>
+    <description>Recent content in Hugo on Looper 的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <managingEditor>newlooper@gmail.com (Dylan Cheng)</managingEditor>
+    <webMaster>newlooper@gmail.com (Dylan Cheng)</webMaster>
+    <lastBuildDate>Tue, 11 May 2021 13:00:00 +0800</lastBuildDate><atom:link href="/tags/hugo/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Hugo 添加 Staticman 评论功能</title>
+      <link>/post/original/cs/blog/hugowithstaticman/</link>
+      <pubDate>Tue, 11 May 2021 13:00:00 +0800</pubDate>
+      <author>newlooper@gmail.com (Dylan Cheng)</author>
+      <guid>/post/original/cs/blog/hugowithstaticman/</guid>
+      <description>描述 能为静态站点提供评论功能的第三方模块有很多(排名无先后) Disqus Talkyard HyperComments Remarkbox IntenseDebate Gitalk Gitment Vuukle Muut 且都各有其优缺点。要取舍这些模块，先明确功能与特性的需求： 免费</description>
+    </item>
+    
+  </channel>
+</rss>

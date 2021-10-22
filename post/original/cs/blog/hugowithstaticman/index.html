@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="zh-cn" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>Hugo 添加 Staticman 评论功能 - Looper 的博客</title>
+  <meta name="description" content="描述 能为静态站点提供评论功能的第三方模块有很多(排名无先后) Disqus Talkyard HyperComments Remarkbox IntenseDebate Gitalk Gitment Vuukle Muut 且都各有其优缺点。要取舍这些模块，先明确功能与特性的需求： 免费">
+  <meta name="author" content="Dylan Cheng"/><script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "Looper 的博客",
+    
+    "url": "\/"
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "\/"
+  
+  
+  
+  
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "\/post\/original\/cs\/blog\/hugowithstaticman\/",
+          "name": "Hugo 添加 staticman 评论功能"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "Dylan Cheng"
+  },
+  "headline": "Hugo 添加 Staticman 评论功能",
+  "description" : "描述 能为静态站点提供评论功能的第三方模块有很多(排名无先后) Disqus Talkyard HyperComments Remarkbox IntenseDebate Gitalk Gitment Vuukle Muut 且都各有其优缺点。要取舍这些模块，先明确功能与特性的需求： 免费",
+  "inLanguage" : "zh-cn",
+  "wordCount":  1950 ,
+  "datePublished" : "2021-05-11T13:00:00",
+  "dateModified" : "2021-05-11T13:00:00",
+  "image" : "\/images\/site\/avatar-icon.png",
+  "keywords" : [ "Hugo, Staticman, Heroku, Netlify, Github" ],
+  "mainEntityOfPage" : "\/post\/original\/cs\/blog\/hugowithstaticman\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "\/images\/site\/avatar-icon.png",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
+
+<meta property="og:title" content="Hugo 添加 Staticman 评论功能" />
+<meta property="og:description" content="描述 能为静态站点提供评论功能的第三方模块有很多(排名无先后) Disqus Talkyard HyperComments Remarkbox IntenseDebate Gitalk Gitment Vuukle Muut 且都各有其优缺点。要取舍这些模块，先明确功能与特性的需求： 免费">
+<meta property="og:image" content="/images/site/avatar-icon.png" />
+<meta property="og:url" content="/post/original/cs/blog/hugowithstaticman/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Looper 的博客" />
+
+  <meta name="twitter:title" content="Hugo 添加 Staticman 评论功能" />
+  <meta name="twitter:description" content="描述 能为静态站点提供评论功能的第三方模块有很多(排名无先后) Disqus Talkyard HyperComments Remarkbox IntenseDebate Gitalk Gitment Vuukle Muut 且都各有其优缺点。要取舍这些模块，先明确功能与特性的需求： 免费">
+  <meta name="twitter:image" content="/images/site/avatar-icon.png" />
+  <meta name="twitter:card" content="summary" />
+  <link href='/img/favicon.ico' rel='icon' type='image/x-icon'/>
+  <meta name="generator" content="Hugo 0.83.1" />
+  <link rel="alternate" href="/index.xml" type="application/rss+xml" title="Looper 的博客"><link rel="stylesheet" href="/css/katex.min.css" />
+  <link rel="stylesheet" href="/fontawesome/css/all.css" />
+  <link rel="stylesheet" href="/css/bootstrap.min.css" /><link rel="stylesheet" href="/css/main.css" /><link rel="stylesheet" href="/css/staticman.css" /><link rel="stylesheet" href="/css/fonts.css" /><link rel="stylesheet" href="/css/syntax.css" /><link rel="stylesheet" href="/css/codeblock.css" /><script src='https://www.google.com/recaptcha/api.js'></script><link rel="stylesheet" href="/css/photoswipe.min.css" />
+  <link rel="stylesheet" href="/css/photoswipe.default-skin.min.css" /><style>
+.container {
+    width: 1500px;
+    min-width: 1500px;
+}
+article.blog-post {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+article.blog-post > blockquote {
+    font-family: 'Lora', 'Times New Roman', serif;
+}
+article.blog-post img {
+    display: block;
+    margin-top: 1em;
+    margin-right: auto;
+    margin-bottom: 1em;
+    margin-left: auto;
+    max-width: 100%;
+}
+article.blog-post table {
+    margin: auto;
+    width: 90%;
+    margin-bottom: 0.5em;
+    box-shadow: 2px 2px 3px rgba(0,0,0,.125);
+}
+article.blog-post blockquote {
+    margin: 1em 0;
+    padding: 10px 20px;
+    position: relative;
+    color: rgba(52,73,94,.8);
+    background-color: rgba(248,245,236,.6);
+    border-left: 5px solid #eee;
+    box-shadow: 1px 1px 2px rgba(0,0,0,.125);
+}
+aside.toc {
+    float: right;
+    padding: 6px;
+    padding-right: 20px;
+    margin: 0;
+    margin-left: 10px;
+    margin-bottom: 10px;
+    border: solid 1px #d3d3d3;
+    font-size: 12px;
+}
+
+aside.toc ul {
+    padding-inline-start: 20px;
+    list-style: circle;
+}
+
+aside.toc a {
+    color: #666;
+}
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" 
+integrity="sha384-AfEj0r4/OFrOo5t7NnNe46zW/tFgW6x/bCJG8FqQCEo3+Aro6EYUG4+cU+KJWu/X" crossorigin="anonymous">
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js" 
+integrity="sha384-g7c+Jr9ZivxKLnZTDUhnkOnsh30B4H0rpLUpJ4jAIKs4fnJI+sEnkvrMWph2EDg4" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js" 
+integrity="sha384-mll67QQFJfxn0IYznZYonOWZ644AWYC+Pt2cHqMaRhXVrursRwvLnLaebdGIlYNa" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+	renderMathInElement(document.body, {
+		delimiters: [
+			{left: "$$", right: "$$", display: true},
+			{left: "$", right: "$", display: false}
+		]
+	});
+});
+</script>
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-175169252-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">切换导航</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">Looper 的博客</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+        
+
+        
+
+        
+      </ul>
+    </div>
+
+    
+      <div class="avatar-container">
+        <div class="avatar-img-border">
+          <a title="Looper 的博客" href="/">
+            <img class="avatar-img" src="/images/site/avatar-icon.png" alt="Looper 的博客" />
+          </a>
+        </div>
+      </div>
+    
+
+  </div>
+</nav>
+
+
+
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+  
+  
+  
+
+
+
+
+
+
+  
+
+  <header class="header-section ">
+    
+    <div class="intro-header no-img">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="post-heading">
+              
+                <h1>Hugo 添加 Staticman 评论功能</h1>
+              
+              
+              
+              
+                <span class="post-meta">
+  
+  
+  <i class="fas fa-calendar"></i>&nbsp;发表于 2021-05-11
+  
+  
+  
+    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;1950&nbsp;个字
+  
+  
+    
+      &nbsp;|&nbsp;<i class="fas fa-user"></i>&nbsp;Dylan Cheng
+    
+  &nbsp;|&nbsp;<i class="fas fa-comment"></i>&nbsp;
+    
+    
+      
+      
+        0 则评论
+      
+    
+  
+  
+</span>
+
+
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        <aside class="toc">
+          <nav id="TableOfContents">
+  <ul>
+    <li><a href="#描述">描述</a></li>
+    <li><a href="#涉及应用">涉及应用</a></li>
+    <li><a href="#步骤">步骤</a></li>
+    <li><a href="#其他">其他</a></li>
+  </ul>
+</nav>
+        </aside>
+        <h2 id="描述">描述</h2>
+<p>能为静态站点提供评论功能的第三方模块有很多(排名无先后)</p>
+<ul>
+<li>Disqus</li>
+<li>Talkyard</li>
+<li>HyperComments</li>
+<li>Remarkbox</li>
+<li>IntenseDebate</li>
+<li>Gitalk</li>
+<li>Gitment</li>
+<li>Vuukle</li>
+<li>Muut</li>
+</ul>
+<p>且都各有其优缺点。要取舍这些模块，先明确功能与特性的需求：</p>
+<ul>
+<li>免费</li>
+<li>无广告</li>
+<li>高度定制</li>
+<li>评论信息保存在站点所有者可控的存储介质中</li>
+<li>安全</li>
+<li>迁移成本低</li>
+</ul>
+<p>经过筛选，决定使用 <a href="https://staticman.net/">staticman</a></p>
+<p>该系统可以满足上述需求，唯一的缺点是部署步骤较多，因此撰写此文，方便参考</p>
+<blockquote>
+<p>本文专注：无(低)成本的让 staticman 在 Hugo 中运行，因此诸如 Hugo 的安装配置，相关站点的注册等则省略</p>
+</blockquote>
+<h2 id="涉及应用">涉及应用</h2>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Ver</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hugo</td>
+<td>静态博客构建</td>
+<td>0.83.1</td>
+</tr>
+<tr>
+<td>Staticman</td>
+<td>博客评论工具</td>
+<td>Branch master</td>
+</tr>
+<tr>
+<td>Heroku</td>
+<td>提供 Staticman 线上运行环境</td>
+<td>cloud service</td>
+</tr>
+<tr>
+<td>Github</td>
+<td>博客代码线上仓库、评论数据线上仓库</td>
+<td></td>
+</tr>
+<tr>
+<td>Netlify</td>
+<td>博客发布平台</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="步骤">步骤</h2>
+<h3 id="0准备工作">0、准备工作</h3>
+<p>在 <a href="https://signup.heroku.com/">https://signup.heroku.com/</a> 注册，从而为 staticman 提供云服务</p>
+<blockquote>
+<p>若计划将 staticman 搭建在自己的平台或其他平台可省略此步骤</p>
+</blockquote>
+<h3 id="1部署-staticman">1、部署 staticman</h3>
+<p>假设 步骤0 已完成</p>
+<blockquote>
+<p>进入 <a href="https://github.com/eduardoboucas/staticman">https://github.com/eduardoboucas/staticman</a></p>
+</blockquote>
+<p><img src="/images/post/original/cs/blog/HugoWithStaticman/1.png" alt="image"></p>
+<blockquote>
+<p>点击紫色的 <code>Deploy on Heroku</code> 按钮，进入 Heroku 站点</p>
+</blockquote>
+<p><img src="/images/post/original/cs/blog/HugoWithStaticman/2.png" alt="image"></p>
+<p>填写 <strong>App name</strong>: blog-commenter</p>
+<blockquote>
+<p>Deploy app 提交成功后，进入刚创建的 App 的 settings 页面</p>
+</blockquote>
+<p><img src="/images/post/original/cs/blog/HugoWithStaticman/3.png" alt="image">
+在 <strong>Config Vars</strong> 栏 Add 如下变量：</p>
+<ul>
+<li>
+<p><strong>GITHUB_APP_ID</strong>: 值从 步骤2 获取</p>
+</li>
+<li>
+<p><strong>GITHUB_PRIVATE_KEY</strong>: 值从 步骤2 获取</p>
+</li>
+<li>
+<p><strong>RSA_PRIVATE_KEY</strong>: 自行生成 rsa 秘钥，例如：openssl genrsa -out key.pem；将 key.pem 内容填入</p>
+</li>
+<li>
+<p><strong>NODE_ENV</strong>: production</p>
+</li>
+</ul>
+<h3 id="2github-app">2、Github App</h3>
+<p>这是 staticman 推荐的授权方式</p>
+<blockquote>
+<p>进入 <a href="https://github.com/settings/apps/new">https://github.com/settings/apps/new</a></p>
+</blockquote>
+<p><img src="/images/post/original/cs/blog/HugoWithStaticman/4.png" alt="image"></p>
+<p>填写的内容包括：</p>
+<ul>
+<li>
+<p><strong>GitHub App name</strong>: my-blog-commenter(不重名就行)</p>
+</li>
+<li>
+<p><strong>Homepage</strong>: <a href="https://staticman.net/">https://staticman.net/</a></p>
+</li>
+<li>
+<p><strong>Webhook URL</strong>: &ldquo;https://{这里的名字取自 步骤1 的App Name}.herokuapp.com/v1/webhook&rdquo;</p>
+</li>
+<li>
+<p><strong>Contents</strong>: Read &amp; Write - Necessary to read the Staticman site config</p>
+</li>
+<li>
+<p><strong>Pull Requests</strong>: Read &amp; Write - Necessary to merge pull requests</p>
+</li>
+<li>
+<p><strong>Subscribe</strong>: 勾选 Pull request events</p>
+</li>
+</ul>
+<blockquote>
+<p>点击<code>Create GitHub App</code>提交，创建成功后</p>
+</blockquote>
+<p><img src="/images/post/original/cs/blog/HugoWithStaticman/5.png" alt="image"></p>
+<blockquote>
+<p>点击 <code>Generate a private key</code> 为该 App 生成私钥</p>
+</blockquote>
+<p><img src="/images/post/original/cs/blog/HugoWithStaticman/6.png" alt="image"></p>
+<blockquote>
+<p>浏览器会自动下载刚刚生成的秘钥，名为：xxxxxxxxxxx.private-key.pem</p>
+</blockquote>
+<p>至此，<strong>App ID</strong> 和 <strong>私钥</strong> 都已知，分别填回 步骤1 的 <strong>GITHUB_APP_ID</strong> 和 <strong>GITHUB_PRIVATE_KEY</strong> 即可</p>
+<h3 id="3评论仓库">3、评论仓库</h3>
+<p>建立单独的 repo 以存储评论数据，以 github.com 为例</p>
+<blockquote>
+<p>进入 <a href="https://github.com/new">https://github.com/new</a></p>
+</blockquote>
+<p>本例名为<code>blog-comments</code>
+<img src="/images/post/original/cs/blog/HugoWithStaticman/7.png" alt="image"></p>
+<blockquote>
+<p>创建成功后，进入 <a href="https://github.com/settings/apps">https://github.com/settings/apps</a></p>
+</blockquote>
+<p><img src="/images/post/original/cs/blog/HugoWithStaticman/8.png" alt="image"></p>
+<blockquote>
+<p><code>Edit</code> 编辑 App</p>
+</blockquote>
+<blockquote>
+<p>点击 <code>Install App</code>，安装 my-blog-commenter 到 <code>blog-comments</code> 的所有者的 github.com 账号</p>
+<p>Repository access 设置为 Only select repositories，选择 <code>blog-comments</code></p>
+</blockquote>
+<p><img src="/images/post/original/cs/blog/HugoWithStaticman/9.png" alt="image"></p>
+<p>保存</p>
+<h3 id="4hugo-配置">4、Hugo 配置</h3>
+<blockquote>
+<p>config.toml</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-toml" data-lang="toml"><span class="p">[</span><span class="nx">Params</span><span class="p">.</span><span class="nx">staticman</span><span class="p">]</span>
+  <span class="nx">api</span> <span class="p">=</span> <span class="s2">&#34;https://{这里的名字取自 步骤1 的App Name}.herokuapp.com/v3/entry/github/{你的github账号名}/blog-comments/master/comments&#34;</span>
+
+</code></pre></div><h3 id="5staticman-配置">5、staticman 配置</h3>
+<p>在 <code>blog-comments</code> 的根下，建立：<code>staticman.yml</code></p>
+<blockquote>
+<p>注意，配置文件的名称严格对应，一个字母都不能差</p>
+</blockquote>
+<blockquote>
+<p>staticman.yml，此例的配置可以适配 Hugo 主题 Beautiful Hugo</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="c"># Name of the property. You can have multiple properties with completely</span><span class="w">
+</span><span class="w"></span><span class="c"># different config blocks for different sections of your site.</span><span class="w">
+</span><span class="w"></span><span class="c"># For example, you can have one property to handle comment submission and</span><span class="w">
+</span><span class="w"></span><span class="c"># another one to handle posts.</span><span class="w">
+</span><span class="w"></span><span class="nt">comments</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="c"># (*) REQUIRED</span><span class="w">
+</span><span class="w">  </span><span class="c">#</span><span class="w">
+</span><span class="w">  </span><span class="c"># Names of the fields the form is allowed to submit. If a field that is</span><span class="w">
+</span><span class="w">  </span><span class="c"># not here is part of the request, an error will be thrown.</span><span class="w">
+</span><span class="w">  </span><span class="nt">allowedFields</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;name&#34;</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;comment&#34;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;email&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;url&#39;</span><span class="p">]</span><span class="w">
+</span><span class="w">
+</span><span class="w">  </span><span class="nt">allowedOrigins</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;yoursite.com&#34;</span><span class="p">]</span><span class="w">
+</span><span class="w">
+</span><span class="w">  </span><span class="c"># (*) REQUIRED</span><span class="w">
+</span><span class="w">  </span><span class="c">#</span><span class="w">
+</span><span class="w">  </span><span class="c"># Name of the branch being used. Must match the one sent in the URL of the</span><span class="w">
+</span><span class="w">  </span><span class="c"># request.</span><span class="w">
+</span><span class="w">  </span><span class="nt">branch</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;master&#34;</span><span class="w">
+</span><span class="w">
+</span><span class="w">  </span><span class="c"># Text to use as the commit message or pull request title. Accepts placeholders.</span><span class="w">
+</span><span class="w">  </span><span class="nt">commitMessage</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;New comment in {options.slug}&#34;</span><span class="w">
+</span><span class="w">
+</span><span class="w">  </span><span class="c"># (*) REQUIRED</span><span class="w">
+</span><span class="w">  </span><span class="c">#</span><span class="w">
+</span><span class="w">  </span><span class="c"># Destination path (filename) for the data files. Accepts placeholders.</span><span class="w">
+</span><span class="w">  </span><span class="nt">filename</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;entry-{@timestamp}&#34;</span><span class="w">
+</span><span class="w">
+</span><span class="w">  </span><span class="c"># The format of the generated data files. Accepted values are &#34;json&#34;, &#34;yaml&#34;</span><span class="w">
+</span><span class="w">  </span><span class="c"># or &#34;frontmatter&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">format</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;yaml&#34;</span><span class="w">
+</span><span class="w">
+</span><span class="w">  </span><span class="c"># List of fields to be populated automatically by Staticman and included in</span><span class="w">
+</span><span class="w">  </span><span class="c"># the data file. Keys are the name of the field. The value can be an object</span><span class="w">
+</span><span class="w">  </span><span class="c"># with a `type` property, which configures the generated field, or any value</span><span class="w">
+</span><span class="w">  </span><span class="c"># to be used directly (e.g. a string, number or array)</span><span class="w">
+</span><span class="w">  </span><span class="nt">generatedFields</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">date</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">date</span><span class="w">
+</span><span class="w">      </span><span class="nt">options</span><span class="p">:</span><span class="w">
+</span><span class="w">        </span><span class="nt">format</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;timestamp-seconds&#34;</span><span class="w">
+</span><span class="w">
+</span><span class="w">  </span><span class="c"># Whether entries need to be appproved before they are published to the main</span><span class="w">
+</span><span class="w">  </span><span class="c"># branch. If set to `true`, a pull request will be created for your approval.</span><span class="w">
+</span><span class="w">  </span><span class="c"># Otherwise, entries will be published to the main branch automatically.</span><span class="w">
+</span><span class="w">  </span><span class="nt">moderation</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span><span class="w">
+</span><span class="w">  </span><span class="c"># Name of the site. Used in notification emails.</span><span class="w">
+</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;yoursite&#34;</span><span class="w">
+</span><span class="w">
+</span><span class="w">  </span><span class="c"># Notification settings. When enabled, users can choose to receive notifications</span><span class="w">
+</span><span class="w">  </span><span class="c"># via email when someone adds a reply or a new comment. This requires an account</span><span class="w">
+</span><span class="w">  </span><span class="c"># with Mailgun, which you can get for free at http://mailgun.com.</span><span class="w">
+</span><span class="w">  </span><span class="c">#notifications:</span><span class="w">
+</span><span class="w">    </span><span class="c"># Enable notifications</span><span class="w">
+</span><span class="w">    </span><span class="c">#enabled: true</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="c"># (!) ENCRYPTED</span><span class="w">
+</span><span class="w">    </span><span class="c">#</span><span class="w">
+</span><span class="w">    </span><span class="c"># Mailgun API key</span><span class="w">
+</span><span class="w">    </span><span class="c">#apiKey: &#34;1q2w3e4r&#34;</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="c"># (!) ENCRYPTED</span><span class="w">
+</span><span class="w">    </span><span class="c">#</span><span class="w">
+</span><span class="w">    </span><span class="c"># Mailgun domain (encrypted)</span><span class="w">
+</span><span class="w">    </span><span class="c">#domain: &#34;4r3e2w1q&#34;</span><span class="w">
+</span><span class="w">
+</span><span class="w">  </span><span class="c"># (*) REQUIRED</span><span class="w">
+</span><span class="w">  </span><span class="c">#</span><span class="w">
+</span><span class="w">  </span><span class="c"># Destination path (directory) for the data files. Accepts placeholders.</span><span class="w">
+</span><span class="w">  </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;{options.slug}&#34;</span><span class="w">
+</span><span class="w">
+</span><span class="w">  </span><span class="c"># Names of required fields. If any of these isn&#39;t in the request or is empty,</span><span class="w">
+</span><span class="w">  </span><span class="c"># an error will be thrown.</span><span class="w">
+</span><span class="w">  </span><span class="nt">requiredFields</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;name&#34;</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;comment&#34;</span><span class="p">]</span><span class="w">
+</span><span class="w">
+</span><span class="w">  </span><span class="c"># List of transformations to apply to any of the fields supplied. Keys are</span><span class="w">
+</span><span class="w">  </span><span class="c"># the name of the field and values are possible transformation types.</span><span class="w">
+</span><span class="w">  </span><span class="nt">transforms</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">email</span><span class="p">:</span><span class="w"> </span><span class="l">md5</span><span class="w">
+</span><span class="w">    
+</span><span class="w">  
+</span></code></pre></div><h3 id="6博客仓库中引入评论仓库">6、博客仓库中引入评论仓库</h3>
+<blockquote>
+<p>将评论仓库 <code>blog-comments</code> 作为博客仓库的 Git 子模块</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ <span class="nb">cd</span> your_hugo_blog_repo_working_dir
+$ git submodule add https://github.com/<span class="o">{</span>你的github账号名<span class="o">}</span>/blog-comments.git data/comments
+</code></pre></div><h3 id="7netlify-配置可选">7、Netlify 配置(可选)</h3>
+<p>经过之前的操作，staticman 模块已经可以收集用户的评论；根据设置的不同，staticman 使用 Pull Requests (PR) 或直接 push 的方式将评论数据发送到 <code>blog-comments</code></p>
+<p>但是目前还需要<strong>手动</strong>的重新构建博客，才能在静态页面中显示用户的评论；想要在用户评论被接受后，<strong>自动</strong>的构建博客，需要进行进一步的设置</p>
+<p>这里以 Netlify 为例说明</p>
+<blockquote>
+<p>站点注册、Github 关联、域名设置等省略</p>
+</blockquote>
+<h4 id="71-build-hooks-in-netlify">7.1 Build hooks in Netlify</h4>
+<blockquote>
+<p>进入 netlify 的站点设置，选择<code>Build &amp; Deploy</code>标签</p>
+<p>在 Build hooks 栏添加新 hook</p>
+</blockquote>
+<p><img src="/images/post/original/cs/blog/HugoWithStaticman/10.png" alt="image"></p>
+<blockquote>
+<p>保存后，netlify 将为该站点生成一个唯一的 url，用来从外部触发自动构建</p>
+</blockquote>
+<h4 id="72-webhooks-in-github">7.2 Webhooks in Github</h4>
+<blockquote>
+<p>进入 <code>blog-comments</code> 仓库的设置页面，选择 Webhooks 标签</p>
+<p>将 步骤7.1 中得到的 url 填入 Payload URL</p>
+<p>选择触发该 hook 的事件 ( Pull Requests、Pushes )</p>
+<p>完成添加</p>
+</blockquote>
+<p><img src="/images/post/original/cs/blog/HugoWithStaticman/11.png" alt="image"></p>
+<h4 id="73-build-settings-in-netlify">7.3 Build settings in Netlify</h4>
+<p>经过 步骤7.1 和 步骤7.2 后，每当有新的用户评论被接受，Github 将通过 Webhook 的 URL 通知 Netlify 构建部署博客</p>
+<p>但是注意：</p>
+<p>步骤6 中，<code>blog-comments</code>仅仅是作为 submodule 被引入到博客仓库的，而 Netlify 的默认构建配置，并没有为 submodule 提供相应的操作，因此需要修改默认构建配置</p>
+<blockquote>
+<p>进入 netlify 的站点设置，选择<code>Build &amp; Deploy</code>标签</p>
+<p>在 Build settings 栏，更新配置</p>
+</blockquote>
+<p><img src="/images/post/original/cs/blog/HugoWithStaticman/12.png" alt="image"></p>
+<p>至此，staticman 为 hugo 博客提供的评论功能，基本配置完毕</p>
+<h2 id="其他">其他</h2>
+<h3 id="扩展配置">扩展配置</h3>
+<p>在 staticman 的配置文件中，还可以引入验证码、评论审核、过滤等功能，详情参见官方文档</p>
+
+
+        
+          <div class="blog-tags">
+            
+              <a href="/tags/hugo/">Hugo</a>&nbsp;
+            
+              <a href="/tags/staticman/">Staticman</a>&nbsp;
+            
+              <a href="/tags/heroku/">Heroku</a>&nbsp;
+            
+              <a href="/tags/netlify/">Netlify</a>&nbsp;
+            
+              <a href="/tags/github/">Github</a>&nbsp;
+            
+          </div>
+        
+
+        
+
+        
+          
+
+          
+        
+      </article>
+
+      
+        <ul class="pager blog-pager">
+          
+            <li class="previous">
+              <a href="/post/original/cs/io/eof/" data-toggle="tooltip" data-placement="top" title="EOF，到底怎么回事">&larr; 前一篇</a>
+            </li>
+          
+          
+            <li class="next">
+              <a href="/post/original/game/board-game/renju/gomoku-protocol/" data-toggle="tooltip" data-placement="top" title="Gomoku Protocol [译]">后一篇 &rarr;</a>
+            </li>
+          
+        </ul>
+      
+
+
+      
+        
+        
+          <div class="staticman-comments">
+            <section class="js-comments staticman-comments">
+
+  
+
+  
+    
+    
+      <h3>没有评论</h3>
+    
+
+
+    
+    
+  
+
+
+
+<form class="js-form form" method="post" action="https://blog-commenter.herokuapp.com/v3/entry/github/newlooper/blog-comments/master/comments">
+  <input type="hidden" name="options[slug]" value="postoriginalcsbloghugowithstaticman">
+  <input type="hidden" name="options[parent]" value="">
+
+  
+  <input type="hidden" name="options[reCaptcha][siteKey]" value="6LeaLs8aAAAAAI2Z1KwJVUyDbSAi-s7YG9ghgBzr">
+  <input type="hidden" name="options[reCaptcha][secret]"  value="q5mXNoBMZRusjrtUtRlkMM/8Zxof5MpHC5Xaezn8xZ8VGrymkpCWWEUp1U4/yQcq4U1XYCnNYA0nVZ4oNHOYfUfoA9ayHHNYK75kE/bHA1IY4bFlcP4YtfnnqjuaNMSQWGva7gPZRqZ7wqynXfjB69YCOB/ORoTG/IzMypyCw7sUIk5IdpcX2edPXJvNeGTCeb5MX4v5Qq1/eHgvVlCFbK12bcPL4kaOwCRwyYEoI/41cZTUZBPePm6yXSH/1dtp4faMCkWEGdDH90sILcg6qQ596di5ANfhKOaviM2xr1zB8czKWjoumctn&#43;qk7kJcKb&#43;Gih6oikaq0EZgHdqsu9Q==">
+  
+
+  <fieldset>
+  <div class="textfield">
+    <textarea name="fields[comment]" placeholder="您可以使用Markdown语法"></textarea>
+  </div>
+  </fieldset>
+
+  <fieldset>
+    <div class="textfield">
+      <input name="fields[name]" type="text" placeholder="你的名字"/>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <div class="textfield">
+      <input type="email" name="fields[email]"  placeholder="您的电子邮件地址"/>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <div class="textfield">
+      <input type="url" name="fields[website]"  placeholder="你的网页"/>
+    </div>
+  </fieldset>
+
+  
+  <fieldset>
+    <div class="g-recaptcha" data-sitekey="6LeaLs8aAAAAAI2Z1KwJVUyDbSAi-s7YG9ghgBzr"></div>
+  </fieldset>
+  
+
+  <fieldset>
+    <button class="button">
+      Submit
+    </button>
+  </fieldset>
+</form>
+</section>
+
+<article class="modal">
+  <div class="title">
+    <h2 class="js-modal-title"></h2>
+  </div>
+  <div class="js-modal-text"></div>
+  <div>
+    <button class="js-close-modal">Close</button>
+  </div>
+</article>
+
+          </div>
+        
+      
+
+    </div>
+  </div>
+</div>
+
+      
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+              <li>
+                <a href="mailto:newlooper@gmail.com" title="Email me">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fas fa-envelope fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+          
+          <li>
+            <a href="" title="RSS">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+        </ul>
+        <p class="credits copyright text-muted">
+          
+            
+              <a href="https://github.com/newlooper">Dylan Cheng</a>
+            
+          
+
+          &nbsp;&bull;&nbsp;&copy;
+          
+            2021
+          
+
+          
+            &nbsp;&bull;&nbsp;
+            <a href="/">Looper 的博客</a>
+          
+        </p>
+        
+        <p class="credits theme-by text-muted">
+          由 <a href="https://gohugo.io">Hugo v0.83.1</a> 强力驱动 &nbsp;&bull;&nbsp; 主题 <a href="https://github.com/halogenica/beautifulhugo">Beautiful Hugo</a> 移植自 <a href="https://deanattali.com/beautiful-jekyll/">Beautiful Jekyll</a>
+          
+        </p>
+      </div>
+    </div>
+  </div>
+</footer><script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+
+<script src="/js/main.js"></script>
+<script src="/js/staticman.js"></script><script src="/js/photoswipe.min.js"></script>
+<script src="/js/photoswipe-ui-default.min.js"></script><script src="/js/load-photoswipe.js"></script>
+
+
+
+
+
+
+
+
+
+    
+  </body>
+</html>
+

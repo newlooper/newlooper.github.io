@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="zh-cn" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>Gomoku Protocol [译] - Looper 的博客</title>
+  <meta name="description" content="0 译序 动机 —— 研究学习五子棋 AI 的同时，对比了很多支持主流五子棋 AI 的 GUI。 结论是：都有一些体验不佳之处，决定自定写一个。要与 AI 程序交互，需要">
+  <meta name="author" content="Dylan Cheng"/><script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "Looper 的博客",
+    
+    "url": "\/"
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "\/"
+  
+  
+  
+  
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "\/post\/original\/game\/board-game\/renju\/gomoku-protocol\/",
+          "name": "Gomoku protocol [译]"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "Dylan Cheng"
+  },
+  "headline": "Gomoku Protocol [译]",
+  "description" : "0 译序 动机 —— 研究学习五子棋 AI 的同时，对比了很多支持主流五子棋 AI 的 GUI。 结论是：都有一些体验不佳之处，决定自定写一个。要与 AI 程序交互，需要",
+  "inLanguage" : "zh-cn",
+  "wordCount":  3856 ,
+  "datePublished" : "2021-06-01T14:12:22",
+  "dateModified" : "2021-06-01T14:12:22",
+  "image" : "\/images\/site\/avatar-icon.png",
+  "keywords" : [ "Board Game, Go, Renju" ],
+  "mainEntityOfPage" : "\/post\/original\/game\/board-game\/renju\/gomoku-protocol\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "\/images\/site\/avatar-icon.png",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
+
+<meta property="og:title" content="Gomoku Protocol [译]" />
+<meta property="og:description" content="0 译序 动机 —— 研究学习五子棋 AI 的同时，对比了很多支持主流五子棋 AI 的 GUI。 结论是：都有一些体验不佳之处，决定自定写一个。要与 AI 程序交互，需要">
+<meta property="og:image" content="/images/site/avatar-icon.png" />
+<meta property="og:url" content="/post/original/game/board-game/renju/gomoku-protocol/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Looper 的博客" />
+
+  <meta name="twitter:title" content="Gomoku Protocol [译]" />
+  <meta name="twitter:description" content="0 译序 动机 —— 研究学习五子棋 AI 的同时，对比了很多支持主流五子棋 AI 的 GUI。 结论是：都有一些体验不佳之处，决定自定写一个。要与 AI 程序交互，需要">
+  <meta name="twitter:image" content="/images/site/avatar-icon.png" />
+  <meta name="twitter:card" content="summary" />
+  <link href='/img/favicon.ico' rel='icon' type='image/x-icon'/>
+  <meta name="generator" content="Hugo 0.83.1" />
+  <link rel="alternate" href="/index.xml" type="application/rss+xml" title="Looper 的博客"><link rel="stylesheet" href="/css/katex.min.css" />
+  <link rel="stylesheet" href="/fontawesome/css/all.css" />
+  <link rel="stylesheet" href="/css/bootstrap.min.css" /><link rel="stylesheet" href="/css/main.css" /><link rel="stylesheet" href="/css/staticman.css" /><link rel="stylesheet" href="/css/fonts.css" /><link rel="stylesheet" href="/css/syntax.css" /><link rel="stylesheet" href="/css/codeblock.css" /><script src='https://www.google.com/recaptcha/api.js'></script><link rel="stylesheet" href="/css/photoswipe.min.css" />
+  <link rel="stylesheet" href="/css/photoswipe.default-skin.min.css" /><style>
+.container {
+    width: 1500px;
+    min-width: 1500px;
+}
+article.blog-post {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+article.blog-post > blockquote {
+    font-family: 'Lora', 'Times New Roman', serif;
+}
+article.blog-post img {
+    display: block;
+    margin-top: 1em;
+    margin-right: auto;
+    margin-bottom: 1em;
+    margin-left: auto;
+    max-width: 100%;
+}
+article.blog-post table {
+    margin: auto;
+    width: 90%;
+    margin-bottom: 0.5em;
+    box-shadow: 2px 2px 3px rgba(0,0,0,.125);
+}
+article.blog-post blockquote {
+    margin: 1em 0;
+    padding: 10px 20px;
+    position: relative;
+    color: rgba(52,73,94,.8);
+    background-color: rgba(248,245,236,.6);
+    border-left: 5px solid #eee;
+    box-shadow: 1px 1px 2px rgba(0,0,0,.125);
+}
+aside.toc {
+    float: right;
+    padding: 6px;
+    padding-right: 20px;
+    margin: 0;
+    margin-left: 10px;
+    margin-bottom: 10px;
+    border: solid 1px #d3d3d3;
+    font-size: 12px;
+}
+
+aside.toc ul {
+    padding-inline-start: 20px;
+    list-style: circle;
+}
+
+aside.toc a {
+    color: #666;
+}
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" 
+integrity="sha384-AfEj0r4/OFrOo5t7NnNe46zW/tFgW6x/bCJG8FqQCEo3+Aro6EYUG4+cU+KJWu/X" crossorigin="anonymous">
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js" 
+integrity="sha384-g7c+Jr9ZivxKLnZTDUhnkOnsh30B4H0rpLUpJ4jAIKs4fnJI+sEnkvrMWph2EDg4" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js" 
+integrity="sha384-mll67QQFJfxn0IYznZYonOWZ644AWYC+Pt2cHqMaRhXVrursRwvLnLaebdGIlYNa" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+	renderMathInElement(document.body, {
+		delimiters: [
+			{left: "$$", right: "$$", display: true},
+			{left: "$", right: "$", display: false}
+		]
+	});
+});
+</script>
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-175169252-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">切换导航</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">Looper 的博客</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+        
+
+        
+
+        
+      </ul>
+    </div>
+
+    
+      <div class="avatar-container">
+        <div class="avatar-img-border">
+          <a title="Looper 的博客" href="/">
+            <img class="avatar-img" src="/images/site/avatar-icon.png" alt="Looper 的博客" />
+          </a>
+        </div>
+      </div>
+    
+
+  </div>
+</nav>
+
+
+
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+  
+  
+  
+
+
+
+
+
+
+  
+
+  <header class="header-section ">
+    
+    <div class="intro-header no-img">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="post-heading">
+              
+                <h1>Gomoku Protocol [译]</h1>
+              
+              
+              
+              
+                <span class="post-meta">
+  
+  
+  <i class="fas fa-calendar"></i>&nbsp;发表于 2021-06-01
+  
+  
+  
+    &nbsp;|&nbsp;<i class="fas fa-book"></i>&nbsp;3856&nbsp;个字
+  
+  
+    
+      &nbsp;|&nbsp;<i class="fas fa-user"></i>&nbsp;Dylan Cheng
+    
+  &nbsp;|&nbsp;<i class="fas fa-comment"></i>&nbsp;
+    
+    
+      
+      
+        0 则评论
+      
+    
+  
+  
+</span>
+
+
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        <aside class="toc">
+          <nav id="TableOfContents">
+  <ul>
+    <li><a href="#0-译序">0 译序</a></li>
+    <li><a href="#1-简介">1 简介</a></li>
+    <li><a href="#2-ai-名称与临时文件">2 AI 名称与临时文件</a></li>
+    <li><a href="#3-强制指令">3 强制指令</a></li>
+    <li><a href="#4-可选命令">4 可选命令</a></li>
+    <li><a href="#5-由-ai-发送的指令">5 由 AI 发送的指令</a></li>
+  </ul>
+</nav>
+        </aside>
+        <h2 id="0-译序">0 译序</h2>
+<p>动机 —— 研究学习五子棋 AI 的同时，对比了很多支持主流五子棋 AI 的 GUI。</p>
+<p>结论是：都有一些体验不佳之处，决定自定写一个。要与 AI 程序交互，需要适配 AI 的接口，因此翻译这篇文章 <a href="http://petr.lastovicka.sweb.cz/protocl2en.htm">Gomoku New protocol</a></p>
+<p>意图 —— 研究过接口协议后，五子棋 GUI 的实现</p>
+<ul>
+<li>对主流 AI 的支持</li>
+<li>人人对战、人机对战、机机对战</li>
+<li>良好的用户体验、高度定制</li>
+<li>跨平台、易扩展</li>
+<li>恰当的开源协议</li>
+</ul>
+<h2 id="1-简介">1 简介</h2>
+<p>此文档描述了一个 AI (Artificial Intelligence) 如何与 go-moku 管理器(一个管理和控制比赛的程序)进行交互。</p>
+<p>管理器创建两个管道：</p>
+<ul>
+<li>
+<p>第一个用来从管理器向 AI 发送指令</p>
+</li>
+<li>
+<p>第二个则从 AI 向管理器传递响应</p>
+</li>
+</ul>
+<p>该 AI 使用标准输入/输出函数(如：C 语言的 <code>scanf</code> 和 <code>printf</code> ，Pascal 的 <code>readln</code> 和 <code>writeln</code> )因而可以使用任何编程语言编写。该 AI 程序必须是一个控制台应用程序，没有 GUI 界面。</p>
+<blockquote>
+<p>注意！</p>
+<p>一些运行时库会缓存输出，比如：在 C 的 <code>printf</code> 之后需要调用<code>fflush(stdout)</code>
+AI 实现者也可以调用一些低级的函数： <code>ReadFile</code> 和 <code>WriteFile</code></p>
+</blockquote>
+<p>每一行包含一条指令（只有一个例外）。管理器采用 <code>CR LF</code> (0x0d,0x0a) 标识一行的结束。AI 则可以用 <code>CR LF</code>， <code>LF</code> 或 <code>CR</code> 来标识响应行的结尾。管理器将忽略空的行。如何行内容过长，可以静默的截断该行但程序不能崩溃。</p>
+<p>如果 AI 是单线程的，则在 AI 在进行思考或响应一条指令时，不要读取输入，否则导致死锁（AI 和 管理器均进入等待状态）。在上述情况下，一个回合的时限达到后，管理器将终止 AI 程序。</p>
+<p>AI 可以使用两个线程来避免上述问题。一个线程读取指令，而另一个负责计算和回写响应。鉴于多个线程的方案，同步机制也必须引入（事件、锁、信号量等）。</p>
+<p>AI 的线程数对于比赛来说并不重要，一个线程比赛足够了。但是两个线程对于人类玩家来说很有用，比如有的人可能想在 AI 思考过程中改变比赛时限。</p>
+<p>AI 的思考应该可以中断而不必关闭 AI 程序。</p>
+<p>AI 必须处理这些指令： <code>START</code>  <code>BEGIN</code>  <code>INFO</code>  <code>BORAD</code>  <code>TURN</code>  <code>END</code> 。如果接受到除此之外的指令则统一返回： <code>UNKNOWN</code> (为了向后兼容以及未来的协议扩展)</p>
+<h2 id="2-ai-名称与临时文件">2 AI 名称与临时文件</h2>
+<p>AI 名称只能包含：英文字母 <code>[A-Za-z]</code>、阿拉伯数字 <code>[0-9]</code>、横杠 <code>(-)</code>、下划线 <code>(_)</code>和点 <code>(.)</code>。程序名比如以 <code>pbrain-</code> 为前缀</p>
+<p>例如：</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">pbrain-swine.exe
+pbrain-pisq5.exe
+</code></pre></div><p>前缀的要求仅限制可执行程序的名称，压缩打包文件本身没有此限制。压缩打包文件中可以同时包含 32位 和 64位 的 EXE 文件，且 64位 的可执行文件名必须包含 64 后缀</p>
+<p>例如：</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">MyGomo.zip
+<span class="p">|</span>-- pbrain-MyGomo.exe
+<span class="p">|</span>-- pbrain-MyGomo64.exe
+</code></pre></div><p>籍此，管理器可以在不同的平台上，选择适配的程序。</p>
+<p>工作目录由管理器来设定，该目录不必与 AI 程序所在路径相同，AI 必须用完整路径来指出其所使用的所有数据文件的位置。该路径可以通过函数 GetModuleFileName 或者程序启动时的命令行参数获得。管理器必须采用上述方式启动 AI 程序，使得 AI 程序可以打开那些数据文件。</p>
+<p>AI 可以在当前目录创建一个文件夹来存储临时文件。该目录的名称必须与 AI 的名称一致，该目录的大小限制在 Gomocup 网页中描述（当前为 20MB）。当管理器退出时，或比赛结束时，管理器可以删除所有临时文件。</p>
+<p>指令 <code>INFO folder</code> 用来指定需要持久保存的文件的位置。</p>
+<h2 id="3-强制指令">3 强制指令</h2>
+<h3 id="31-start-size">3.1 START [size]</h3>
+<p>AI 接收到此指令时，执行自身初始化并绘制一个空棋盘，但此时没有任何行棋的动作。</p>
+<p>参数 <code>size</code> 用来指定棋盘的大小，AI 必须支持 20x20 大小的棋盘<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>，这是 Gomocpu 锦标赛的规定尺寸。</p>
+<p>建议但不强制 AI 支持其他尺寸的棋盘，若 AI 不支持指令给出的尺寸，则需以 <code>ERROR</code> 响应</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">管理器发送:
+	START <span class="m">20</span>
+AI 回答：
+	OK <span class="c1"># 一切正常</span>
+	ERROR &lt;message&gt; <span class="c1"># 不支持的棋盘尺寸或其他错误</span>
+</code></pre></div><h3 id="32-turn-xy">3.2 TURN [X],[Y]</h3>
+<p>参数 <code>[X],[Y]</code> 表示对手的落子位置，横纵坐标都属于 [0,N] ，其中 N 为自然数。</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">管理器发送：
+      TURN 10,10
+AI 回答：
+      11,10
+</code></pre></div><h3 id="33-begin">3.3 BEGIN</h3>
+<p>此指令在一局比赛的开始，由管理器发送给其中一个 AI。表明期望该 AI 在一个空棋盘上开始行棋。之后其他的 AI 通过接收 <code>TURN</code> 指令的方式得悉对手的落子。 <code>BEGIN</code> 指令在启用<strong>自动开局</strong>时将不被使用，这是因为参赛的双方 AI 都将接收 <code>BOARD</code> 指令</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">管理器发送：
+      BEGIN
+AI 回答：
+      10,10
+</code></pre></div><h3 id="34-board">3.4 BOARD</h3>
+<p>此指令强制规定整个行棋局面。适合从中途延续一局比赛、或执行撤销/重做等用户指令的场景。</p>
+<p><code>BOARD</code> 指令通常在 <code>START</code> ， <code>RESTART</code> 或 <code>RECTSTART</code> 指令之后执行，此时棋盘为空。如果当前有任何比赛在进行中，管理器将在发送 <code>BOARD</code> 指令前发送 <code>RESTART</code> 指令</p>
+<p><code>BOARD</code> 指令之后，发送局面数据，格式为：</p>
+<p><code>[X],[Y],[field]</code></p>
+<p>其中：</p>
+<p><code>[X],[Y]</code> 为坐标</p>
+<p><code>[field]</code> 为：</p>
+<ul>
+<li>
+<p>1 表示自己的落子</p>
+</li>
+<li>
+<p>2 表示对手的落子</p>
+</li>
+<li>
+<p>3 仅在设置了<strong>持续行棋</strong>选项后，表示胜利线中的落子，或者(renju规则)禁手点</p>
+</li>
+</ul>
+<p>如果是 renju 规则，则管理器必须按照真实的行棋顺序发送局面数据。</p>
+<p>如果是 Gomoku 规则，则管理器可以用任意顺序发送局面数据，且 AI 需自行处理这些数据。</p>
+<p>数据发送完成后，管理器发送 <code>DONE</code> 指令通知 AI，用以期望 AI 的计算应答，以及后续的 <code>TURN</code> 或 <code>BEGIN</code> 指令</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">管理器发送：
+      BOARD
+      10,10,1
+      10,11,2
+      11,11,1
+      9,10,2
+      DONE
+AI 回答：
+      9,9
+</code></pre></div><h3 id="35-info-key-value">3.5 INFO [key] [value]</h3>
+<p>AI 可以忽略这条指令。然而，若无限制的忽略则直接判负。</p>
+<p>AI 必须能够应对<strong>管理器没有通过INFO指令给出下面文档中提到的全部信息</strong>的情况。</p>
+<p>下列信息全部在一局比赛开始时发送，锦标赛期间时限信息将不被修改。</p>
+<p>建议 AI 在任何情况下都响应该指令，因为人类对手可以在 AI 思考过程中修改下列信息</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">timeout_turn  - <span class="nb">time</span> limit <span class="k">for</span> each move <span class="o">(</span>milliseconds, <span class="nv">0</span><span class="o">=</span>play as fast as possible<span class="o">)</span>
+timeout_match - <span class="nb">time</span> limit of a whole match <span class="o">(</span>milliseconds, <span class="nv">0</span><span class="o">=</span>no limit<span class="o">)</span>
+max_memory    - memory limit <span class="o">(</span>bytes, <span class="nv">0</span><span class="o">=</span>no limit<span class="o">)</span>
+time_left     - remaining <span class="nb">time</span> limit of a whole match <span class="o">(</span>milliseconds<span class="o">)</span>
+game_type     - <span class="nv">0</span><span class="o">=</span>opponent is human, <span class="nv">1</span><span class="o">=</span>opponent is brain, <span class="nv">2</span><span class="o">=</span>tournament, <span class="nv">3</span><span class="o">=</span>network tournament
+rule          - bitmask or sum of <span class="nv">1</span><span class="o">=</span>exactly five in a row win, <span class="nv">2</span><span class="o">=</span>continuous game, <span class="nv">4</span><span class="o">=</span>renju
+evaluate      - coordinates X,Y representing current position of the mouse cursor
+folder        - folder <span class="k">for</span> persistent files
+</code></pre></div><p>时限和内存限制在第一步棋之前发送(在 <code>START</code> 指令之前、或紧跟 <code>START</code> )；</p>
+<p>time_left 在每一步棋之前发送(也就是 <code>TURN</code> , <code>BEGIN</code> 和 <code>BOARD</code> 之前)；</p>
+<p>当 AI 超时的情况下，剩余时间可以是负值；</p>
+<p>对于无时限的对局，剩余时间为：2147483647；</p>
+<p>对于有时限的对局，管理器必须发送 time_left，从而 AI 可以忽略 timeout_match 仅响应 time_left</p>
+<p>一局比赛的时间是从进程创建到比赛结束（但不包含对手回合的时间），一个回合的时间包含除了初始化指令( <code>START</code> , <code>RECTSTART</code> , <code>RESTART</code> )的全部时间，回合时限为 0 表示 AI 应该尽可能快的行棋（例如：只进行静态评估而不搜索可能的行棋）</p>
+<p><code>INFO folder</code> 用来指定需要被持久化的文件保存到哪里。由于这些文件对于其他 AI 和程序都是可见的，因此 AI 必须创建自己的子目录，目录名与 AI 名一致。如果管理器没有发送 <code>INFO folder</code>，则 AI 不能持久保存文件</p>
+<p>只有调试版本的程序才应该响应 <code>INFO evaluate</code> 指令，比如在某些窗口中打印评估信息，这些信息不应该打印到标准输出。发布版本的程序应该忽略 <code>INFO evaluate</code></p>
+<p>问：AI 接收到不认识的 <code>INFO</code> 怎么办</p>
+<p>答：忽略，该指令大概不重要；如果他是重要的，就不该出现在 <code>INFO</code> 中</p>
+<p>问：AI 接收到不现实的 <code>INFO</code> 怎么办(比如：特别小的内存限制值)</p>
+<p>答：AI 应该在标准输出上等待，直到管理器发送一个非 <code>INFO</code> 指令( <code>TURN</code> , <code>BOARD</code> or <code>BEGIN</code> )，管理器发送 <code>INFO</code> 指令时并不读取 AI 的响应</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">INFO timeout_match <span class="m">300000</span>
+INFO timeout_turn <span class="m">10000</span>
+INFO max_memory <span class="m">83886080</span>
+ 
+<span class="c1"># 没有期待的响应</span>
+</code></pre></div><h3 id="36-end">3.6 END</h3>
+<p>AI 在接收到这条指令时应该尽快中止。管理器等待 AI 自行完成，但若中止过程太久（比如1秒），则管理器将结束 AI 进程。AI 在接收到 <code>END</code> 指令后，不应该在标准输出上写任何信息。但在 AI 进程结束前，管理器不要关闭管道。</p>
+<p>AI 应该删除其临时文件</p>
+<h3 id="37-about">3.7 ABOUT</h3>
+<p>管理器期望 AI 在一个行内给出自身的一些信息，信息的格式为 key=&ldquo;info&rdquo;，多个信息用逗号隔开，建议的 key 包括：name, version, author, country, www, email。管理器应当识别这些信息，但是也必须能够应对旧版 AI 中曾经使用的非结构化的人类习惯文本</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">管理器发送：
+      ABOUT
+AI 回答：
+      <span class="nv">name</span><span class="o">=</span><span class="s2">&#34;SomeBrain&#34;</span>, <span class="nv">version</span><span class="o">=</span><span class="s2">&#34;1.0&#34;</span>, <span class="nv">author</span><span class="o">=</span><span class="s2">&#34;Nymand&#34;</span>, <span class="nv">country</span><span class="o">=</span><span class="s2">&#34;USA&#34;</span>
+</code></pre></div><h2 id="4-可选命令">4 可选命令</h2>
+<p>本章节中的扩展命令在 Gomocup 锦标赛中并不强制要求支持，但在人类对弈过程中是很有用的。</p>
+<h3 id="41-rectstart-widthheight">4.1 RECTSTART [width],[height]</h3>
+<p>与 <code>START</code> 类似，区别在于棋盘为矩形。<code>[width]</code> 描述横轴，<code>[height]</code> 描述纵轴。若棋盘为正方形则必须使用 <code>START</code></p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">管理器发送：
+      RECTSTART 30,20
+AI 回答：
+      OK <span class="c1"># parameters are good</span>
+      ERROR message <span class="c1"># rectangular board is not supported or other error</span>
+</code></pre></div><h3 id="42-restart">4.2 RESTART</h3>
+<p>该指令在一局比赛结束或中止后执行。棋盘尺寸不变。AI 释放上一局的棋盘和其他资源，创建一个新的空棋盘并使自己准备开始新的一局比赛，准备停当后 AI 回写 <code>OK</code> 并等待后续的对局指令。如果 AI 回答 <code>UNKNOWN</code> ，管理器将发送 <code>END</code> 并重新运行 AI 进程</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">管理器发送：
+      RESTART
+AI 回答：
+      OK
+</code></pre></div><h3 id="43-takeback-xy">4.3 TAKEBACK [X],[Y]</h3>
+<p>该指令用于撤销最后的一步行棋，AI 移除 <code>[X],[Y]</code> 处的落子后回答 <code>OK</code></p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">管理器发送：
+      TAKEBACK 9,10
+AI 回答：
+      OK
+</code></pre></div><h3 id="44-play-xy">4.4 PLAY [X],[Y]</h3>
+<p>仅当 AI 发送 <code>SUGGEST</code> 指令时，用来强制 AI 行棋在 <code>[X],[Y]</code></p>
+<p>期望的响应：与 <code>PLAY</code> 指令指定的 <code>[X],[Y]</code> 相同；若 AI 不认同管理器发送的坐标，其可以回答一个不同于 <code>PLAY</code> 指令的坐标，但行棋位置必须按照 <code>PLAY</code> 指令指定的位置落子</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">AI 发送：
+      SUGGEST 10,10
+管理器发送：
+      PLAY 12,10
+AI 在 12,10 落子并且回答:
+      12,10
+</code></pre></div><h2 id="5-由-ai-发送的指令">5 由 AI 发送的指令</h2>
+<blockquote>
+<p>以下指令由 AI 按需发送，管理器必须能够识别这些指令</p>
+</blockquote>
+<h3 id="51-unknown-error-message">5.1 UNKNOWN [error message]</h3>
+<p>AI 发送此指令，表明其接收到了未知的或未实现的指令。这意味着在 AI 接收到奇怪的指令时不是退出程序。</p>
+<p>指令后跟随的消息被用来通过管理器展现给用户。若管理器发送的可选指令未由 AI 实现，则管理器应当转而发送强制指令。</p>
+<h3 id="52-error-error-message">5.2 ERROR [error message]</h3>
+<p>AI 发送此指令，表明其接收到了已经实现的指令，但是在处理过程中出现了错误。比如内存限制太小或者棋盘尺寸太大。</p>
+<p>指令后跟随的简短消息将由管理器写入日志窗口或日志文件。</p>
+<p>管理器也可是试图修改一些游戏选项并重发指令！</p>
+<h3 id="53-message-message">5.3 MESSAGE [message]</h3>
+<p>发送给用户的消息。管理器可以将该消息写入日志窗口或日志文件。期望的是，AI 在响应管理器的一些指令之前，发送这些消息。一条消息中不可以有换行符，多行文本应该拆分成多个 <code>MESSAGE</code> 指令发送给管理器</p>
+<p>建议之发送英文消息。若 AI 发送其他语种的消息，其应该检测系统的 <code>code page</code> 并且不要发送该 <code>code page</code> 中无法显示的字符</p>
+<h3 id="54-debug-message">5.4 DEBUG [message]</h3>
+<p>与 <code>MESSAGE</code> 指令类似，但仅面向 AI 的作者提供调试信息。这些信息在 Gomocup 锦标赛中将不被公开可见。</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">管理器发送：
+      TURN 10,15
+AI 回答:
+      DEBUG The most promising move now is <span class="o">[</span>10,14<span class="o">]</span> <span class="nv">alfa</span><span class="o">=</span><span class="m">10025</span> <span class="nv">beta</span><span class="o">=</span><span class="m">8641</span>
+      DEBUG The most promising move now is <span class="o">[</span>11,14<span class="o">]</span> <span class="nv">alfa</span><span class="o">=</span><span class="m">10125</span> <span class="nv">beta</span><span class="o">=</span><span class="m">8641</span>
+      MESSAGE I will be the winner  
+      10,16
+</code></pre></div><h3 id="55-suggest-xy">5.5 SUGGEST [X],[Y]</h3>
+<p>AI 可以自行推荐行棋的坐标，而内部的局面状态并不改变。管理器可能忽略 AI 的建议而强制另一个坐标给 AI。期望的管理器应答是 <code>PLAY</code> 或者 <code>END</code> 指令。</p>
+<p>在 Gomocup 锦标赛中，管理器始终采纳 AI 在SUGGEST指令中给出的行棋位置。大多数 AI 都不使用此指令</p>
+<section class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1" role="doc-endnote">
+<p>(五子棋棋盘的默认大小为15x15，详见：http://renju.net/study/rifrules.php)&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</section>
+
+
+        
+          <div class="blog-tags">
+            
+              <a href="/tags/board-game/">Board Game</a>&nbsp;
+            
+              <a href="/tags/go/">Go</a>&nbsp;
+            
+              <a href="/tags/renju/">Renju</a>&nbsp;
+            
+          </div>
+        
+
+        
+
+        
+          
+
+          
+        
+      </article>
+
+      
+        <ul class="pager blog-pager">
+          
+            <li class="previous">
+              <a href="/post/original/cs/blog/hugowithstaticman/" data-toggle="tooltip" data-placement="top" title="Hugo 添加 Staticman 评论功能">&larr; 前一篇</a>
+            </li>
+          
+          
+        </ul>
+      
+
+
+      
+        
+        
+          <div class="staticman-comments">
+            <section class="js-comments staticman-comments">
+
+  
+
+  
+    
+    
+      <h3>没有评论</h3>
+    
+
+
+    
+    
+  
+
+
+
+<form class="js-form form" method="post" action="https://blog-commenter.herokuapp.com/v3/entry/github/newlooper/blog-comments/master/comments">
+  <input type="hidden" name="options[slug]" value="postoriginalgameboard-gamerenjugomoku-protocol">
+  <input type="hidden" name="options[parent]" value="">
+
+  
+  <input type="hidden" name="options[reCaptcha][siteKey]" value="6LeaLs8aAAAAAI2Z1KwJVUyDbSAi-s7YG9ghgBzr">
+  <input type="hidden" name="options[reCaptcha][secret]"  value="q5mXNoBMZRusjrtUtRlkMM/8Zxof5MpHC5Xaezn8xZ8VGrymkpCWWEUp1U4/yQcq4U1XYCnNYA0nVZ4oNHOYfUfoA9ayHHNYK75kE/bHA1IY4bFlcP4YtfnnqjuaNMSQWGva7gPZRqZ7wqynXfjB69YCOB/ORoTG/IzMypyCw7sUIk5IdpcX2edPXJvNeGTCeb5MX4v5Qq1/eHgvVlCFbK12bcPL4kaOwCRwyYEoI/41cZTUZBPePm6yXSH/1dtp4faMCkWEGdDH90sILcg6qQ596di5ANfhKOaviM2xr1zB8czKWjoumctn&#43;qk7kJcKb&#43;Gih6oikaq0EZgHdqsu9Q==">
+  
+
+  <fieldset>
+  <div class="textfield">
+    <textarea name="fields[comment]" placeholder="您可以使用Markdown语法"></textarea>
+  </div>
+  </fieldset>
+
+  <fieldset>
+    <div class="textfield">
+      <input name="fields[name]" type="text" placeholder="你的名字"/>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <div class="textfield">
+      <input type="email" name="fields[email]"  placeholder="您的电子邮件地址"/>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <div class="textfield">
+      <input type="url" name="fields[website]"  placeholder="你的网页"/>
+    </div>
+  </fieldset>
+
+  
+  <fieldset>
+    <div class="g-recaptcha" data-sitekey="6LeaLs8aAAAAAI2Z1KwJVUyDbSAi-s7YG9ghgBzr"></div>
+  </fieldset>
+  
+
+  <fieldset>
+    <button class="button">
+      Submit
+    </button>
+  </fieldset>
+</form>
+</section>
+
+<article class="modal">
+  <div class="title">
+    <h2 class="js-modal-title"></h2>
+  </div>
+  <div class="js-modal-text"></div>
+  <div>
+    <button class="js-close-modal">Close</button>
+  </div>
+</article>
+
+          </div>
+        
+      
+
+    </div>
+  </div>
+</div>
+
+      
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+              <li>
+                <a href="mailto:newlooper@gmail.com" title="Email me">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fas fa-envelope fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+          
+          <li>
+            <a href="" title="RSS">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+        </ul>
+        <p class="credits copyright text-muted">
+          
+            
+              <a href="https://github.com/newlooper">Dylan Cheng</a>
+            
+          
+
+          &nbsp;&bull;&nbsp;&copy;
+          
+            2021
+          
+
+          
+            &nbsp;&bull;&nbsp;
+            <a href="/">Looper 的博客</a>
+          
+        </p>
+        
+        <p class="credits theme-by text-muted">
+          由 <a href="https://gohugo.io">Hugo v0.83.1</a> 强力驱动 &nbsp;&bull;&nbsp; 主题 <a href="https://github.com/halogenica/beautifulhugo">Beautiful Hugo</a> 移植自 <a href="https://deanattali.com/beautiful-jekyll/">Beautiful Jekyll</a>
+          
+        </p>
+      </div>
+    </div>
+  </div>
+</footer><script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+
+<script src="/js/main.js"></script>
+<script src="/js/staticman.js"></script><script src="/js/photoswipe.min.js"></script>
+<script src="/js/photoswipe-ui-default.min.js"></script><script src="/js/load-photoswipe.js"></script>
+
+
+
+
+
+
+
+
+
+    
+  </body>
+</html>
+

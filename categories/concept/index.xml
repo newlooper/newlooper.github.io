@@ -18,14 +18,5 @@
       <description>TL;DR 首先，确未想到，为说清楚这个玩意儿，居然要用不少的篇幅；其次，当涉及对一些概念、原理的追溯时，递归到多深的地步，也不容易拿捏；好在，写这些</description>
     </item>
     
-    <item>
-      <title>邻位对换法生成全排列</title>
-      <link>/post/original/cs/math/permutation/</link>
-      <pubDate>Thu, 02 Feb 2017 17:16:09 +0800</pubDate>
-      <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>/post/original/cs/math/permutation/</guid>
-      <description>算法原理 相关算法——插入法 对于集合 $$ S=\{a_1, a_2, &amp;hellip;, a_n\} $$ 若已知前 $n-1$ 个元素的全排列，则 $n$ 个元素的全排列 $$ p_i=\{p_1,p_2,&amp;hellip;,p_{(n-1)!}\} $$ 可以这样生成：将 $a_n$ 插入 $p_i$ 不同位置中，由此，得</description>
-    </item>
-    
   </channel>
 </rss>

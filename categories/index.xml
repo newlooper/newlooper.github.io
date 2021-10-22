@@ -18,41 +18,5 @@
       <description></description>
     </item>
     
-    <item>
-      <title>Translation</title>
-      <link>/categories/translation/</link>
-      <pubDate>Sat, 01 Aug 2020 16:29:01 +0800</pubDate>
-      <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>/categories/translation/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Tricks</title>
-      <link>/categories/tricks/</link>
-      <pubDate>Sat, 01 Aug 2020 12:19:50 +0800</pubDate>
-      <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>/categories/tricks/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Theory</title>
-      <link>/categories/theory/</link>
-      <pubDate>Mon, 22 Jun 2020 09:28:07 +0800</pubDate>
-      <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>/categories/theory/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Manual</title>
-      <link>/categories/manual/</link>
-      <pubDate>Fri, 12 Jun 2020 17:20:59 +0800</pubDate>
-      <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>/categories/manual/</guid>
-      <description></description>
-    </item>
-    
   </channel>
 </rss>
