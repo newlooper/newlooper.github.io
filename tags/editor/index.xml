@@ -5,17 +5,584 @@
     <link>/tags/editor/</link>
     <description>Recent content in Editor on Looper 的博客</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>zh-cn</language>
-    <managingEditor>newlooper@gmail.com (Dylan Cheng)</managingEditor>
-    <webMaster>newlooper@gmail.com (Dylan Cheng)</webMaster>
+    <language>zh-CN</language>
+    <copyright>Copyright © Dylan(github.com/newlooper); all rights reserved.</copyright>
     <lastBuildDate>Fri, 12 Jun 2020 17:20:59 +0800</lastBuildDate><atom:link href="/tags/editor/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>The GNU ed line editor [译]</title>
       <link>/post/trans/cs/editor/ed/</link>
       <pubDate>Fri, 12 Jun 2020 17:20:59 +0800</pubDate>
-      <author>newlooper@gmail.com (Dylan Cheng)</author>
+      
       <guid>/post/trans/cs/editor/ed/</guid>
-      <description>GNU ed 手册 (version 1.16, 2020-02-20). 原址：https://www.gnu.org/software/ed/manual/ed_manual.html 概览: ed 概览 行</description>
+      <description>
+        
+          &lt;p&gt;GNU ed 手册 (version 1.16, 2020-02-20).&lt;/p&gt;
+&lt;p&gt;原址：&lt;a href=&#34;https://www.gnu.org/software/ed/manual/ed_manual.html&#34;&gt;https://www.gnu.org/software/ed/manual/ed_manual.html&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;概览: ed 概览&lt;/li&gt;
+&lt;li&gt;行编辑简介: GNU ed 起步&lt;/li&gt;
+&lt;li&gt;调用 ed: 命令行界面&lt;/li&gt;
+&lt;li&gt;行寻址: 在缓冲区中指定行/范围&lt;/li&gt;
+&lt;li&gt;正则表达式: 文本选择模式&lt;/li&gt;
+&lt;li&gt;命令: GNU ed 识别命令&lt;/li&gt;
+&lt;li&gt;限制: GNU ed 的固有局限性&lt;/li&gt;
+&lt;li&gt;诊断: GNU ed 错误处理&lt;/li&gt;
+&lt;li&gt;问题: 报告 bugs&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.gnu.org/software/ed/manual/ed_manual.html#GNU-Free-Documentation-License&#34;&gt;GNU Free Documentation License&lt;/a&gt;: How you can copy and share this manual&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Copyright © 1993, 1994, 2006-2020 Free Software Foundation, Inc.
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.3 or any later version published by the Free Software Foundation; with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;1-概览&#34;&gt;1 概览&lt;/h2&gt;
+&lt;p&gt;GNU &lt;strong&gt;ed&lt;/strong&gt; 是一种基于行的文本编辑器。它以交互方式或通过 Shell 脚本对文本文件进行：创建、显示、修改等操作。&lt;strong&gt;ed&lt;/strong&gt; 的受限版本(&lt;strong&gt;red&lt;/strong&gt;)只能编辑当前目录中的文件且无法执行 Shell 命令。&lt;strong&gt;ed&lt;/strong&gt; 是 Unix 中广泛使用的原始编辑器，因此某种意义上可以说：&lt;strong&gt;ed&lt;/strong&gt; 是事实上的&amp;quot;标准&amp;quot;。但是，在大多数情况下，它已被 GNU &lt;strong&gt;Emacs&lt;/strong&gt; 或 GNU &lt;strong&gt;Moe&lt;/strong&gt; 等全屏编辑器取代。&lt;/p&gt;
+&lt;p&gt;GNU &lt;strong&gt;ed&lt;/strong&gt; 基于 Brian W. Kernighan 和  P. J. Plauger 在1981年 Addison-Wesley 的著作&amp;quot;Software Tools in Pascal&amp;quot;中描述的编辑器算法。&lt;/p&gt;
+&lt;p&gt;如果在调用 &lt;strong&gt;ed&lt;/strong&gt; 时附加 &lt;em&gt;file&lt;/em&gt; 参数，则会将对应文件的副本读入编辑器的缓冲区。对副本进行更改，不影响文件本身。退出时，所有未用&lt;code&gt;&#39;w&#39;&lt;/code&gt;命令&amp;quot;明确保存&amp;quot;的变更将被丢弃。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;ed&lt;/strong&gt; 有两种不同的模式：&lt;strong&gt;command&lt;/strong&gt; 命令模式和 &lt;strong&gt;input&lt;/strong&gt; 输入模式。刚启动时，&lt;strong&gt;ed&lt;/strong&gt; 处于命令模式。在这种模式下，从标准输入读取命令，并执行命令以操作编辑器缓冲区的内容。典型的命令可能如下所示：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;,s/old/new/g
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;用 &lt;em&gt;new&lt;/em&gt; 替换字符串 &lt;em&gt;old&lt;/em&gt; 的&lt;strong&gt;所有&lt;/strong&gt;出现。&lt;/p&gt;
+&lt;p&gt;当输入诸如：&lt;code&gt;&#39;a&#39;&lt;/code&gt;追加，&lt;code&gt;&#39;i&#39;&lt;/code&gt;插入，&lt;code&gt;&#39;c&#39;&lt;/code&gt;修改等命令时，就进入输入模式。这是将文本添加到文件的主要方法。在这种模式下，命令将不可用。此时的标准输入直接写入编辑器缓冲区。一个行由结尾的&lt;code&gt;&amp;lt;换行符&amp;gt;&lt;/code&gt;字符表示。输入模式可通过在整行中输入一个单独的句点&lt;code&gt;&#39;.&#39;&lt;/code&gt;结束。&lt;/p&gt;
+&lt;p&gt;所有 &lt;strong&gt;ed&lt;/strong&gt; 命令都应用于整行或行的范围。例如：&lt;code&gt;&#39;d&#39;&lt;/code&gt;删除行；&lt;code&gt;&#39;m&#39;&lt;/code&gt;移动行……等等。如上例所示，可以通过替换命令仅修改行的一部分内容。但是，&lt;code&gt;&#39;s&#39;&lt;/code&gt;命令依然是整行上执行的。&lt;/p&gt;
+&lt;p&gt;一般的，&lt;strong&gt;ed&lt;/strong&gt; 命令有如下组成部分：零个或多个行地址，后跟单个字符命令和可能的附加参数；即，命令结构为：
+$$
+[address[,address]]command[parameters]
+$$
+地址标识出行或行的范围。如果给出的地址少于命令接受的地址，则使用默认地址。&lt;/p&gt;
+&lt;h2 id=&#34;2-行编辑简介&#34;&gt;2 行编辑简介&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;ed&lt;/strong&gt; 的作者是 Ken Thompson 和 Dennis Ritchie，该工具伴随 Unix 操作系统一起创建。Thompson 和 Ritchie 已经在其中添加了模式匹配功能(请参阅&lt;a href=&#34;https://www.gnu.org/software/ed/manual/ed_manual.html#Regular-expressions&#34;&gt;正则表达式&lt;/a&gt;)，这是对其前身——更复杂、可编程的 &lt;strong&gt;QED&lt;/strong&gt; 的改进。&lt;/p&gt;
+&lt;p&gt;就本教程而言，建议具备 Unix Shell 和 sh 的基本知识，因为 &lt;strong&gt;ed&lt;/strong&gt; 与他们紧密关联。(有关 bash 的详细信息，请参见 &lt;a href=&#34;http://www.gnu.org/software/bash/manual/&#34;&gt;bash 手册&lt;/a&gt;)。&lt;/p&gt;
+&lt;p&gt;行编辑器和全屏编辑器的主要区别在于：全屏编辑器可对用户命令做出即时反馈，而行编辑器有时要在输入上花较长时间才能看到效果。显然，即时反馈的优势在于，如果犯了错，可以在产生更严重的破坏之前及时纠正。在 &lt;strong&gt;ed&lt;/strong&gt; 中编辑则需要更多的策略和前瞻性；但是一旦熟练掌握了其应用，效率收益颇高。&lt;/p&gt;
+&lt;p&gt;许多 &lt;strong&gt;ed&lt;/strong&gt; 命令语法与其他 Unix 实用程序也通用。&lt;/p&gt;
+&lt;p&gt;与 Shell 程序一样，&lt;code&gt;&amp;lt;RETURN&amp;gt;&lt;/code&gt;(回车键)输入一行。因此，当我们在 &lt;strong&gt;ed&lt;/strong&gt; 中说&amp;quot;输入&amp;quot;命令或某些文本时，暗示&lt;code&gt;&amp;lt;RETURN&amp;gt;&lt;/code&gt;在每一行的末尾。在键入&lt;code&gt;&amp;lt;RETURN&amp;gt;&lt;/code&gt;之前，可以通过键入&lt;code&gt;&amp;lt;BACKSPACE&amp;gt;&lt;/code&gt;来向后擦除字符，或者键入&lt;code&gt;&amp;lt;CONTROL&amp;gt;-u&lt;/code&gt;(即，按住CONTROL 键并键入 u)以擦除整行来对行进行校正。&lt;/p&gt;
+&lt;p&gt;刚打开 &lt;strong&gt;ed&lt;/strong&gt; 的时候，它会等待我们的指令，但不像 Shell 那样有提示符。因此，我们从让 &lt;strong&gt;ed&lt;/strong&gt; 显示提示符开始，使用&lt;code&gt;&amp;lt;P&amp;gt;&lt;/code&gt;提示符)命令：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;$ ed 
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;P 
+&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;*
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;默认情况下，&lt;strong&gt;ed&lt;/strong&gt; 使用星号&lt;code&gt;*&lt;/code&gt;作为命令提示符，以避免与 Shell 命令提示符&lt;code&gt;$&lt;/code&gt;混淆。&lt;/p&gt;
+&lt;p&gt;我们可以通过&lt;code&gt;!&lt;/code&gt;前缀来运行 Unix Shell 内部的命令(&lt;code&gt;!&lt;/code&gt;感叹号，又名 &amp;quot;bang&amp;quot;)。例如：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;*!date
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;Mon Jun &lt;span class=&#34;m&#34;&gt;26&lt;/span&gt; 10:08:41 PDT &lt;span class=&#34;m&#34;&gt;2006&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;!
+&lt;span class=&#34;ln&#34;&gt;4&lt;/span&gt;*!for s in hello world&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;do&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;echo&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;$s&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;done&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;5&lt;/span&gt;hello
+&lt;span class=&#34;ln&#34;&gt;6&lt;/span&gt;world
+&lt;span class=&#34;ln&#34;&gt;7&lt;/span&gt;!
+&lt;span class=&#34;ln&#34;&gt;8&lt;/span&gt;*
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;到目前为止，这与在 Unix Shell 中运行命令没有什么不同。现在，假设我们要编辑命令的输出或将其保存到文件中。首先，我们必须将命令输出捕获到一个称为缓冲区的临时位置，以便 &lt;strong&gt;ed&lt;/strong&gt; 可以访问。执行 &lt;strong&gt;ed&lt;/strong&gt; 的&lt;code&gt;&amp;lt;r&amp;gt;&lt;/code&gt;命令(助记符：read)：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;*r !cal -m
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;137&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;*
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;这里 &lt;strong&gt;ed&lt;/strong&gt; 告诉我们它将 137 个字符读入编辑器缓冲区，即：cal 命令的输出，该命令打印一个简单的 ASCII 日历。要显示缓冲区内容，我们发出&lt;code&gt;&amp;lt;p&amp;gt;&lt;/code&gt;(print)命令(不要与大写的&lt;code&gt;&amp;lt;P&amp;gt;&lt;/code&gt;提示命令混淆！)。为了指示应打印的缓冲区行范围，我们在命令前加上单独的&lt;code&gt;,&lt;/code&gt;(逗号)，这是“整个缓冲区”的简写：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;*,p
+&lt;span class=&#34;ln&#34;&gt; 2&lt;/span&gt;      June &lt;span class=&#34;m&#34;&gt;2006&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 3&lt;/span&gt;Mo Tu We Th Fr Sa Su
+&lt;span class=&#34;ln&#34;&gt; 4&lt;/span&gt;          &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt;  &lt;span class=&#34;m&#34;&gt;2&lt;/span&gt;  &lt;span class=&#34;m&#34;&gt;3&lt;/span&gt;  &lt;span class=&#34;m&#34;&gt;4&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 5&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;5&lt;/span&gt;  &lt;span class=&#34;m&#34;&gt;6&lt;/span&gt;  &lt;span class=&#34;m&#34;&gt;7&lt;/span&gt;  &lt;span class=&#34;m&#34;&gt;8&lt;/span&gt;  &lt;span class=&#34;m&#34;&gt;9&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;10&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;11&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 6&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;12&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;13&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;14&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;15&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;16&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;17&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;18&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 7&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;19&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;20&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;21&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;22&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;23&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;24&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;25&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 8&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;26&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;27&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;28&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;29&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;30&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 9&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;10&lt;/span&gt;*
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;现在，让我们将缓冲区内容写入名为 junk 的文件，使用&lt;code&gt;&amp;lt;w&amp;gt;&lt;/code&gt;(write)命令：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;*w junk
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;137&lt;/span&gt; 
+&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;*
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;毋须多言，时常将缓冲区内容写入文件是一个好习惯，因为当我们退出时，对缓冲区的未保存变更将丢失。&lt;/p&gt;
+&lt;p&gt;下面的示例演示了 &lt;strong&gt;ed&lt;/strong&gt; 行编辑的一些基本概念。我们首先创建一个文件 sonnet，引用莎士比亚的十四行诗。与 Shell 一样，所有输入必须后跟一个&lt;code&gt;&amp;lt;newline&amp;gt;&lt;/code&gt;字符。命令模式中以 # 开头的命令作为注释，将被忽略。输入模式中 # 开头的行是正文。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;$ ed
+&lt;span class=&#34;ln&#34;&gt; 2&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# The &amp;#39;a&amp;#39; command is for appending text to the editor buffer.&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 3&lt;/span&gt;a
+&lt;span class=&#34;ln&#34;&gt; 4&lt;/span&gt;No more be grieved at that which thou hast &lt;span class=&#34;k&#34;&gt;done&lt;/span&gt;.
+&lt;span class=&#34;ln&#34;&gt; 5&lt;/span&gt;Roses have thorns, and filvers foutians mud.
+&lt;span class=&#34;ln&#34;&gt; 6&lt;/span&gt;Clouds and eclipses stain both moon and sun,
+&lt;span class=&#34;ln&#34;&gt; 7&lt;/span&gt;And loathsome canker lives in sweetest bud.
+&lt;span class=&#34;ln&#34;&gt; 8&lt;/span&gt;.
+&lt;span class=&#34;ln&#34;&gt; 9&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# Entering a single period on a line returns ed to command mode.&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# Now write the buffer to the file &amp;#39;sonnet&amp;#39; and quit:&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;11&lt;/span&gt;w sonnet
+&lt;span class=&#34;ln&#34;&gt;12&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;183&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;13&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# ed reports the number of characters written.&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;14&lt;/span&gt;q
+&lt;span class=&#34;ln&#34;&gt;15&lt;/span&gt;$ ls -l
+&lt;span class=&#34;ln&#34;&gt;16&lt;/span&gt;total &lt;span class=&#34;m&#34;&gt;2&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;17&lt;/span&gt;-rw-rw-r--    &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; alm           &lt;span class=&#34;m&#34;&gt;183&lt;/span&gt; Nov &lt;span class=&#34;m&#34;&gt;10&lt;/span&gt; 01:16 sonnet
+&lt;span class=&#34;ln&#34;&gt;18&lt;/span&gt;$
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;在下一个示例中，我们修正文件中的一些拼写错误。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;$ ed sonnet
+&lt;span class=&#34;ln&#34;&gt; 2&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;183&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 3&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# Begin by printing the buffer to the terminal with the &amp;#39;p&amp;#39; command.&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 4&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# The &amp;#39;,&amp;#39; means &amp;#34;all lines&amp;#34;.&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 5&lt;/span&gt;,p
+&lt;span class=&#34;ln&#34;&gt; 6&lt;/span&gt;No more be grieved at that which thou hast &lt;span class=&#34;k&#34;&gt;done&lt;/span&gt;.
+&lt;span class=&#34;ln&#34;&gt; 7&lt;/span&gt;Roses have thorns, and filvers foutians mud.
+&lt;span class=&#34;ln&#34;&gt; 8&lt;/span&gt;Clouds and eclipses stain both moon and sun,
+&lt;span class=&#34;ln&#34;&gt; 9&lt;/span&gt;And loathsome canker lives in sweetest bud.
+&lt;span class=&#34;ln&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# Select line 2 for editing.&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;11&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;2&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;12&lt;/span&gt;Roses have thorns, and filvers foutians mud.
+&lt;span class=&#34;ln&#34;&gt;13&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# Use the substitute command, &amp;#39;s&amp;#39;, to replace &amp;#39;filvers&amp;#39; with &amp;#39;silver&amp;#39;,&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;14&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# and print the result.&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;15&lt;/span&gt;s/filvers/silver/p
+&lt;span class=&#34;ln&#34;&gt;16&lt;/span&gt;Roses have thorns, and silver foutians mud.
+&lt;span class=&#34;ln&#34;&gt;17&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# And correct the spelling of &amp;#39;fountains&amp;#39;.&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;18&lt;/span&gt;s/utia/untai/p
+&lt;span class=&#34;ln&#34;&gt;19&lt;/span&gt;Roses have thorns, and silver fountains mud.
+&lt;span class=&#34;ln&#34;&gt;20&lt;/span&gt;w sonnet
+&lt;span class=&#34;ln&#34;&gt;21&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;183&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;22&lt;/span&gt;q
+&lt;span class=&#34;ln&#34;&gt;23&lt;/span&gt;$
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;ed&lt;/strong&gt; 是基于行的，我们必须告诉它要编辑哪一行或某些范围的行。在上面的示例中，通过指定行号或缓冲区中的序列来执行此操作。另外，我们也可以指定行中的唯一的字符串，例如&lt;code&gt;&#39;/filvers/&#39;&lt;/code&gt;，其中&lt;code&gt;/&lt;/code&gt;界定了要查找的字符串。随后的命令仅影响选定的行，或者说：当前行。查找到匹配后，替换命令将该行的匹配部分进行替换，语法为&lt;code&gt;&#39;s/old/new/&#39;&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;虽然 &lt;strong&gt;ed&lt;/strong&gt; 每行仅接受一个命令，打印命令&lt;code&gt;&#39;p&#39;&lt;/code&gt;是一个例外，可以附加到大多数命令的末尾。&lt;/p&gt;
+&lt;p&gt;在下一个示例中，我们把标题添加到文件中&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;$ ed sonnet
+&lt;span class=&#34;ln&#34;&gt; 2&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;183&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 3&lt;/span&gt;a
+&lt;span class=&#34;ln&#34;&gt; 4&lt;/span&gt;Sonnet &lt;span class=&#34;c1&#34;&gt;#50&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 5&lt;/span&gt;.
+&lt;span class=&#34;ln&#34;&gt; 6&lt;/span&gt;,p
+&lt;span class=&#34;ln&#34;&gt; 7&lt;/span&gt;No more be grieved at that which thou hast &lt;span class=&#34;k&#34;&gt;done&lt;/span&gt;.
+&lt;span class=&#34;ln&#34;&gt; 8&lt;/span&gt;Roses have thorns, and silver fountains mud.
+&lt;span class=&#34;ln&#34;&gt; 9&lt;/span&gt;Clouds and eclipses stain both moon and sun,
+&lt;span class=&#34;ln&#34;&gt;10&lt;/span&gt;And loathsome canker lives in sweetest bud.
+&lt;span class=&#34;ln&#34;&gt;11&lt;/span&gt;Sonnet &lt;span class=&#34;c1&#34;&gt;#50&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;12&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# The title got appended to the end; we should have used &amp;#39;0a&amp;#39;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;13&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# to append &amp;#34;before the first line&amp;#34;.&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;14&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# Move the title to its proper place.&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;15&lt;/span&gt;5m0p
+&lt;span class=&#34;ln&#34;&gt;16&lt;/span&gt;Sonnet &lt;span class=&#34;c1&#34;&gt;#50&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;17&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# The title is now the first line, and the current address has been&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;18&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# set to the address of this line as well.&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;19&lt;/span&gt;,p
+&lt;span class=&#34;ln&#34;&gt;20&lt;/span&gt;Sonnet &lt;span class=&#34;c1&#34;&gt;#50&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;21&lt;/span&gt;No more be grieved at that which thou hast &lt;span class=&#34;k&#34;&gt;done&lt;/span&gt;.
+&lt;span class=&#34;ln&#34;&gt;22&lt;/span&gt;Roses have thorns, and silver fountains mud.
+&lt;span class=&#34;ln&#34;&gt;23&lt;/span&gt;Clouds and eclipses stain both moon and sun,
+&lt;span class=&#34;ln&#34;&gt;24&lt;/span&gt;And loathsome canker lives in sweetest bud.
+&lt;span class=&#34;ln&#34;&gt;25&lt;/span&gt;wq sonnet
+&lt;span class=&#34;ln&#34;&gt;26&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;195&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;27&lt;/span&gt;$
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;当用 &lt;strong&gt;ed&lt;/strong&gt; 打开一个文件时，当前地址最初设置为该文件最后一行的地址。类似的，移动命令&lt;code&gt;&#39;m&#39;&lt;/code&gt;将当前地址设置为最后移动的行的目的地址。&lt;/p&gt;
+&lt;p&gt;相关程序或例程是 vi(1), sed(1), regex(3), sh(1)。相关文件有：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Unix User&#39;s Manual Supplementary Documents：12-13&lt;/li&gt;
+&lt;li&gt;BW Kernighan 和 PJ Plauger：&amp;quot;Software Tools in Pascal&amp;quot;，Addison-Wesley，1981&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;3-调用-ed&#34;&gt;3 调用 ed&lt;/h2&gt;
+&lt;p&gt;启动 &lt;strong&gt;ed&lt;/strong&gt; 的命令格式为：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;ed &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;options&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;file&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# or&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;red &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;options&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;file&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;em&gt;file&lt;/em&gt; 指明被读取的文件的名字。如果文件名以&lt;code&gt;!&lt;/code&gt;开头，将被解释为 Shell 命令。这种情况下 &lt;strong&gt;ed&lt;/strong&gt; 读取的是&lt;code&gt;sh&lt;/code&gt;执行 &lt;em&gt;file&lt;/em&gt; 的输出结果。要读取文件名以&lt;code&gt;!&lt;/code&gt;开头的文件的内容，需要在&lt;code&gt;!&lt;/code&gt;前加上&lt;code&gt;\&lt;/code&gt;转义。默认的文件名被设置为 &lt;em&gt;file&lt;/em&gt;，除非前缀是&lt;code&gt;!&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;ed&lt;/strong&gt; 支持如下选项:&lt;/p&gt;
+&lt;p&gt;-h&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;--help
+Print an informative help message describing the options and exit.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;-V&lt;br&gt;
+--version&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Print the version number of ed on the standard output and exit.
+This version number should be included in all bug reports.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;-G&lt;br&gt;
+--traditional&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Forces backwards compatibility. This affects the behavior of the ed commands &#39;G&#39;, &#39;V&#39;, &#39;f&#39;, &#39;l&#39;, &#39;m&#39;, &#39;t&#39; and &#39;!!&#39;.
+If the default behavior of these commands does not seem familiar, then try invoking ed with this switch.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;-l&lt;br&gt;
+--loose-exit-status&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Don&#39;t exit with bad status if a command happens to &amp;quot;fail&amp;quot; (for example if a substitution command finds nothing to replace).
+This can be useful when ed is invoked as the editor for crontab.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;-p string&lt;br&gt;
+--prompt=string&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Specifies a command prompt string and turns prompting on. Showing the prompt string may be toggled on and off with the &#39;P&#39; command.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;-r&lt;br&gt;
+--restricted&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Run in restricted mode. This mode disables editing of files out of the current directory and execution of shell commands.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;-s&lt;br&gt;
+--quiet&lt;br&gt;
+--silent&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Suppresses diagnostics, the printing of byte counts by &#39;e&#39;, &#39;E&#39;, &#39;r&#39; and &#39;w&#39; commands,
+and the &#39;!&#39; prompt after a &#39;!&#39; command. This option may be useful if ed&#39;s standard input is from a script.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;-v&lt;br&gt;
+--verbose&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Verbose mode; prints error explanations. This may be toggled on and off with the &#39;H&#39; command.
+Exit status: 0 if no errors occurred; otherwise &amp;gt;0.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;4-行寻址&#34;&gt;4 行寻址&lt;/h2&gt;
+&lt;p&gt;地址表示某行在缓冲区中的行号。&lt;strong&gt;ed&lt;/strong&gt; 维护着一个当前地址，当没有明确指定地址时，该地址作为默认地址提供给命令。文件读取完毕，当前地址被设置为该文件的最后一行。一般情况下，当前地址总是被设置为一个命令所影响的最后一行的地址。&lt;/p&gt;
+&lt;p&gt;一个特例是行号为 0 的行。意为&amp;quot;缓冲区的开头&amp;quot;，在任何有意义的地方都有效。&lt;/p&gt;
+&lt;p&gt;地址范围由两个地址组成，其间用(&lt;code&gt;,&lt;/code&gt;)或(&lt;code&gt;;&lt;/code&gt;)分隔。在(&lt;code&gt;;&lt;/code&gt;)分隔的范围中，第二个地址被计算前，当前地址(&lt;code&gt;.&lt;/code&gt;)被设为第一个地址；当第二个地址包含正则表达式时，这个特性可被用来设置搜索的开始行。第一个地址的值不能超过第二个地址。&lt;/p&gt;
+&lt;p&gt;分隔符两边的地址都可以被省略。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;若只提供第一个地址，则第二个地址与第一个地址相同。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;如果只提供第二个地址，则&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;以(&lt;code&gt;,&lt;/code&gt;)分隔的范围是：&lt;code&gt;1,addr&lt;/code&gt;;&lt;/li&gt;
+&lt;li&gt;而由(&lt;code&gt;;&lt;/code&gt;)分隔的范围是：&lt;code&gt;.,addr&lt;/code&gt;。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;如果给出 n 个元组的地址，其中 n &amp;gt; 2，则相应的范围由 n 个元组中的最后两个地址确定(1,2,3,&lt;code&gt;4,5&lt;/code&gt;)。如果只需要一个地址，则使用最后一个地址。将任意数量的地址分配给需要零个地址的命令将引发错误。&lt;/p&gt;
+&lt;p&gt;行地址的构造如下：&lt;/p&gt;
+&lt;p&gt;.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The current line (address) in the buffer.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;$&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The last line in the buffer.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;n&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The nth line in the buffer, where n is a number in the range &#39;0,$&#39;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;+n&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The nth next line, where n is a non-negative number.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;-n&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The nth previous line, where n is a non-negative number.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;+&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The next line. This is equivalent to &#39;+1&#39; and may be repeated with cumulative effect.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;-&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The previous line. This is equivalent to &#39;-1&#39; and may be repeated with cumulative effect.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;,&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The first through last lines in the buffer. This is equivalent to the address range &#39;1,$&#39;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The current through last lines in the buffer. This is equivalent to the address range &#39;.;$&#39;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;/re/&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The next line containing the regular expression re.
+The search wraps to the beginning of the buffer and continues down to the current line, if necessary.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;?re?&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The previous line containing the regular expression re.
+The search wraps to the end of the buffer and continues up to the current line, if necessary.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&#39;x&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The apostrophe-x character pair addresses the line previously marked by a &#39;k&#39; (mark) command,
+where &#39;x&#39; is a lower case letter from the portable character set &#39;[a-z]&#39;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;5-正则表达式&#34;&gt;5 正则表达式&lt;/h2&gt;
+&lt;p&gt;正则表达式是用于选择文本的模式。例如：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;g/string/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;打印所有包含 &lt;em&gt;string&lt;/em&gt; 的行。正则表达式也可以用在&lt;code&gt;&#39;s&#39;&lt;/code&gt;替换命令中的匹配文本部分。&lt;/p&gt;
+&lt;p&gt;除了字符串字面量外，正则表达式还可以表示字符类，表示&amp;quot;由相应的正则表达式匹配&amp;quot;的字符串。如果正则表达式可以匹配一行中的多个字符串，则最左边的匹配项就是被选则的匹配项。如果正则表达式允许可变数量的匹配字符，则匹配从该位置开始的最长序列。&lt;/p&gt;
+&lt;p&gt;一个空的正则表达式(&lt;code&gt;//&lt;/code&gt;)等价于上一个匹配的表达式。&lt;/p&gt;
+&lt;p&gt;以下符号用来构造正则表达式：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;c
+&lt;span class=&#34;ln&#34;&gt; 2&lt;/span&gt;Any character c not listed below, including &lt;span class=&#34;s1&#34;&gt;&amp;#39;{&amp;#39;&lt;/span&gt;, &lt;span class=&#34;s1&#34;&gt;&amp;#39;}&amp;#39;&lt;/span&gt;, &lt;span class=&#34;s1&#34;&gt;&amp;#39;(&amp;#39;&lt;/span&gt;, &lt;span class=&#34;s1&#34;&gt;&amp;#39;)&amp;#39;&lt;/span&gt;, &lt;span class=&#34;s1&#34;&gt;&amp;#39;&amp;lt;&amp;#39;&lt;/span&gt; and &lt;span class=&#34;s1&#34;&gt;&amp;#39;&amp;gt;&amp;#39;&lt;/span&gt;, matches itself.
+&lt;span class=&#34;ln&#34;&gt; 3&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 4&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\c&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 5&lt;/span&gt;Any backslash-escaped character c, other than &lt;span class=&#34;s1&#34;&gt;&amp;#39;{&amp;#39;&lt;/span&gt;, &lt;span class=&#34;s1&#34;&gt;&amp;#39;}&amp;#39;&lt;/span&gt;, &lt;span class=&#34;s1&#34;&gt;&amp;#39;(&amp;#39;&lt;/span&gt;, &lt;span class=&#34;s1&#34;&gt;&amp;#39;)&amp;#39;&lt;/span&gt;, &lt;span class=&#34;s1&#34;&gt;&amp;#39;&amp;lt;&amp;#39;&lt;/span&gt;, &lt;span class=&#34;s1&#34;&gt;&amp;#39;&amp;gt;&amp;#39;&lt;/span&gt;, &lt;span class=&#34;s1&#34;&gt;&amp;#39;b&amp;#39;&lt;/span&gt;, &lt;span class=&#34;s1&#34;&gt;&amp;#39;B&amp;#39;&lt;/span&gt;, &lt;span class=&#34;s1&#34;&gt;&amp;#39;w&amp;#39;&lt;/span&gt;, &lt;span class=&#34;s1&#34;&gt;&amp;#39;W&amp;#39;&lt;/span&gt;, &lt;span class=&#34;s1&#34;&gt;&amp;#39;+&amp;#39;&lt;/span&gt; and &lt;span class=&#34;s1&#34;&gt;&amp;#39;?&amp;#39;&lt;/span&gt;, matches itself.
+&lt;span class=&#34;ln&#34;&gt; 6&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 7&lt;/span&gt;.
+&lt;span class=&#34;ln&#34;&gt; 8&lt;/span&gt;Matches any single character.
+&lt;span class=&#34;ln&#34;&gt; 9&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;char-class&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;11&lt;/span&gt;Matches any single character in char-class. 
+&lt;span class=&#34;ln&#34;&gt;12&lt;/span&gt;To include a &lt;span class=&#34;s1&#34;&gt;&amp;#39;]&amp;#39;&lt;/span&gt; in char-class, it must be the first character. 
+&lt;span class=&#34;ln&#34;&gt;13&lt;/span&gt;A range of characters may be specified by separating the end characters of the range with a &lt;span class=&#34;s1&#34;&gt;&amp;#39;-&amp;#39;&lt;/span&gt;, 
+&lt;span class=&#34;ln&#34;&gt;14&lt;/span&gt;e.g., &lt;span class=&#34;s1&#34;&gt;&amp;#39;a-z&amp;#39;&lt;/span&gt; specifies the lower &lt;span class=&#34;k&#34;&gt;case&lt;/span&gt; characters. 
+&lt;span class=&#34;ln&#34;&gt;15&lt;/span&gt;The following literal expressions can also be used in char-class to specify sets of characters:
+&lt;span class=&#34;ln&#34;&gt;16&lt;/span&gt;          &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;:alnum:&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;:cntrl:&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;:lower:&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;:space:&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;17&lt;/span&gt;          &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;:alpha:&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;:digit:&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;:print:&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;:upper:&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;18&lt;/span&gt;          &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;:blank:&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;:graph:&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;:punct:&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;:xdigit:&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;19&lt;/span&gt;If &lt;span class=&#34;s1&#34;&gt;&amp;#39;-&amp;#39;&lt;/span&gt; appears as the first or last character of char-class, &lt;span class=&#34;k&#34;&gt;then&lt;/span&gt; it matches itself. 
+&lt;span class=&#34;ln&#34;&gt;20&lt;/span&gt;All other characters in char-class match themselves.
+&lt;span class=&#34;ln&#34;&gt;21&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;22&lt;/span&gt;Patterns in char-class of the form:
+&lt;span class=&#34;ln&#34;&gt;23&lt;/span&gt;          &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;.col-elm.&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;24&lt;/span&gt;          &lt;span class=&#34;o&#34;&gt;[=&lt;/span&gt;col-elm&lt;span class=&#34;o&#34;&gt;=]&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;25&lt;/span&gt;where col-elm is a collating element are interpreted according to &lt;span class=&#34;s1&#34;&gt;&amp;#39;locale (5)&amp;#39;&lt;/span&gt;. 
+&lt;span class=&#34;ln&#34;&gt;26&lt;/span&gt;See &lt;span class=&#34;s1&#34;&gt;&amp;#39;regex (7)&amp;#39;&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; an explanation of these constructs.
+&lt;span class=&#34;ln&#34;&gt;27&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;28&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;^char-class&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;29&lt;/span&gt;Matches any single character, other than newline, not in char-class. char-class is defined as above.
+&lt;span class=&#34;ln&#34;&gt;30&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;31&lt;/span&gt;^
+&lt;span class=&#34;ln&#34;&gt;32&lt;/span&gt;If &lt;span class=&#34;s1&#34;&gt;&amp;#39;^&amp;#39;&lt;/span&gt; is the first character of a regular expression, &lt;span class=&#34;k&#34;&gt;then&lt;/span&gt; it anchors the regular expression to the beginning of a line. 
+&lt;span class=&#34;ln&#34;&gt;33&lt;/span&gt;Otherwise, it matches itself.
+&lt;span class=&#34;ln&#34;&gt;34&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;35&lt;/span&gt;$
+&lt;span class=&#34;ln&#34;&gt;36&lt;/span&gt;If &lt;span class=&#34;s1&#34;&gt;&amp;#39;$&amp;#39;&lt;/span&gt; is the last character of a regular expression, it anchors the regular expression to the end of a line. 
+&lt;span class=&#34;ln&#34;&gt;37&lt;/span&gt;Otherwise, it matches itself.
+&lt;span class=&#34;ln&#34;&gt;38&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;39&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\(&lt;/span&gt;re&lt;span class=&#34;se&#34;&gt;\)&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;40&lt;/span&gt;Defines a &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;possibly null&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; subexpression re. Subexpressions may be nested. 
+&lt;span class=&#34;ln&#34;&gt;41&lt;/span&gt;A subsequent backreference of the form &lt;span class=&#34;s1&#34;&gt;&amp;#39;\n&amp;#39;&lt;/span&gt;, where n is a number in the range &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;1,9&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;, 
+&lt;span class=&#34;ln&#34;&gt;42&lt;/span&gt;expands to the text matched by the nth subexpression. 
+&lt;span class=&#34;ln&#34;&gt;43&lt;/span&gt;For example, the regular expression &lt;span class=&#34;s1&#34;&gt;&amp;#39;\(a.c\)\1&amp;#39;&lt;/span&gt; matches the string &lt;span class=&#34;s1&#34;&gt;&amp;#39;abcabc&amp;#39;&lt;/span&gt;, 
+&lt;span class=&#34;ln&#34;&gt;44&lt;/span&gt;but not &lt;span class=&#34;s1&#34;&gt;&amp;#39;abcadc&amp;#39;&lt;/span&gt;. Subexpressions are ordered relative to their left delimiter.
+&lt;span class=&#34;ln&#34;&gt;45&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;46&lt;/span&gt;*
+&lt;span class=&#34;ln&#34;&gt;47&lt;/span&gt;Matches zero or more repetitions of the regular expression immediately preceding it. 
+&lt;span class=&#34;ln&#34;&gt;48&lt;/span&gt;The regular expression can be either a single character regular expression or a subexpression. 
+&lt;span class=&#34;ln&#34;&gt;49&lt;/span&gt;If &lt;span class=&#34;s1&#34;&gt;&amp;#39;*&amp;#39;&lt;/span&gt; is the first character of a regular expression or subexpression, &lt;span class=&#34;k&#34;&gt;then&lt;/span&gt; it matches itself. 
+&lt;span class=&#34;ln&#34;&gt;50&lt;/span&gt;The &lt;span class=&#34;s1&#34;&gt;&amp;#39;*&amp;#39;&lt;/span&gt; operator sometimes yields unexpected results. 
+&lt;span class=&#34;ln&#34;&gt;51&lt;/span&gt;For example, the regular expression &lt;span class=&#34;s1&#34;&gt;&amp;#39;b*&amp;#39;&lt;/span&gt; matches the beginning of the string &lt;span class=&#34;s1&#34;&gt;&amp;#39;abbb&amp;#39;&lt;/span&gt;, 
+&lt;span class=&#34;ln&#34;&gt;52&lt;/span&gt;as opposed to the substring &lt;span class=&#34;s1&#34;&gt;&amp;#39;bbb&amp;#39;&lt;/span&gt;, since a null match is the only left-most match.
+&lt;span class=&#34;ln&#34;&gt;53&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;54&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\{&lt;/span&gt;n,m&lt;span class=&#34;se&#34;&gt;\}&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;55&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\{&lt;/span&gt;n,&lt;span class=&#34;se&#34;&gt;\}&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;56&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\{&lt;/span&gt;n&lt;span class=&#34;se&#34;&gt;\}&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;57&lt;/span&gt;Matches the single character regular expression or subexpression immediately preceding it at least n and at most m times. 
+&lt;span class=&#34;ln&#34;&gt;58&lt;/span&gt;If m is omitted, &lt;span class=&#34;k&#34;&gt;then&lt;/span&gt; it matches at least n times. 
+&lt;span class=&#34;ln&#34;&gt;59&lt;/span&gt;If the comma is also omitted, &lt;span class=&#34;k&#34;&gt;then&lt;/span&gt; it matches exactly n times. 
+&lt;span class=&#34;ln&#34;&gt;60&lt;/span&gt;If any of these forms occurs first in a regular expression or subexpression, 
+&lt;span class=&#34;ln&#34;&gt;61&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;then&lt;/span&gt; it is interpreted literally &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;i.e., the regular expression &lt;span class=&#34;s1&#34;&gt;&amp;#39;\{2\}&amp;#39;&lt;/span&gt; matches the string &lt;span class=&#34;s1&#34;&gt;&amp;#39;{2}&amp;#39;&lt;/span&gt;, and so on&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;.
+&lt;span class=&#34;ln&#34;&gt;62&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;63&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\&amp;lt;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;64&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\&amp;gt;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;65&lt;/span&gt;Anchors the single character regular expression or subexpression immediately following it 
+&lt;span class=&#34;ln&#34;&gt;66&lt;/span&gt;to the beginning &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;in the &lt;span class=&#34;k&#34;&gt;case&lt;/span&gt; of &lt;span class=&#34;s1&#34;&gt;&amp;#39;\&amp;lt;&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; or ending &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;in the &lt;span class=&#34;k&#34;&gt;case&lt;/span&gt; of &lt;span class=&#34;s1&#34;&gt;&amp;#39;\&amp;gt;&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; of a word, 
+&lt;span class=&#34;ln&#34;&gt;67&lt;/span&gt;i.e., in ASCII, a maximal string of alphanumeric characters, including the underscore &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;_&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;.
+&lt;span class=&#34;ln&#34;&gt;68&lt;/span&gt;The following extended regular expression operators are preceded by a backslash &lt;span class=&#34;s1&#34;&gt;&amp;#39;\&amp;#39;&lt;/span&gt; 
+&lt;span class=&#34;ln&#34;&gt;69&lt;/span&gt;to distinguish them from traditional ed syntax. 
+&lt;span class=&#34;ln&#34;&gt;70&lt;/span&gt;They may be unavailable depending on the particular regex implementation in your system.
+&lt;span class=&#34;ln&#34;&gt;71&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;72&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\`&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;73&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\&amp;#39;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;74&lt;/span&gt;Unconditionally matches the beginning &lt;span class=&#34;s1&#34;&gt;&amp;#39;\`&amp;#39;&lt;/span&gt; or ending &lt;span class=&#34;s1&#34;&gt;&amp;#39;\&amp;#39;&amp;#39; of a line.
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;75&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;76&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;\?
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;77&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;Optionally matches the single character regular expression or subexpression immediately preceding it. 
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;78&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;For example, the regular expression &amp;#39;&lt;/span&gt;a&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;bd&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\?&lt;/span&gt;c&lt;span class=&#34;s1&#34;&gt;&amp;#39; matches the strings &amp;#39;&lt;/span&gt;abc&lt;span class=&#34;s1&#34;&gt;&amp;#39;, &amp;#39;&lt;/span&gt;adc&lt;span class=&#34;s1&#34;&gt;&amp;#39; and &amp;#39;&lt;/span&gt;ac&lt;span class=&#34;s1&#34;&gt;&amp;#39;. 
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;79&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;If &amp;#39;&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\?&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39; occurs at the beginning of a regular expressions or subexpression, then it matches a literal &amp;#39;&lt;/span&gt;?&lt;span class=&#34;s1&#34;&gt;&amp;#39;.
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;80&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;81&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;\+
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;82&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;Matches the single character regular expression or subexpression immediately preceding it one or more times. 
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;83&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;So the regular expression &amp;#39;&lt;/span&gt;a&lt;span class=&#34;se&#34;&gt;\+&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39; is shorthand for &amp;#39;&lt;/span&gt;aa*&lt;span class=&#34;s1&#34;&gt;&amp;#39;. If &amp;#39;&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\+&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39; occurs at the beginning of 
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;84&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;a regular expression or subexpression, then it matches a literal &amp;#39;&lt;/span&gt;+&lt;span class=&#34;s1&#34;&gt;&amp;#39;.
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;85&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;86&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;\b
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;87&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;Matches the beginning or ending (null string) of a word. 
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;88&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;Thus the regular expression &amp;#39;&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\b&lt;/span&gt;hello&lt;span class=&#34;se&#34;&gt;\b&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39; is equivalent to &amp;#39;&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\&amp;lt;&lt;/span&gt;hello&lt;span class=&#34;se&#34;&gt;\&amp;gt;&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;. 
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;89&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;However, &amp;#39;&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\b\b&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39; is a valid regular expression whereas &amp;#39;&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\&amp;lt;\&amp;gt;&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&amp;#39;&lt;/span&gt; is not.
+&lt;span class=&#34;ln&#34;&gt;90&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;91&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\B&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;92&lt;/span&gt;Matches &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;a null string&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; inside a word.
+&lt;span class=&#34;ln&#34;&gt;93&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;94&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\w&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;95&lt;/span&gt;Matches any character in a word.
+&lt;span class=&#34;ln&#34;&gt;96&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;97&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\W&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;98&lt;/span&gt;Matches any character not in a word.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;6-命令&#34;&gt;6 命令&lt;/h2&gt;
+&lt;p&gt;所有的 &lt;strong&gt;ed&lt;/strong&gt; 命令都是单个字符。当然，某些命令需要额外的参数。如果命令的参数跨越多行，则除最后一行外，每行都必须以反斜杠&lt;code&gt;\&lt;/code&gt;结尾 。&lt;/p&gt;
+&lt;p&gt;通常，每行最多允许一个命令。但是，大多数命令都接受打印后缀，即&lt;code&gt;&#39;p&#39;&lt;/code&gt;(打印)，&lt;code&gt;&#39;l&#39;&lt;/code&gt;(列表)或&lt;code&gt;&#39;n&#39;&lt;/code&gt;(枚举)，以打印受命令影响的最后一行。提供多个打印后缀并不轻便，但是 &lt;strong&gt;ed&lt;/strong&gt; 允许非重复打印后缀的任意组合，并结合其效果。如果给出了任何打印后缀，则必须紧随命令之后。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;&#39;e&#39;&lt;/code&gt;, &lt;code&gt;&#39;E&#39;&lt;/code&gt;, &lt;code&gt;&#39;f&#39;&lt;/code&gt;, &lt;code&gt;&#39;r&#39;&lt;/code&gt; 和&lt;code&gt;&#39;w&#39;&lt;/code&gt; 这些命令接收可选的 &lt;em&gt;file&lt;/em&gt; 参数，参数与命令之间用一个或多个空格分隔。&lt;/p&gt;
+&lt;p&gt;中断(一般为&lt;code&gt;&amp;lt;Control-C&amp;gt;&lt;/code&gt;)可以中止当前命令并使编辑器返回命令模式。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;ed&lt;/strong&gt; 识别以下命令：默认地址与命令放在一起显示，若未指定地址则在括号中给出地址范围。&lt;/p&gt;
+&lt;p&gt;(.)a&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;在地址标明的行之后将文本追加到缓冲区。地址 0(零) 对该命令有效——它将输入的文本放在缓冲区的开头。命令之后进入输入模式以输入文字。当前地址设置为最后输入的行的地址，否则，设置为地址标明的行。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;(.,.)c&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;改变缓冲区中的行。地址标明的一或多行从缓冲区中被删除，命令后进入输入模式。新输入的文本在所有被删除的行所在的位置插入。当前地址设置为最后输入的行的地址，否则，设置为删除对应行后的地址。如果被删除的行原本就在缓冲区末尾，当前地址被设置为新的最后一行；如果缓冲区中已经没有行，则当前地址被设置为 0。被删除的行被复制到剪切缓冲区。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;(.,.)d&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;从缓冲区中删除地址标识的行。当前地址被设置为删除对应行后的地址；如果被删除的行原本就在缓冲区末尾，当前地址被设置为新的最后一行；如果缓冲区中已经没有行，则当前地址被设置为 0。被删除的行被复制到剪切缓冲区。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;e &lt;em&gt;file&lt;/em&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;编辑指定文件，并设置默认文件名。若 &lt;em&gt;file&lt;/em&gt; 未指定，则使用默认文件名。缓冲区中的所有行在新文件读取之前被删除。当前地址被设置为缓冲区中的最后一行。&lt;/p&gt;
+&lt;p&gt;如果 &lt;em&gt;file&lt;/em&gt; 以&lt;code&gt;!&lt;/code&gt;为前缀，则被解释为 Shell 命令，并将该命令的输出读入到缓冲区。这种情况下默认文件名无变化。&lt;/p&gt;
+&lt;p&gt;若自上次执行&lt;code&gt;&#39;w&#39;&lt;/code&gt;命令将缓冲区内容写到文件之后，缓冲区中有任何改变，则该命令打印一个警告。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;E file&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;无条件的打开另一个文件。与&lt;code&gt;&#39;e&#39;&lt;/code&gt;命令类似，但是丢弃未保存的改变而无任何警告。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;f file&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;设置默认文件名为：&lt;em&gt;file&lt;/em&gt;。如果未指定 &lt;em&gt;file&lt;/em&gt;，则打印未转义的默认文件名。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;(1,$)g/re/command-list&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;全局命令。分两步实施。首先，与&lt;code&gt;re&lt;/code&gt;匹配的所有行被标记。然后，从头至尾遍历文件，命令列表里的每个命令都会逐个实施到每个标记的行上，当前地址也随着逐行遍历而改变。实施过命令的行被取消标记。当前地址的最终值，被设置为命令列表中最后一条命令影响的最后一行。如果没有匹配的行，当前地址不变。&lt;/p&gt;
+&lt;p&gt;命令列表的第一个命令必须于&lt;code&gt;&#39;g&#39;&lt;/code&gt;在同一行。其他命令必须各自占一行。多行命令中除了最后一行，其他行必须以反斜杠&lt;code&gt;\&lt;/code&gt;结尾。除了&lt;code&gt;&#39;g&#39;&lt;/code&gt;,&lt;code&gt;&#39;G&#39;&lt;/code&gt;,&lt;code&gt;&#39;v&#39;&lt;/code&gt;,&lt;code&gt;&#39;V&#39;&lt;/code&gt;，其他命令都可以出现在命令列表中。&lt;code&gt;&#39;.&#39;&lt;/code&gt;字符结束&lt;code&gt;&#39;a&#39;&lt;/code&gt;,&lt;code&gt;&#39;c&#39;&lt;/code&gt;,&lt;code&gt;&#39;i&#39;&lt;/code&gt;命令的输入模式，如果&lt;code&gt;&#39;.&#39;&lt;/code&gt;在最后一行则可以被省略。默认情况下，命令列表中的单独&lt;code&gt;&amp;lt;newline&amp;gt;&lt;/code&gt;等价于&lt;code&gt;&#39;p&#39;&lt;/code&gt;命令。如果 &lt;strong&gt;ed&lt;/strong&gt; 启动时带了&lt;code&gt;-G&lt;/code&gt;参数，则命令列表中的&lt;code&gt;&amp;lt;newline&amp;gt;&lt;/code&gt;等价于&lt;code&gt;&#39;.+1p&#39;&lt;/code&gt;。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;(1,$)G/re/&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;交互式全局命令。交互式的编辑与&lt;code&gt;re&lt;/code&gt;匹配的行。首先打印匹配的行，当前地址设置为该行，然后提示用户输入命令列表。当前地址的最终值为最后一条命令影响的行。如果没有匹配的行，当前地址不变。&lt;/p&gt;
+&lt;p&gt;命令列表的格式与&lt;code&gt;&#39;g&#39;&lt;/code&gt;命令相同。单独的&lt;code&gt;&amp;lt;newline&amp;gt;&lt;/code&gt;相当于不执行任何命令。单独的&lt;code&gt;&#39;&amp;amp;&#39;&lt;/code&gt;表示重复上一个非空的命令。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;h&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;帮助。打印上一个错误的解释。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;H&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;错误解释的开关。默认情况下，不打印。建议在执行 &lt;strong&gt;ed&lt;/strong&gt; 脚本之前开启以便调试。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;(.)i&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;在地址标识的行之前插入文本。地址 0 对此命令有效，这将导致文本被插入到缓冲区的开头。命令后进入输入模式。当前地址设置为最后输入的行的地址，否则，设置为地址标识的行。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;(.,.+1)j&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;合并地址标识的行，用单一行替换所有被合并的行。如果只给出了一个地址，命令什么也不做。如果有若干行被合并，则被替换的所有行都被复制到剪切缓冲区，且当前地址被设置为合并后的行。否则，当前地址不变。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;(.)kx&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;用小写字母&lt;code&gt;x&lt;/code&gt;标记一行。被标记的行可以由对应的小写字母寻址(比如&lt;code&gt;&#39;x&lt;/code&gt;)。除非该行被删除或修改，否则标记不会消失。当前地址无变化。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;(.,.)l&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;列表。直白的打印地址标识的行。每行的结尾由&lt;code&gt;$&lt;/code&gt;标记，而行内的所有&lt;code&gt;$&lt;/code&gt;字符都会添加前导的反斜杠&lt;code&gt;\&lt;/code&gt;。特殊字符按照转义序列打印。当前地址被设置为最后打印的行。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;(.,.)m(.)&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;移动缓冲区中的行。地址标识的行被移动到&lt;code&gt;&#39;m&#39;&lt;/code&gt;命令右边指定的行的后面。地址 0 对此命令有效，意为将行移动到缓冲区开头。如果目标地址包含在寻址行范围内则报错。当前地址被设置为被移动的最后一行的新地址。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;(.,.)n&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;行号命令。打印地址标识的行，行号作为前导且用&lt;code&gt;&amp;lt;tab&amp;gt;&lt;/code&gt;与行文本隔开。当前地址设置为最后被打印的行。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;(.,.)p&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;打印地址标识的行。当前地址设置为最后被打印的行。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;P&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;命令提示符开关。除非通过启动时的&lt;code&gt;&#39;-p&#39;&lt;/code&gt;参数指定提示符字符串，否则默认情况下不显示提示符。提示符默认字符为：星号(&lt;code&gt;&#39;*&#39;&lt;/code&gt;)&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;q&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;退出 &lt;strong&gt;ed&lt;/strong&gt;。若自上次执行&lt;code&gt;&#39;w&#39;&lt;/code&gt;命令保存缓冲区到文件后，缓冲区中有任何改变则会打印警告信息。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Q&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;无条件退出 &lt;strong&gt;ed&lt;/strong&gt;。与&lt;code&gt;&#39;q&#39;&lt;/code&gt;类似，但缓冲区中未保存的改变将丢失而不会提出警告。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;($)r file&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;读取指定文件的内容，追加到地址标识的行后面。如果 &lt;em&gt;file&lt;/em&gt; 未指定，则使用默认文件名。如果执行命令前没有默认文件名，则使用 &lt;em&gt;file&lt;/em&gt; 作为默认名。否则，默认文件名无变化。地址 0 对此命令有效。意为将读取到的内容放置在缓冲区开头。当前地址被设置为最后读取的行，否则设置为地址标识的行。&lt;/p&gt;
+&lt;p&gt;如果 &lt;em&gt;file&lt;/em&gt; 以&lt;code&gt;!&lt;/code&gt;为前缀，则被解释为 Shell 命令，读取的是脚本执行后的输出。这种情况加默认文件名无变化。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;(.,.)s/re/replacement/&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;替换命令。地址标识范围内与&lt;code&gt;re&lt;/code&gt;匹配的部分将被&lt;code&gt;replacment&lt;/code&gt;替换。默认情况下，只有第一个匹配被替换。&lt;code&gt;&#39;s&#39;&lt;/code&gt;命令可以与后缀&lt;code&gt;&#39;g&#39;&lt;/code&gt;,&lt;code&gt;count&lt;/code&gt;,&lt;code&gt;&#39;l&#39;&lt;/code&gt;以及&lt;code&gt;&#39;p&#39;&lt;/code&gt;组合。如果使用了&lt;code&gt;&#39;g&#39;&lt;/code&gt;后缀，则所有匹配都会被替换。&lt;code&gt;count&lt;/code&gt;后缀(其中：count &amp;gt; 0)，表示只替换 count 个匹配。&lt;code&gt;&#39;g&#39;&lt;/code&gt;与&lt;code&gt;count&lt;/code&gt;不能同时使用。&lt;code&gt;&#39;l&#39;&lt;/code&gt;,&lt;code&gt;&#39;n&#39;&lt;/code&gt;和&lt;code&gt;&#39;p&#39;&lt;/code&gt;是常见的打印后缀。如果地址标识的行内没有任何替换操作则会报错。当前地址被设置为最后一个出现匹配的行。如果一行被拆分，则看做是每个新行上都发生了替换。若未发生替换，则当前地址不变。最后被修改的一行将被复制到剪切缓冲区。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;re&lt;/code&gt;和&lt;code&gt;replacement&lt;/code&gt;可以由除了&lt;code&gt;&amp;lt;space&amp;gt;&lt;/code&gt;和&lt;code&gt;&amp;lt;newline&amp;gt;&lt;/code&gt;之外的任何字符界定，&lt;code&gt;&#39;s&#39;&lt;/code&gt;命令格式使用的字符详见下文。如果尾部的界定符被省略，则相当于在最后一个受影响的行上执行&lt;code&gt;&#39;p&#39;&lt;/code&gt;命令。如果&lt;code&gt;&#39;s&#39;&lt;/code&gt;命令是&lt;code&gt;&#39;g&#39;&lt;/code&gt;或&lt;code&gt;&#39;v&#39;&lt;/code&gt;命令列表的一部分并且不是最后一条命令时，结尾的界定符&lt;code&gt;不能&lt;/code&gt;被省略，这是为了避免跟随后的转义新行混淆。&lt;/p&gt;
+&lt;p&gt;在&lt;code&gt;replacement&lt;/code&gt;中未转义的&#39;&amp;amp;&#39;代表当前匹配的文本。字符序列&lt;code&gt;\m&lt;/code&gt;(其中 m 的区间[1,9])，被替换为第 m 个后向引用表达式。如果对应的后向引用不存在，&lt;code&gt;\m&lt;/code&gt;会被替换成空字符串。如果&lt;code&gt;replacement&lt;/code&gt;只包含单独的&lt;code&gt;&#39;%&#39;&lt;/code&gt;，则表示上一个替换命令使用的&lt;code&gt;replacement&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;replacement&lt;/code&gt;中，一行可以拆分成多行，新拆分的行需要用&lt;code&gt;\&lt;/code&gt;转义。这些在&lt;code&gt;replacement&lt;/code&gt;中的&lt;code&gt;\&lt;/code&gt;将移除其后字符的特殊含义。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;(.,.)s&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;重复上一个替换命令。这个格式的&lt;code&gt;&#39;s&#39;&lt;/code&gt;命令接受&lt;code&gt;&#39;g&#39;&lt;/code&gt;和&lt;code&gt;count&lt;/code&gt;作为后缀，还包括&lt;code&gt;&#39;p&#39;&lt;/code&gt;和&lt;code&gt;&#39;r&#39;&lt;/code&gt;后缀。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;&#39;g&#39;&lt;/code&gt;后缀切换上一个替换命令的&lt;strong&gt;全局&lt;/strong&gt;开关，并且重置&lt;code&gt;count&lt;/code&gt;的为 1。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;&#39;p&#39;&lt;/code&gt;后缀则切换上一个替换命令的&lt;strong&gt;打印&lt;/strong&gt;开关。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;&#39;r&#39;&lt;/code&gt;后缀导致命令在上一次&lt;strong&gt;查找的结果&lt;/strong&gt;上运行，而不是在&lt;strong&gt;替换过的结果&lt;/strong&gt;上运行(如果是在替换后再查找)。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;(.,.)t(.)&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;将地址标识的行复制到命令右边地址标识的行之后。如果目标地址为 0，则意为复制到缓冲区开头。当前地址设置为复制出的最后一行。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;u&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;撤销上一条命令的效果，恢复当前地址为执行命令前的地址。&lt;/p&gt;
+&lt;p&gt;全局命令&lt;code&gt;&#39;g&#39;&lt;/code&gt;,&lt;code&gt;&#39;G&#39;&lt;/code&gt;,&lt;code&gt;&#39;v&#39;&lt;/code&gt;和&lt;code&gt;&#39;V&#39;&lt;/code&gt;对于 undo 作为单条命令看待。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;&#39;u&#39;&lt;/code&gt;命令与自己互逆，它只能撤销最后一条命令。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;(1,$)v/re/command-list&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;与&lt;code&gt;&#39;g&#39;&lt;/code&gt;类似，但是作用于地址范围内不匹配&lt;code&gt;re&lt;/code&gt;的行。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;(1,$)V/re/&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;与&lt;code&gt;&#39;G&#39;&lt;/code&gt;类似，但是当遇到地址范围内不匹配&lt;code&gt;re&lt;/code&gt;的行会交互式的编辑。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;(1,$)w file&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;将地址标记的行写入文件。目标文件的内容将被覆盖。若未设置默认文件名，则使用目标文件名作为默认名，否则文件名无变化。如果未指定目标文件名，则使用默认文件名。当前地址无变化。&lt;/p&gt;
+&lt;p&gt;如果文件名以&lt;code&gt;!&lt;/code&gt;为前导，将被解释为 Shell 命令，并且地址标记的行将做为该 Shell 命令的标准输入，这种情况下默认文件名无变化。若试图通过&lt;code&gt;&#39;e&#39;&lt;/code&gt;或&lt;code&gt;&#39;q&#39;&lt;/code&gt;命令覆盖或丢弃缓冲器内容，缓冲区内容作为 Shell 命令的输入依然会得到警告。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;(1,$)wq file&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;将地址标记的行写入文件，然后退出。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;(1,$)W file&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;追加地址标记的行到文件结尾。与&lt;code&gt;&#39;w&#39;&lt;/code&gt;命令类似，除了不会覆盖目标文件的内容。当前地址不变。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;(.)x&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;将剪切缓冲区中的内容放置到地址标记行的后面。当前行被设置为最后拷贝的行。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;(.,.)y&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;拷贝地址标明的行到剪切缓冲区。能覆盖剪切缓冲区命令有：&lt;code&gt;&#39;c&#39;&lt;/code&gt;,&lt;code&gt;&#39;d&#39;&lt;/code&gt;,&lt;code&gt;&#39;j&#39;&lt;/code&gt;,&lt;code&gt;&#39;s&#39;&lt;/code&gt;,&lt;code&gt;&#39;y&#39;&lt;/code&gt;。当前地址不变。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;(.+1)zn&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;滚动。从地址标记的行开始，一次打印 n 行，并设置窗口大小为 n。若未指定 n，则使用当前窗口大小。窗口的默认大小为屏幕尺寸减去 2 行，若屏幕尺寸无法确定则为 22 行。当前地址设置为最后被打印的行。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;!command&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;执行 Shell 命令。通过&lt;code&gt;sh(1)&lt;/code&gt;执行命令。&lt;code&gt;!!&lt;/code&gt;表示与上一条相同的命令。&lt;strong&gt;ed&lt;/strong&gt; 并不识别反斜杠&lt;code&gt;\&lt;/code&gt;转义。但是&lt;code&gt;%&lt;/code&gt;将被替换为默认的文件名。当从执行的命令中返回时，将在单独一行打印一个&lt;code&gt;!&lt;/code&gt;。当前行的地址不变。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;(.,.)#&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;注释。# 到换行符之间的内容都将被忽略。如果地址由&lt;code&gt;;&lt;/code&gt;分隔，则当前地址被设置成&lt;code&gt;;&lt;/code&gt;前的地址，否则，当前地址不变。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;($)=&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;打印地址所标记的行号。不改变当前行地址。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;(.+1)&lt;code&gt;&amp;lt;newline&amp;gt;&lt;/code&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;空命令。单独打印地址标记的行。单一的&lt;code&gt;&amp;lt;newline&amp;gt;&lt;/code&gt;等价于&lt;code&gt;+1p&lt;/code&gt;。当前地址设置为被打印的行。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;7-限制&#34;&gt;7 限制&lt;/h2&gt;
+&lt;p&gt;如果终端挂起，&lt;strong&gt;ed&lt;/strong&gt; 将试图将缓冲区写入 ed.hup 文件，失败则写入  $HOME/ed.hup。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;ed&lt;/strong&gt; 的 &lt;em&gt;file&lt;/em&gt; 参数中，任何前导反斜杠&lt;code&gt;\&lt;/code&gt;将被解释为字面的意思。比如：&lt;code&gt;ed &#39;hello\tworld&#39;&lt;/code&gt;将编辑名为：&#39;hellotworld&#39;的文件。&lt;/p&gt;
+&lt;p&gt;如果文本文件不以&lt;code&gt;&amp;lt;newline&amp;gt;&lt;/code&gt;字符结尾，&lt;strong&gt;ed&lt;/strong&gt; 将在读写时追加该字符。在二进制文件中，则不然。一个二进制文件至少要包含一个 ASCII NUL 字符。如果最后一行被修改了，则在写入之前读取空文件(如：/dev/null)可防止将换行符附加到二进制文件中。&lt;/p&gt;
+&lt;p&gt;为了跟踪缓冲区中的文本行，&lt;strong&gt;ed&lt;/strong&gt; 使用包含行的位置和尺寸的结构体的双向链表。每行的开销为：2个&#39;pointers&#39;，1个&#39;long int&#39;，1个&#39;int&#39;&lt;/p&gt;
+&lt;h2 id=&#34;8-诊断&#34;&gt;8 诊断&lt;/h2&gt;
+&lt;p&gt;如果 &lt;strong&gt;ed&lt;/strong&gt; 的输入是普通文件或 HEREDOC，则出错就直接退出。其他情况下的错误，&lt;strong&gt;ed&lt;/strong&gt; 只是打印一个问号&lt;code&gt;?&lt;/code&gt;后返回命令模式。最后一个错误的解释可以通过&lt;code&gt;&#39;h&#39;&lt;/code&gt;(help)命令查看。&lt;/p&gt;
+&lt;p&gt;如果&lt;code&gt;&#39;u&#39;&lt;/code&gt;(undo)出现在全局命令列表中，则命令列表只执行一次。&lt;/p&gt;
+&lt;p&gt;首次试图在一个修改过的缓冲区上执行退出命令或编辑另一个文件将报错；再次执行相同命令会成功，但缓冲区中的变更会丢失。&lt;/p&gt;
+&lt;h2 id=&#34;9-报告-bugs&#34;&gt;9 报告 bugs&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;ed&lt;/strong&gt; 中可能有 bug。手册中也会有错误或遗漏。如果你报告了，则都会被修正。否则这些错误将永远被遗留在程序中。&lt;/p&gt;
+&lt;p&gt;如果你发现了 &lt;strong&gt;ed&lt;/strong&gt; 中的 bug，请发送电子邮件到：bug-ed@gnu.org。并注明详细的版本号，这可以通过&lt;code&gt;ed --version&lt;/code&gt;查看。&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;说明&lt;/strong&gt;：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;命令字符的书写并不统一，比如：&lt;code&gt;&amp;lt;p&amp;gt;&lt;/code&gt;和&lt;code&gt;&#39;p&#39;&lt;/code&gt;都表示打印命令&lt;/li&gt;
+&lt;/ol&gt;
+
+        
+      </description>
     </item>
     
   </channel>

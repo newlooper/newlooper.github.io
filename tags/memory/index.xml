@@ -5,17 +5,149 @@
     <link>/tags/memory/</link>
     <description>Recent content in Memory on Looper 的博客</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>zh-cn</language>
-    <managingEditor>newlooper@gmail.com (Dylan Cheng)</managingEditor>
-    <webMaster>newlooper@gmail.com (Dylan Cheng)</webMaster>
+    <language>zh-CN</language>
+    <copyright>Copyright © Dylan(github.com/newlooper); all rights reserved.</copyright>
     <lastBuildDate>Mon, 22 Jun 2020 09:28:07 +0800</lastBuildDate><atom:link href="/tags/memory/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>分页内存地址转换点滴</title>
       <link>/post/original/cs/os/memory/memory_paging/</link>
       <pubDate>Mon, 22 Jun 2020 09:28:07 +0800</pubDate>
-      <author>newlooper@gmail.com (Dylan Cheng)</author>
+      
       <guid>/post/original/cs/os/memory/memory_paging/</guid>
-      <description>环境与条件：CPU 和操作系统都为 32 位，主存按字节编址 一、页大小的确定 一言以蔽之——在页表所占内存和页内填充内存的耗费上做取舍、折中 以下极端情</description>
+      <description>
+        
+          &lt;p&gt;环境与条件：CPU 和操作系统都为 32 位，主存按字节编址&lt;/p&gt;
+&lt;h2 id=&#34;一页大小的确定&#34;&gt;一、页大小的确定&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;一言以蔽之——在&lt;code&gt;页表所占内存&lt;/code&gt;和&lt;code&gt;页内填充内存&lt;/code&gt;的耗费上做取舍、折中&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;以下极端情况的对比，用以阐明为什么要取舍、折中&lt;/p&gt;
+&lt;p&gt;A、页面大小 = 1Byte&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;颗粒度到达极致细微、系统永远不必为页面填充不需要的内存&lt;/li&gt;
+&lt;li&gt;但页表项目达到 2^32 个，占用了整个内存&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;B、页面大小 = 4GBytes&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;每当新进程启动时，都需要将 4G 内存交换到磁盘&lt;/li&gt;
+&lt;li&gt;页表中只有一个条目，因此几乎不占用任何内存&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;因此：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;x86 设计人员发现 4K 大小的页面是很好的庸点&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;当然，随着 CPU 地址总线位数的扩张，系统中物理内存的膨胀，4K 也并不是总是合适的大小。&lt;/p&gt;
+&lt;h2 id=&#34;二页大小--页内偏移量位数&#34;&gt;二、页大小 &amp;amp; 页内偏移量位数&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;已确定页大小，可算出页内偏移量需要多少位，如常见的页面尺寸 &lt;code&gt;4K = 4096Bytes&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;$$ \log_{2}{4096} = 12，即：需要12_{bits}  $$&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;已知页内偏移量占用 12 位，则可算出页大小&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;$$ 2^{12} = 4096_{Bytes} $$&lt;/p&gt;
+&lt;p&gt;页内偏移范围：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;BIN&lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;HEX&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;000000000000&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0x0000&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;000000000001&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0x0001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;...&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;...&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;111111111111&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0x0FFF&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;三页大小--页框大小--页表项数--物理内存块数&#34;&gt;三、页大小 &amp;amp; 页框大小 &amp;amp; 页表项数 &amp;amp; 物理内存块数&lt;/h2&gt;
+&lt;p&gt;$$
+\begin{array}{l}
+物理内存块数 = \frac{物理内存(寻址范围)\equiv 2^{N}}{页大小}，其中 N = 地址总线条数
+\end{array}
+$$
+$$
+有：页大小 \equiv 页框大小，且：页表项数 \equiv物理内存块数
+$$&lt;/p&gt;
+&lt;h2 id=&#34;四页表项大小及其存储内容&#34;&gt;四、页表项大小及其存储内容&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;一个页表项的大小(即：占用二进制位数)，至少要能容纳&lt;code&gt;块号最大的物理内存块首地址的位数&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;例如：32 位地址总线&lt;/p&gt;
+&lt;p&gt;$$
+\begin{array}{l}
+寻址范围： 2 ^{32} = 4294967296_{Bytes} = 4G_{Bytes}
+\end{array}
+$$
+$$
+页面大小(即：页框大小) = 4096_{Bytes} = 4K_{Bytes}
+$$
+$$
+则，页框数 = \frac{4G}{4K} = \frac{2 ^{32}}{2^{12}} = 2^{32-12} = 2^{20}
+$$&lt;/p&gt;
+&lt;p&gt;物理内存块号范围：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;BIN&lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;HEX&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;00000000000000000000&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0x00000&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;00000000000000000001&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0x00001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;...&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;...&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;11111111111111111111&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0xFFFFF&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;即：页表项中指向物理内存块号部分需要 &lt;code&gt;20bits&lt;/code&gt;，而 &lt;code&gt;2Bytes = 2 * 8bits = 16bits&lt;/code&gt;，不够；至少需要 &lt;code&gt;3Bytes = 3 * 8bits = 24bits&lt;/code&gt;，就是说占 3 个字节浪费的 bit 最少。然而，需要额外考虑：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;页表项需要连续内存存储，但 3 不是 2 的整数次幂，按页面对其无法严密填满单个页面&lt;/li&gt;
+&lt;li&gt;内存页除了地址，还有读写性质、运行级别等等属性需要占用 bit&lt;/li&gt;
+&lt;li&gt;避免内存管理本身使用的内存过多&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;等等因素，所以&lt;code&gt;一般页表项大小&lt;/code&gt;取 &lt;code&gt;4Bytes&lt;/code&gt; 共 &lt;code&gt;32bits&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;高 20 位(31-12)给了块号，低 12 位(11-0)被用来存放内存页属性，详见下图 PTE(Page-Table Entry)部分&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/images/post/original/cs/os/memory/memory_paging/1.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;五线性地址-物理地址转换过程&#34;&gt;五、线性地址-&amp;gt;物理地址转换过程&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;进程访问某个逻辑地址时，MMU 将逻辑地址分为页号 Pn 和页内地址 offset&lt;/li&gt;
+&lt;li&gt;页号大于页表长度，越界错误&lt;/li&gt;
+&lt;li&gt;页表项的地址 PTE = 页表起始地址 PTB + [页号 Pn * 表项大小 sizeof(PTE)]，从而得到对应的物理块号 Pb&lt;/li&gt;
+&lt;li&gt;页和物理块的大小是一致的，所以：页内地址 = 块内地址&lt;/li&gt;
+&lt;li&gt;最终的物理地址 PA = 物理块号 Pb * 页大小 sizeof(Page) + 页内地址 offset&lt;/li&gt;
+&lt;/ol&gt;
+&lt;hr&gt;
+&lt;p&gt;本文采用 &lt;a href=&#34;https://creativecommons.org/licenses/by-sa/4.0/&#34;&gt;知识共享署名许可协议（CC-BY 4.0）&lt;/a&gt;进行许可，转载注明来源即可。如有错误劳烦评论或邮件指出。&lt;img src=&#34;/images/site/CC-BY_icon.svg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+
+        
+      </description>
     </item>
     
   </channel>

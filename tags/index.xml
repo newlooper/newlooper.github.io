@@ -5,36 +5,8 @@
     <link>/tags/</link>
     <description>Recent content in Tags on Looper 的博客</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>zh-cn</language>
-    <managingEditor>newlooper@gmail.com (Dylan Cheng)</managingEditor>
-    <webMaster>newlooper@gmail.com (Dylan Cheng)</webMaster>
-    <lastBuildDate>Mon, 03 Aug 2020 15:52:41 +0800</lastBuildDate><atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>EOF</title>
-      <link>/tags/eof/</link>
-      <pubDate>Mon, 03 Aug 2020 15:52:41 +0800</pubDate>
-      <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>/tags/eof/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Programming</title>
-      <link>/tags/programming/</link>
-      <pubDate>Mon, 03 Aug 2020 15:52:41 +0800</pubDate>
-      <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>/tags/programming/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Terminal</title>
-      <link>/tags/terminal/</link>
-      <pubDate>Mon, 03 Aug 2020 15:52:41 +0800</pubDate>
-      <author>newlooper@gmail.com (Dylan Cheng)</author>
-      <guid>/tags/terminal/</guid>
-      <description></description>
-    </item>
-    
+    <language>zh-CN</language>
+    <copyright>Copyright © Dylan(github.com/newlooper); all rights reserved.</copyright>
+    <lastBuildDate>Tue, 01 Jun 2021 14:12:22 +0800</lastBuildDate><atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>

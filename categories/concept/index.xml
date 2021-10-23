@@ -5,17 +5,838 @@
     <link>/categories/concept/</link>
     <description>Recent content in Concept on Looper 的博客</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>zh-cn</language>
-    <managingEditor>newlooper@gmail.com (Dylan Cheng)</managingEditor>
-    <webMaster>newlooper@gmail.com (Dylan Cheng)</webMaster>
+    <language>zh-CN</language>
+    <copyright>Copyright © Dylan(github.com/newlooper); all rights reserved.</copyright>
     <lastBuildDate>Mon, 03 Aug 2020 15:52:41 +0800</lastBuildDate><atom:link href="/categories/concept/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>EOF，到底怎么回事</title>
       <link>/post/original/cs/io/eof/</link>
       <pubDate>Mon, 03 Aug 2020 15:52:41 +0800</pubDate>
-      <author>newlooper@gmail.com (Dylan Cheng)</author>
+      
       <guid>/post/original/cs/io/eof/</guid>
-      <description>TL;DR 首先，确未想到，为说清楚这个玩意儿，居然要用不少的篇幅；其次，当涉及对一些概念、原理的追溯时，递归到多深的地步，也不容易拿捏；好在，写这些</description>
+      <description>
+        
+          &lt;h2 id=&#34;tldr&#34;&gt;TL;DR&lt;/h2&gt;
+&lt;p&gt;&lt;em&gt;首先，确未想到，为说清楚这个玩意儿，居然要用不少的篇幅；其次，当涉及对一些概念、原理的追溯时，递归到多深的地步，也不容易拿捏；好在，写这些文字主要是为了将来碰到某些反直觉的情况时可以有个快捷解答；最后若能得到碰巧逛到这里的同仁指点迷津，纠正错误，互通有无，就算赚到了 :-)&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;希望读完此文，能够消除一些关于 EOF 的疑惑，再碰到关于她的一些争论时，大家能够相视一笑。&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;愿此文，能解释&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;什么是 EOF？&lt;/li&gt;
+&lt;li&gt;为什么需要 EOF？&lt;/li&gt;
+&lt;li&gt;文件里包不包含 EOF？&lt;/li&gt;
+&lt;li&gt;终端输入时的 EOF 的表示方式和处理行为是怎么样的?&lt;/li&gt;
+&lt;li&gt;不同计算机语言的 EOF 如何定义的？&lt;/li&gt;
+&lt;li&gt;……&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;may your blade never dull&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;section-0&#34;&gt;section-0&lt;/h2&gt;
+&lt;h3 id=&#34;概念澄清&#34;&gt;概念澄清&lt;/h3&gt;
+&lt;blockquote&gt;
+&lt;p&gt;In computing, end-of-file (commonly abbreviated &lt;a href=&#34;https://en.wikipedia.org/wiki/End-of-file&#34;&gt;EOF&lt;/a&gt;) is a condition in a computer operating system where no more data can be read from a data source. The data source is usually called a file or stream.&lt;/p&gt;
+&lt;p&gt;——Wikipedia&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;em&gt;难为下定义的人们，描述既不能太复杂，又要尽可能的说清一个事物的本质。&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;好，从上面的叙述中，我们萃取出关于 EOF：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;范畴：&lt;code&gt;计算机操作系统中&lt;/code&gt;，其他领域看来用不着这玩意儿&lt;/li&gt;
+&lt;li&gt;含义：一种&lt;code&gt;状况&lt;/code&gt;，什么状况？表明从数据源(通常指文件或流)中已无数据可读&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;如果只看到这里，EOF 似乎只是抽象概念而已，她应该独立于操作系统的种类、也应该独立于能够在某种操作系统下编译的计算机语言，everything before &#39;but&#39; is bullshit。&lt;/p&gt;
+&lt;p&gt;但是，维基百科在紧挨着定义的下一段里说：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;In the &lt;strong&gt;C Standard Library&lt;/strong&gt;, the character reading functions such as &lt;strong&gt;getchar&lt;/strong&gt; return a value equal to the symbolic value (macro) &lt;strong&gt;EOF&lt;/strong&gt; to indicate that an end-of-file condition has occurred. The actual value of &lt;strong&gt;EOF&lt;/strong&gt; is implementation-dependent (but is commonly &lt;strong&gt;-1&lt;/strong&gt;, such as in glibc[2]) and is &lt;strong&gt;distinct from&lt;/strong&gt; all &lt;strong&gt;valid character codes&lt;/strong&gt;. Block-reading functions return the number of bytes read, and if this is fewer than asked for, then the end of file was reached or an error occurred (checking of &lt;strong&gt;errno&lt;/strong&gt; or dedicated function, such as &lt;strong&gt;ferror&lt;/strong&gt; is often required to determine which).&lt;/p&gt;
+&lt;p&gt;——Wikipedia&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;展开：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;定义既然说：EOF 表明了&amp;quot;已无数据可读&amp;quot;的状况，那么识别这种状况的依据是什么？&lt;/li&gt;
+&lt;li&gt;计算机语言上千种，唯独选了 C 来描述 EOF 的实现，隐约感到虽然不同语言对于 EOF 的实现可能不同，但 C 的很有代表性&lt;/li&gt;
+&lt;li&gt;只要能起到识别&lt;strong&gt;结尾在哪&lt;/strong&gt;的作用就成，并没有一个标准说 EOF 该怎么实现，但&lt;strong&gt;通常&lt;/strong&gt;是用一个能够&lt;strong&gt;区别&lt;/strong&gt;于&lt;strong&gt;全部有效字符码&lt;/strong&gt;的&lt;strong&gt;值&lt;/strong&gt;，比如 glibc 里用 &lt;strong&gt;-1&lt;/strong&gt;。啊，越来越具体，越来越靠近 CPU 里那些用于判断的指令和寄存器&lt;/li&gt;
+&lt;li&gt;短暂的概念陈述后，定义者放下了遮面的琵琶，挥舞着藏在身上的各种刀凿斧锯迎面扑来——阻塞 IO 中的读函数，返回读取到的字节数，如果实际数据长度小于指定的长度，
+&lt;ul&gt;
+&lt;li&gt;重点 1：就会产生一个 EOF(谁产生的后面说)&lt;/li&gt;
+&lt;li&gt;重点 2：出错了呢？也是返个 EOF 给你。啊？那我的程序怎么办，到底是读完了还是出错了？别慌——瞧 errno 或问 ferror 去&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;至此，我们暂且可以总结出：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;从功用的角度说 EOF，其对于输入输出操作时标识结尾具有不可或缺性，这种概括屏蔽掉了实现细节&lt;/li&gt;
+&lt;li&gt;一旦讨论具体实现时，就不可避免的要限定在某种操作系统和某种计算机语言的环境中&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;同时，新的疑问自然产生：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;尝听人说，在现代操作系统中，对于输入输出这类操作，运行在用户态的应用程序一般是不直接访问硬件的，要请求叫做系统调用的内核接口通过缓冲区来间接进行，那么 EOF 是由内核生成并返给应用程序的吗？除了直接告诉我答案是或否，哪里有直接的证据？&lt;/li&gt;
+&lt;li&gt;EOF 的实现没有具体规范，那么操作系统与应用程序之间是如何打招呼：“文件已经读完”的呢？&lt;/li&gt;
+&lt;li&gt;EOF 的处理策略与表现特征，是跨平台跨语言统一的，还是各家有各家的高招儿呢？&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;让我们带着疑问，误入藕花深处……&lt;/p&gt;
+
+&lt;div class=&#34;notices tip&#34;&gt;
+    &lt;div class=&#34;label&#34;&gt;随笔&lt;/div&gt;
+    &lt;p&gt;下定义，但不规定具体的实现，这下好了，且看众多的操作系统和计算机语言们如何搭配自己的 EOF &amp;quot;卡组&amp;quot;。&lt;/p&gt;
+
+  &lt;/div&gt;
+
+&lt;hr&gt;
+&lt;h2 id=&#34;section-1&#34;&gt;section-1&lt;/h2&gt;
+&lt;h3 id=&#34;先说文件&#34;&gt;先说文件&lt;/h3&gt;
+
+&lt;div class=&#34;notices warning&#34;&gt;
+    &lt;div class=&#34;label&#34;&gt;注意&lt;/div&gt;
+    &lt;p&gt;不要将 Linux 中的&lt;code&gt;一切皆文件&lt;/code&gt;的&lt;code&gt;文件&lt;/code&gt;二字，与我们现在所说的&lt;code&gt;文件&lt;/code&gt;混淆，这里说的文件，就是通常在外部存储器(如：磁盘)中保存的那些普通文件，特别是文本文件。&lt;/p&gt;
+
+  &lt;/div&gt;
+
+&lt;p&gt;静态的相对单纯些，我们就从其开始——&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Some MS-DOS programs, including parts of the Microsoft MS-DOS shell (COMMAND.COM) and operating-system utility programs (such as EDLIN), treat a &lt;strong&gt;Control-Z in a text file&lt;/strong&gt; as marking the end of meaningful data, and/or append a Control-Z to the end when writing a text file. This was done for two reasons:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Backward compatibility with CP/M. The CP/M file system only recorded the lengths of files in multiples of 128-byte &amp;quot;records&amp;quot;, so by convention a Control-Z character was used to mark the end of meaningful data if it ended in the middle of a record. The MS-DOS filesystem has always &lt;strong&gt;recorded the exact byte-length of files&lt;/strong&gt;, so this was never necessary on MS-DOS.&lt;/li&gt;
+&lt;li&gt;It allows programs to use the &lt;strong&gt;same code&lt;/strong&gt; to &lt;strong&gt;read&lt;/strong&gt; input from both a &lt;strong&gt;terminal&lt;/strong&gt; and a &lt;strong&gt;text file&lt;/strong&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;——Wikipedia&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;乍看之下，为了兼容性和代码复用以及便利性，某些 MS-DOS 程序在保存文件的时候会在最后多写入一个和正文无关的，但用来标识有意义数据的结尾的字符，只不过选的值不是 -1(这是必然的，ASCII 里没 -1)，而是一个有效的 ASCII 字符，即：替换字符( Control-Z 码值 26)，这算不算文件中包含 EOF？&lt;/p&gt;
+&lt;p&gt;嗯，不算。&lt;/p&gt;
+
+&lt;div class=&#34;notices info&#34;&gt;
+    &lt;div class=&#34;label&#34;&gt;简明结论&lt;/div&gt;
+    &lt;p&gt;文件中不包含 EOF。或者说，文件不通过在自身内容的最后放一个特殊的额外的字符来标记自己的结尾！&lt;/p&gt;
+
+  &lt;/div&gt;
+
+&lt;p&gt;说的这么绝对，那上面的(Control-Z 码值 26)被写在了某些文件的尾部该作何解？&lt;/p&gt;
+&lt;p&gt;可以这么说：这个在某些文件中的(Control-Z 码值 26)字符，只有在那些把他&lt;code&gt;当作文件结尾标识&lt;/code&gt;来对待的程序中，才表现得具备了 EOF 的特征；换句话说，对于那些不把(Control-Z 码值 26)当做文件结尾标识的程序来说，这就是个普通的 ASCII，只不过他&lt;a href=&#34;https://web.itu.edu.tr/sgunduz/courses/mikroisl/ascii.html&#34;&gt;不可打印&lt;/a&gt;而已。&lt;/p&gt;
+&lt;p&gt;$$
+那文件的结尾到底在哪？
+$$&lt;/p&gt;
+&lt;p&gt;回答之前，我们先问这样一个问题：假设文件中有一个或多个字节的数据用来标明其结尾，那么对于二进制文件，如何区分内容和结尾呢？&lt;/p&gt;
+&lt;p&gt;嗯，不太灵光呢。看来，单靠文件内容本身，做不到这一点。&lt;/p&gt;
+&lt;p&gt;$$
+『文件的结尾在哪』这个问题该转换为：怎么判断文件读完了？
+$$&lt;/p&gt;
+&lt;p&gt;听老辈们说——戏不够，神仙凑~&lt;/p&gt;
+
+&lt;div class=&#34;notices info&#34;&gt;
+    &lt;div class=&#34;label&#34;&gt;简明结论&lt;/div&gt;
+    &lt;p&gt;读取文件时，判断是否读完全部内容，不是靠文件内容中的特殊字符，而是文件系统中的重要元数据之一——文件长度&lt;/p&gt;
+
+  &lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&#34;/images/post/original/cs/io/eof/one_byte.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;长度，居然不是文件内容的附属品，有这么重要的作用？为了突出这一点，我们来做个实验，感受一下文件长度的威力，只关注 EOF 的话可以跳过这一段：(不开虚拟机了，怪麻烦的，就手头的 Windows 了)&lt;/p&gt;
+&lt;p&gt;通常情况下，我们无法直接修改诸如文件大小、创建时间等重要的元数据信息，但我们可以间接地晃 Windows 一枪……&lt;/p&gt;
+&lt;p&gt;删文件大家都干过，那么 Windows 的回收站想必不陌生，我们的实验步骤如下：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;为演示方便先清空回收站。然后随便建个什么文件，本例是空的 txt，叫 empty.txt；这个文件扔进回收站，右键属性：&lt;img src=&#34;/images/post/original/cs/io/eof/win_recycle_bin_2.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;管理员身份启动 cmd&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;获取当前用户的 SID 后，进入该用户对应的回收站&lt;img src=&#34;/images/post/original/cs/io/eof/win_recycle_bin_1.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;以 &lt;code&gt;$R&lt;/code&gt; 开头的那个是我们删除的文件本身，大小是 0 没错；而我们关注的是在回收站中与其成对出现的以 &lt;code&gt;$I&lt;/code&gt; 开头的文件，本例中名为：$ICPJMHU.txt。他的大小不是 0，看来里头有东西，我们来看一下&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-powershell&#34; data-lang=&#34;powershell&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;type &lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;$ICPJMHU&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;txt&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Z&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;u輏&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;?&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;C:\Users\Looper\Desktop\empty.txt
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;嗯，有能看懂的，有乱码的。我们需要从二进制视角来看他的内容&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;打开 &lt;a href=&#34;https://docs.microsoft.com/en-us/windows/wsl/&#34;&gt;WSL&lt;/a&gt;，我们已经知道 SID了，所以这次直接进目录&lt;img src=&#34;/images/post/original/cs/io/eof/win_recycle_bin_3.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;vi -b $ICPJMHU.txt 二进制打开，调 xxd 查看十六进制显示&lt;img src=&#34;/images/post/original/cs/io/eof/win_recycle_bin_4.png&#34; alt=&#34;&#34;&gt;
+路径的部分，没什么可说的，除了每个字符占了俩字节(这是因为 Windows 默认存的是 UTF-16)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;我们逐个说明各个二进制段的作用&lt;img src=&#34;/images/post/original/cs/io/eof/win_recycle_bin_6.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;好，吟唱完毕，施法~&lt;br&gt;
+我们把&lt;code&gt;8~15&lt;/code&gt;的&lt;code&gt;8&lt;/code&gt;个字节修改成：&lt;code&gt;FFFF FFFF FFFF FF7F&lt;/code&gt;&lt;br&gt;
+保存退出，回到 Windows，从新查看被删除文件的属性&lt;br&gt;
+&lt;img src=&#34;/images/post/original/cs/io/eof/win_recycle_bin_5.png&#34; alt=&#34;&#34;&gt;
+$$
+7.99 EB = 7.99 * 1024 PB
+$$
+$$
+7.99 EB = 7.99 * 1024 * 1024 TB
+$$
+$$
+7.99 EB = 7.99 * 1024 * 1024 * 1024 GB = 8579197173.76 GB
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;div class=&#34;notices tip&#34;&gt;
+    &lt;div class=&#34;label&#34;&gt;友情提示&lt;/div&gt;
+    &lt;p&gt;24~27的4个字节存了一个长度。欸，你怎么就和文件大小长得那么像呢~&lt;/p&gt;
+
+  &lt;/div&gt;
+
+&lt;h3 id=&#34;再说终端&#34;&gt;再说终端&lt;/h3&gt;
+&lt;p&gt;上一节中，在已知文件长度的情况下，不需要 EOF 存在于文件中，就可以知道何时文件读取完毕。然而，对于处理在终端中输入的数据来说，怎么标识出输入的结束呢？&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Input from a terminal &lt;strong&gt;never really &amp;quot;ends&amp;quot;&lt;/strong&gt; (unless the device is disconnected), but it is useful to enter more than one &amp;quot;&lt;strong&gt;file&lt;/strong&gt;&amp;quot;into a terminal, so &lt;strong&gt;a key sequence&lt;/strong&gt; is &lt;strong&gt;reserved&lt;/strong&gt; to indicate end of input. In &lt;strong&gt;UNIX&lt;/strong&gt; the translation of the keystroke to EOF is performed by the &lt;strong&gt;terminal driver&lt;/strong&gt;, so a program does not need to distinguish terminals from other input files. By default, the driver converts a &lt;strong&gt;Control-D character&lt;/strong&gt; at the start of a line into an end-of-file indicator. To insert an actual Control-D (ASCII 04) character into the input stream, the user precedes it with a &amp;quot;quote&amp;quot; command character (usually Control-V). AmigaDOS is similar but uses Control-\ instead of Control-D.&lt;/p&gt;
+&lt;p&gt;In &lt;strong&gt;DOS and Windows&lt;/strong&gt; (and in CP/M and many DEC operating systems such as RT-11 or VMS), reading from the terminal will &lt;strong&gt;never produce an EOF&lt;/strong&gt;. Instead, programs &lt;strong&gt;recognize&lt;/strong&gt; that the source is a terminal (or other &amp;quot;character device&amp;quot;) and interpret a given &lt;strong&gt;reserved character or sequence as an end-of-file indicator&lt;/strong&gt;; most commonly this is an &lt;strong&gt;ASCII Control-Z, code 26&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;——Wikipedia&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;诚然，这回长度是未知的了，若不指明在何时在哪里结束，程序将无法得知：一段输入已经结束。&lt;/p&gt;
+&lt;p&gt;虽然，定义规范并没有限制要用那个值来表示 EOF，可实现者却无法规避以下问题：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;这个值不能和任何有效字符冲突&lt;/li&gt;
+&lt;li&gt;这个值得能从键盘输入，且不能太麻烦&lt;/li&gt;
+&lt;li&gt;这个值虽然特殊，但没有特殊到占用太多的内存，为其设计特别的处理逻辑的地步&lt;/li&gt;
+&lt;li&gt;键盘上就那么些组合，怎么才能同时满足以上 3 点&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;且看，具有代表性的实现：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;在 UNIX 中，组合键击(Control-D 码值 04)&lt;strong&gt;转换&lt;/strong&gt;为 EOF 是由终端驱动完成的，因此应用程序&lt;strong&gt;不需要&lt;/strong&gt;将终端和普通文件&lt;strong&gt;区别对待&lt;/strong&gt;。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;提问&lt;/strong&gt;：既然我们从键盘输入的(Control-D 码值 04)被终端截胡转成 EOF 了，文件中又不存 EOF，那我要想在文件中切实的存一个(Control-D 码值 04)怎么办呢？&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;回答&lt;/strong&gt;：转义，先按(Control-V)紧接着按(Control-D)。注意，这不是把 EOF 输入进去了，是把没被转成 EOF 的(Control-D)的原本码值输入进去了。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在 DOS 和 Windows 中，从终端读取永远不会产生 EOF。取而代之的，因为程序知道数据源是终端而不是文件(留意其与 UNIX 策略的不同)，所以将特定的保留字符或序列当作文件结束指示符看待，最常见的是(Control-Z 码值 26)。(哦~ Control-Z 好像在哪里见过你。)&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;section-2&#34;&gt;section-2&lt;/h2&gt;
+&lt;h3 id=&#34;let-us-reading-the-fucking-source-code&#34;&gt;let us reading the fucking source code...&lt;/h3&gt;
+
+&lt;div class=&#34;notices tip&#34;&gt;
+    &lt;div class=&#34;label&#34;&gt;随笔&lt;/div&gt;
+    &lt;p&gt;就说嘛，拿个 echo 和 hexdump 就想糊弄过去？笑~&lt;/p&gt;
+
+  &lt;/div&gt;
+
+&lt;p&gt;在 faq.cprogramming.com 站点上，有一篇很古老的文章 &lt;a href=&#34;https://faq.cprogramming.com/cgi-bin/smartfaq.cgi?answer=1048865140&amp;amp;id=1043284351&#34;&gt;Definition of EOF and how to use it effectively&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;开篇就一锤定音的说到：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;EOF 不是 A char&lt;/li&gt;
+&lt;li&gt;EOF 不是 A value that exists at the end of a file&lt;/li&gt;
+&lt;li&gt;EOF 不是 A value that could exist in the middle of a file&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;还好还好，和我们前面说的不冲突。该文作者的目的，是希望学习该语言的程序员不要掉进该语言的 EOF 的一些陷阱，留意作者所说的关于与 EOF 比较时变量类型的坑。其与我们当前关注的问题并不直接关联，因此在这里仅做了链接，不打算展开。&lt;/p&gt;
+&lt;p&gt;回到我们的探索。&lt;/p&gt;
+&lt;p&gt;C 语言中对 EOF 的定义简单明了：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&amp;lt;stdio.h&amp;gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;...&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;#define EOF     (-1)
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;...&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;真的是&lt;code&gt;-1&lt;/code&gt;，那么，各家都是用的&lt;code&gt;-1&lt;/code&gt;吗？我们看一看 &lt;a href=&#34;https://www.gnu.org/software/libc/manual/html_node/index.html&#34;&gt;The GNU C Library&lt;/a&gt; 怎么说&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.gnu.org/software/libc/manual/html_node/EOF-and-Errors.html&#34;&gt;12.15 End-Of-File and Errors&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Macro: int EOF&lt;br&gt;
+This macro is an integer value that is returned by a number of narrow stream functions to indicate an end-of-file condition, or some other error situation. With the GNU C Library, EOF is -1. In other libraries, &lt;strong&gt;its value may be some other negative number.&lt;/strong&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;也就是说，程序要做判断时 EOF 不可与 -1 互换。欸，NULL 和 ‘\0’ 何尝不是如此。像这类规范中不限定具体实现的例子，在 CS(Computer Science) 世界里比比皆是，比如 Go 的包导入；比如 C++ 自增自减运算符的副作用；比如……停，眼前这点儿事还没扯完呢。&lt;/p&gt;
+&lt;p&gt;记得之前我们说在某些条件下，会产生 EOF，但那时没说是谁产生的。&lt;/p&gt;
+&lt;p&gt;下面就去代码中寻觅答案，这也能捎带着回答 section-0 末尾提出的问题。&lt;/p&gt;
+&lt;p&gt;我们选 glibc-2.31 (clone 能不能快点)里的 getc 为例子：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;glibc-2.31/libio/getc.c&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;#include&lt;/span&gt; &lt;span class=&#34;cpf&#34;&gt;&amp;#34;libioP.h&amp;#34;&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 2&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;#include&lt;/span&gt; &lt;span class=&#34;cpf&#34;&gt;&amp;#34;stdio.h&amp;#34;&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 3&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 4&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;...&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 5&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 6&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 7&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_IO_getc&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;FILE&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 8&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 9&lt;/span&gt;  &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;result&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;10&lt;/span&gt;  &lt;span class=&#34;n&#34;&gt;CHECK_FILE&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;EOF&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;11&lt;/span&gt;  &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_IO_need_lock&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;12&lt;/span&gt;    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;_IO_getc_unlocked&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;13&lt;/span&gt;  &lt;span class=&#34;n&#34;&gt;_IO_acquire_lock&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;14&lt;/span&gt;  &lt;span class=&#34;n&#34;&gt;result&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;_IO_getc_unlocked&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;15&lt;/span&gt;  &lt;span class=&#34;n&#34;&gt;_IO_release_lock&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;16&lt;/span&gt;  &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;result&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;17&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;18&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;19&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;...&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;这是一个需要确保线程安全的函数，可以看到其为了进入临界区而获得锁的逻辑。这里关注的是 &lt;code&gt;_IO_getc_unlocked&lt;/code&gt;，查看此宏，看到他又展开为另一个宏(老一些的版本没有这个步骤)：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;glibc-2.31/libio/libio.h&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;...&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;#define _IO_getc_unlocked(_fp) __getc_unlocked_body (_fp) 
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;...&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;继续定位&lt;code&gt;__getc_unlocked_body&lt;/code&gt;，这是一个内联宏，作用是可以用不调函数的方式执行从流中读取数据的逻辑。其中，&lt;code&gt;__glibc_unlikely&lt;/code&gt;并不改变比较结果，而是用来通知编译器在此处进行恰当优化的，他与我们的读调用何时产生 EOF 无关，不展开了，继续追索：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;glibc-2.31/bits/types/struct_FILE.h&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;...&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt;/* These macros are used by bits/stdio.h and internal headers.  */&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;4&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;#define __getc_unlocked_body(_fp)                                 \
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;5&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;(__glibc_unlikely ((_fp)-&amp;gt;_IO_read_ptr &amp;gt;= (_fp)-&amp;gt;_IO_read_end)    \
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;6&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;? __uflow (_fp) : *(unsigned char *) (_fp)-&amp;gt;_IO_read_ptr++)
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;7&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;...&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;我们离真相，还差一步，这里先把不太直观的代码简化为等价的函数体：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;kr&#34;&gt;inline&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;__getc_unlocked_body&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;FILE&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;    &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_fp&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_IO_read_ptr&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;_fp&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_IO_read_end&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;__uflow&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_fp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;4&lt;/span&gt;    &lt;span class=&#34;k&#34;&gt;else&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;5&lt;/span&gt;        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;unsigned&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;char&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_fp&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_IO_read_ptr&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;++&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;6&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;如果，&lt;code&gt;_IO_read_ptr &amp;gt;= _IO_read_end&lt;/code&gt;，说明缓冲区已读完，需要重新从 IO 设备中读取数据到缓冲区。&lt;/li&gt;
+&lt;li&gt;否则，说明尚未到达缓冲区末尾，只需返回&lt;code&gt;_IO_read_ptr&lt;/code&gt;所指向的一个字节大小的内容，然后&lt;code&gt;_IO_read_ptr&lt;/code&gt;加 1(指针加减要留神)，指向下一个字节。&lt;/li&gt;
+&lt;li&gt;最初的时候&lt;code&gt;_IO_read_ptr&lt;/code&gt;和&lt;code&gt;_IO_read_end&lt;/code&gt;是相等的，这样才会从键盘中进行读取。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;最终，定位到 &lt;code&gt;__uflow&lt;/code&gt; 函数：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;glibc-2.31/libio/genops.c&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;...&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 2&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 3&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;__uflow&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;FILE&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 4&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 5&lt;/span&gt;  &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_IO_vtable_offset&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;_IO_fwide&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;!=&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 6&lt;/span&gt;    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;EOF&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 7&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 8&lt;/span&gt;  &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_mode&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 9&lt;/span&gt;    &lt;span class=&#34;n&#34;&gt;_IO_fwide&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;10&lt;/span&gt;  &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_IO_in_put_mode&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;11&lt;/span&gt;    &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_IO_switch_to_get_mode&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;EOF&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;12&lt;/span&gt;      &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;EOF&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;13&lt;/span&gt;  &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_IO_read_ptr&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_IO_read_end&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;14&lt;/span&gt;    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;unsigned&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;char&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_IO_read_ptr&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;++&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;15&lt;/span&gt;  &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_IO_in_backup&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;16&lt;/span&gt;    &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;17&lt;/span&gt;      &lt;span class=&#34;n&#34;&gt;_IO_switch_to_main_get_area&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;18&lt;/span&gt;      &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_IO_read_ptr&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_IO_read_end&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;19&lt;/span&gt;	&lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;unsigned&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;char&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_IO_read_ptr&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;++&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;20&lt;/span&gt;    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;21&lt;/span&gt;  &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_IO_have_markers&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;22&lt;/span&gt;    &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;23&lt;/span&gt;      &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;save_for_backup&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_IO_read_end&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;24&lt;/span&gt;	&lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;EOF&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;25&lt;/span&gt;    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;26&lt;/span&gt;  &lt;span class=&#34;k&#34;&gt;else&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_IO_have_backup&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;27&lt;/span&gt;    &lt;span class=&#34;n&#34;&gt;_IO_free_backup_area&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;28&lt;/span&gt;  &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;_IO_UFLOW&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;29&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;30&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;...&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;呜呼呀，满屏的 EOF。——注意上面代码的语境，程序领空中运行在用户态的库函数。&lt;/p&gt;
+&lt;p&gt;关于 EOF 是在哪里产生的，这里还有一篇老外的文章，&lt;a href=&#34;https://ruslanspivak.com/eofnotchar/&#34;&gt;EOF is not a character&lt;/a&gt;。图文并茂，既有跨语言的横向对比，又有纵深的底层原理说明。比我写的好多了，大家有空可以看看。&lt;/p&gt;
+&lt;p&gt;我们摘抄一段：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;How do the high-level I/O routines in the examples above determine the end-of-file condition? On Linux systems the routines either directly or indirectly use the read() system call provided by the kernel. The getc() function (or macro) in C, for example, uses the read() system call and returns EOF if read() indicated the end-of-file condition. The read() system call returns 0 to indicate the EOF condition.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img src=&#34;/images/post/original/cs/io/eof/getc_read.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;这里就告诉了我们结论，EOF 并非由内核直接产生，库函数是通过判断系统调用的返回值，进而决定是否要返回 EOF 给调用者的。(老外随手画的图，看起来比我费半天劲用 visio 做的一点不差。莫非是因为：只要不是汉字，其他的看起来就都是画儿的缘故。。。)&lt;/p&gt;
+&lt;p&gt;另外多说一句：其实到&lt;code&gt;int __uflow (FILE *fp)&lt;/code&gt;这里还没完，还有很多宏、函数，可以细追下去，比如在最终的系统调用&lt;code&gt;sys_read&lt;/code&gt;之前，能追到&lt;code&gt;int _IO_new_file_underflow (FILE *fp)&lt;/code&gt;，但可能需要运行时调试。因其与产生 EOF 的关系不是直接的，为省略篇幅就不全粘过来了。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;section-3&#34;&gt;section-3&lt;/h2&gt;
+&lt;h3 id=&#34;举起我们的栗子&#34;&gt;举起我们的栗子&lt;/h3&gt;
+&lt;p&gt;看了那么多别人的代码，我们自己也应该试着写一写，写不好没关系，反正也不是拿去卖钱的。&lt;/p&gt;
+&lt;p&gt;$$
+\left ( \frac{表演真正的技术}{露一把真正的怯}\right )^{是时候了}= 1
+$$&lt;/p&gt;
+&lt;p&gt;原则，我们的程序&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;要尽量简单&lt;/li&gt;
+&lt;li&gt;要能达到让我们不再对 EOF 的怪异行为困惑的目的&lt;/li&gt;
+&lt;li&gt;尽量不只使用一种系统、一种语言，免得孤证不证，以偏概全&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;既然是问题带我们误入的藕花深处，为了解答疑问，就让我们——争渡，睁渡&lt;/p&gt;
+&lt;p&gt;记得前文中，UNIX 和 Windows 下的终端对于文件结尾的处理策略是不同的，具体差在哪呢？&lt;/p&gt;
+&lt;p&gt;看如下代码：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-php&#34; data-lang=&#34;php&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;?&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;php&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;$line&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;4&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;5&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;while&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;false&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;!==&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;$char&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;fgetc&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;STDIN&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)))&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;6&lt;/span&gt;    &lt;span class=&#34;k&#34;&gt;echo&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\t&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;char-&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;$line&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;++&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\t&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;ord&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;$char&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;),&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\n&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;7&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;这段程序的功能如下：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;启动后阻塞，等待用户输入，遇到文件结尾标记(注意我这里没用 EOF 的叫法)就退出。&lt;/li&gt;
+&lt;li&gt;在遇到文件结尾标记之前，用户每输入一次回车，就执行循环内的代码，fgetc 负责读取一个字符(不是字节)，而 ord 将被读到的字符的第一个字节转为 0-255 之间的值(就是对应的 ASCII)。&lt;/li&gt;
+&lt;li&gt;把经过处理的输入，用稍微友好一点的格式打印出来。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&#34;notices tip&#34;&gt;
+    &lt;div class=&#34;label&#34;&gt;步骤&lt;/div&gt;
+    &lt;p&gt;在 Windows 10 终端下，使用 php-cli 7.x 执行此程序，输入的过程是：&lt;br&gt;
+ENTER、a ENTER、A ENTER、abc ENTER、aBc ENTER、CTRL-D ENTER、CTRL-DCTRL-D ENTER、CTRL-Z ENTER&lt;/p&gt;
+
+  &lt;/div&gt;
+
+&lt;p&gt;输出如下：# 和后面的内容是我加的注释&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 2&lt;/span&gt;		char-1  &lt;span class=&#34;m&#34;&gt;13&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# ASCII of CR \r&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 3&lt;/span&gt;		char-2  &lt;span class=&#34;m&#34;&gt;10&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# ASCII of LF \n&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 4&lt;/span&gt;a      
+&lt;span class=&#34;ln&#34;&gt; 5&lt;/span&gt;		char-3  &lt;span class=&#34;m&#34;&gt;97&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# ASCII of a&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 6&lt;/span&gt;		char-4  &lt;span class=&#34;m&#34;&gt;13&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# ASCII of CR \r&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 7&lt;/span&gt;		char-5  &lt;span class=&#34;m&#34;&gt;10&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# ASCII of LF \n&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 8&lt;/span&gt;A      
+&lt;span class=&#34;ln&#34;&gt; 9&lt;/span&gt;		char-6  &lt;span class=&#34;m&#34;&gt;65&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# ASCII of A&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;10&lt;/span&gt;		char-7  &lt;span class=&#34;m&#34;&gt;13&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# ASCII of CR \r&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;11&lt;/span&gt;		char-8  &lt;span class=&#34;m&#34;&gt;10&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# ASCII of LF \n&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;12&lt;/span&gt;abc    
+&lt;span class=&#34;ln&#34;&gt;13&lt;/span&gt;		char-9  &lt;span class=&#34;m&#34;&gt;97&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# ASCII of a&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;14&lt;/span&gt;		char-10 &lt;span class=&#34;m&#34;&gt;98&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# ASCII of b&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;15&lt;/span&gt;		char-11 &lt;span class=&#34;m&#34;&gt;99&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# ASCII of c&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;16&lt;/span&gt;		char-12 &lt;span class=&#34;m&#34;&gt;13&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# ASCII of CR \r&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;17&lt;/span&gt;		char-13 &lt;span class=&#34;m&#34;&gt;10&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# ASCII of LF \n&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;18&lt;/span&gt;aBc    
+&lt;span class=&#34;ln&#34;&gt;19&lt;/span&gt;		char-14 &lt;span class=&#34;m&#34;&gt;97&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# ASCII of a&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;20&lt;/span&gt;		char-15 &lt;span class=&#34;m&#34;&gt;66&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# ASCII of B&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;21&lt;/span&gt;		char-16 &lt;span class=&#34;m&#34;&gt;99&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# ASCII of c&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;22&lt;/span&gt;		char-17 &lt;span class=&#34;m&#34;&gt;13&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# ASCII of CR \r&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;23&lt;/span&gt;		char-18 &lt;span class=&#34;m&#34;&gt;10&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# ASCII of LF \n&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;24&lt;/span&gt;^D     
+&lt;span class=&#34;ln&#34;&gt;25&lt;/span&gt;		char-19 &lt;span class=&#34;m&#34;&gt;4&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;# ASCII of CTRL-D&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;26&lt;/span&gt;		char-20 &lt;span class=&#34;m&#34;&gt;13&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# ASCII of CR \r&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;27&lt;/span&gt;		char-21 &lt;span class=&#34;m&#34;&gt;10&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# ASCII of LF \n&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;28&lt;/span&gt;^D^D   
+&lt;span class=&#34;ln&#34;&gt;29&lt;/span&gt;		char-22 &lt;span class=&#34;m&#34;&gt;4&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;# ASCII of CTRL-D&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;30&lt;/span&gt;		char-23 &lt;span class=&#34;m&#34;&gt;4&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;# ASCII of CTRL-D&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;31&lt;/span&gt;		char-24 &lt;span class=&#34;m&#34;&gt;13&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# ASCII of CR \r&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;32&lt;/span&gt;		char-25 &lt;span class=&#34;m&#34;&gt;10&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# ASCII of LF \n&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;33&lt;/span&gt;^Z
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;关于 CR 和 LF 的话题，网络上的文章比关于 EOF 的多，可以搜索来看。在 Linux 和 MacOS 下，同样的程序，同样的输入，输出会与 Windows 不同。例如在 MacOS 下 ENTER 只对应一个单独的 \n，没有 \r。&lt;/p&gt;
+&lt;p&gt;我们目前的关注点不在于不同系统对于 CR 和 LF 的不同策略，那是一个可以追溯到没有计算机时代的故事。现在想看的是不同平台下，对待表示输入结束的文件结尾标识的异同。&lt;/p&gt;
+&lt;p&gt;首先，前文中说过，Windows 中从终端读取输入，不会产生 EOF；其次，为了表示文件结尾，他选用了 CTRL-Z ASCII 26，作为输入结束的标记，所以我们才能够看到对于 CTRL-D，Windows 将其视作普通字符，程序读取该字符并将其 ASCII 码值打印到屏幕上。而当我们输入了 CTRL-Z 并 ENTER 后，程序退出(实际上是退出的循环，但因为退出循环后没别的代码了，程序自然退出)，并没有打印 CTRL-Z 的 ASCII 码值。那么，能不能让该程序在 Windows 下打出这个 CTRL-Z 的码值，并且不退出程序呢？可以的，这样操作：
+
+&lt;div class=&#34;notices tip&#34;&gt;
+    &lt;div class=&#34;label&#34;&gt;步骤&lt;/div&gt;
+    &lt;p&gt;启动程序，输入一些除了 CTRL-Z 以外的其他输入，然后 CTRL-Z，最后回车。&lt;br&gt;
+比如：anything but &amp;quot;CTRL-Z&amp;quot;，然后 CTRL-Z，最后 ENTER&lt;/p&gt;
+
+  &lt;/div&gt;
+
+输出如下：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;anything but &lt;span class=&#34;s2&#34;&gt;&amp;#34;CTRL-Z&amp;#34;&lt;/span&gt;^Z
+&lt;span class=&#34;ln&#34;&gt; 2&lt;/span&gt;		char-1  &lt;span class=&#34;m&#34;&gt;97&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# 我该选个字母少的句子。。。懒，省略一些注释&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 3&lt;/span&gt;		char-2  &lt;span class=&#34;m&#34;&gt;110&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 4&lt;/span&gt;		char-3  &lt;span class=&#34;m&#34;&gt;121&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 5&lt;/span&gt;		char-4  &lt;span class=&#34;m&#34;&gt;116&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 6&lt;/span&gt;		char-5  &lt;span class=&#34;m&#34;&gt;104&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 7&lt;/span&gt;		char-6  &lt;span class=&#34;m&#34;&gt;105&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 8&lt;/span&gt;		char-7  &lt;span class=&#34;m&#34;&gt;110&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 9&lt;/span&gt;		char-8  &lt;span class=&#34;m&#34;&gt;103&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;10&lt;/span&gt;		char-9  &lt;span class=&#34;m&#34;&gt;32&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;11&lt;/span&gt;		char-10 &lt;span class=&#34;m&#34;&gt;98&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;12&lt;/span&gt;		char-11 &lt;span class=&#34;m&#34;&gt;117&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;13&lt;/span&gt;		char-12 &lt;span class=&#34;m&#34;&gt;116&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;14&lt;/span&gt;		char-13 &lt;span class=&#34;m&#34;&gt;32&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;15&lt;/span&gt;		char-14 &lt;span class=&#34;m&#34;&gt;34&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;16&lt;/span&gt;		char-15 &lt;span class=&#34;m&#34;&gt;67&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;17&lt;/span&gt;		char-16 &lt;span class=&#34;m&#34;&gt;84&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;18&lt;/span&gt;		char-17 &lt;span class=&#34;m&#34;&gt;82&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;19&lt;/span&gt;		char-18 &lt;span class=&#34;m&#34;&gt;76&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;20&lt;/span&gt;		char-19 &lt;span class=&#34;m&#34;&gt;45&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;21&lt;/span&gt;		char-20 &lt;span class=&#34;m&#34;&gt;90&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;22&lt;/span&gt;		char-21 &lt;span class=&#34;m&#34;&gt;34&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;23&lt;/span&gt;		char-22 &lt;span class=&#34;m&#34;&gt;26&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# ASCII of CTRL-Z，哦，26，我们终于亲眼见到了你&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;24&lt;/span&gt;		char-23 &lt;span class=&#34;m&#34;&gt;13&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# ASCII of CR \r&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;25&lt;/span&gt;		char-24 &lt;span class=&#34;m&#34;&gt;10&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# ASCII of LF \n&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;程序打印了 CTRL-Z 26，并且没有退出，继续等待我们的下一轮输入。为什么没退出，后面详解。&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;在其他平台下运行同样程序的操作留给有好奇心的你我他。&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;让我们的 Windows 先那儿等着，说说其他系统。&lt;/p&gt;
+&lt;p&gt;比如 Linux 下，输入 CTRL-Z，程序会被切入后台执行，需用 fg 命令唤回，这个和我们的 EOF 无关，略过。那么输入 CTRL-D 呢，不必输入 ENTER 了，程序会立刻对 EOF 做出响应。&lt;/p&gt;
+&lt;p&gt;系统和语言都换一换——&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;// 你好，号称 C+Python 的 Golang
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 2&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kn&#34;&gt;package&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 3&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 4&lt;/span&gt;&lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 5&lt;/span&gt;	&lt;span class=&#34;s&#34;&gt;&amp;#34;bufio&amp;#34;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 6&lt;/span&gt;	&lt;span class=&#34;s&#34;&gt;&amp;#34;io&amp;#34;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 7&lt;/span&gt;	&lt;span class=&#34;s&#34;&gt;&amp;#34;os&amp;#34;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 8&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 9&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;11&lt;/span&gt;	&lt;span class=&#34;nx&#34;&gt;line&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;r&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;:=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;bufio&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;NewReader&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;os&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;Stdin&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;12&lt;/span&gt;	&lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;13&lt;/span&gt;		&lt;span class=&#34;nx&#34;&gt;c&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;err&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;:=&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;r&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;ReadByte&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;14&lt;/span&gt;		&lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;err&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;io&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;EOF&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;15&lt;/span&gt;			&lt;span class=&#34;c1&#34;&gt;// println(&amp;#34;\tchar|&amp;#34;, line, &amp;#34;\t&amp;#34;, c) // 注意 Go 对于这种情况下 c 值的处理
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;16&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;			&lt;span class=&#34;k&#34;&gt;break&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;17&lt;/span&gt;		&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;18&lt;/span&gt;		&lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;err&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;!=&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;nil&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;19&lt;/span&gt;			&lt;span class=&#34;nb&#34;&gt;panic&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;err&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;20&lt;/span&gt;		&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;21&lt;/span&gt;		&lt;span class=&#34;nb&#34;&gt;println&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;\tchar-&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;line&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;\t&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;c&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;22&lt;/span&gt;		&lt;span class=&#34;nx&#34;&gt;line&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;++&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;23&lt;/span&gt;	&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;24&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;div class=&#34;notices tip&#34;&gt;
+    &lt;div class=&#34;label&#34;&gt;步骤&lt;/div&gt;
+    &lt;p&gt;以下为 Ubuntu 20.04 终端下，go 1.14.4 运行该程序的输出&lt;br&gt;
+输入过程：ENTER、a ENTER、A ENTER、abc ENTER、aBc ENTER、CTRL-D&lt;/p&gt;
+
+  &lt;/div&gt;
+
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 2&lt;/span&gt;		char-1          &lt;span class=&#34;m&#34;&gt;10&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 3&lt;/span&gt;a      
+&lt;span class=&#34;ln&#34;&gt; 4&lt;/span&gt;		char-2          &lt;span class=&#34;m&#34;&gt;97&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 5&lt;/span&gt;		char-3          &lt;span class=&#34;m&#34;&gt;10&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 6&lt;/span&gt;A      
+&lt;span class=&#34;ln&#34;&gt; 7&lt;/span&gt;		char-4          &lt;span class=&#34;m&#34;&gt;65&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 8&lt;/span&gt;		char-5          &lt;span class=&#34;m&#34;&gt;10&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 9&lt;/span&gt;abc    
+&lt;span class=&#34;ln&#34;&gt;10&lt;/span&gt;		char-6          &lt;span class=&#34;m&#34;&gt;97&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;11&lt;/span&gt;		char-7          &lt;span class=&#34;m&#34;&gt;98&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;12&lt;/span&gt;		char-8          &lt;span class=&#34;m&#34;&gt;99&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;13&lt;/span&gt;		char-9          &lt;span class=&#34;m&#34;&gt;10&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;14&lt;/span&gt;aBc    
+&lt;span class=&#34;ln&#34;&gt;15&lt;/span&gt;		char-10         &lt;span class=&#34;m&#34;&gt;97&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;16&lt;/span&gt;		char-11         &lt;span class=&#34;m&#34;&gt;66&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;17&lt;/span&gt;		char-12         &lt;span class=&#34;m&#34;&gt;99&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;18&lt;/span&gt;		char-13         &lt;span class=&#34;m&#34;&gt;10&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;可以看到，不同平台下的终端对待 ENTER 的行为是一致的，但对待文件结束标记却不同&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Windows 下输入 CTRL-Z，并不会有响应，必须等 ENTER 后，才进入判断和处理流程( EOF 跑 ENTER 前头去了？No。后文详述)&lt;/li&gt;
+&lt;li&gt;Linux 下只要输入 CTRL-D，就会立刻进入处理流程( EOF 变成 ENTER 了？No。后文详述)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;还没完，记得之前的例子，我们曾用某种输入方式让那个 PHP 程序在 Windows 下打印了我们输入的 CTRL-Z 的码值，那么对于这个 GO 程序，是否适用呢？很遗憾，GO 并不把 EOF 当作有效输入返回给用户程序，无论在哪个平台；可以通过取消上面代码中 io.EOF 判断块中的注释来验证这点。&lt;/p&gt;
+&lt;p&gt;虽然无法让 GO 打印出我们通过终端输入的 EOF 的码值，但前面的方法(先输入一些内容，不回车直接给 EOF)的确改变了文件结尾标记的默认行为，下面解释其原理：&lt;/p&gt;
+&lt;p&gt;在 &lt;a href=&#34;https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/contents.html&#34;&gt;The Open Group Base Specifications Issue 7, 2018 edition&lt;/a&gt;(如果感觉这玩意儿名字陌生，他还有另一个名字：POSIX。虽然也可能像我一样，久闻其名，却不知其全貌，但起码比第一个名字脸熟多了)的&lt;a href=&#34;https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap11.html#tag_11&#34;&gt;11.1.9 Special Characters&lt;/a&gt;中，关于 EOF 的描述：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;EOF&lt;br&gt;
+Special character on input, which is recognized if the ICANON flag is set. When received, all the bytes waiting to be read are immediately passed to the process without waiting for a &amp;lt;newline&amp;gt;, and the EOF is discarded. Thus, if there are no bytes waiting (that is, the EOF occurred at the beginning of a line), a byte count of zero shall be returned from the read(), representing an end-of-file indication. If ICANON is set, the EOF character shall be discarded when processed.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;我们来试着翻译一下：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;EOF&lt;br&gt;
+输入中的特殊字符，在 ICANON 标志为真时被识别。当遇到这个字符时，所有等待被读取的字节将&lt;strong&gt;立刻&lt;/strong&gt;被传给处理程序而&lt;strong&gt;无需等待&lt;/strong&gt;一个&lt;strong&gt;新行符&lt;/strong&gt;，同时该 EOF 被&lt;strong&gt;丢弃&lt;/strong&gt;。然而，如果当前没有字节等待被处理(也即：EOF 出现在了一行的&lt;strong&gt;行首&lt;/strong&gt;)，一个 0 长度的字节计数将被 read() 返回，表现出一种 EOF 迹象。如果 ICANON 为真，EOF 字符在被处理后应该被丢弃。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;EOF 就够晕的了，怎么又杀出个 ICANON flag？&lt;/p&gt;
+&lt;p&gt;嗯，规范中也是都写清楚了的，是终端 I/O 工作模式相关的内容(欸~就不能只有一种键盘，一种鼠标，一种显示器，一种系统，一种接口么。。。)，EOF 在其中只是很小的一部分。可以看看国内这哥们儿的一篇文章：&lt;a href=&#34;https://www.cnblogs.com/nufangrensheng/p/3575752.html&#34;&gt;终端 I/O 之综述&lt;/a&gt;，弄清楚终端 I/O 的故事，有助于我们正向的理解终端处理用户输入的各种策略。&lt;/p&gt;
+&lt;p&gt;最后一例：代码取自我翻译的一个老外的汇编教程，原址：https://asmtutor.com/&lt;/p&gt;
+&lt;p&gt;高级语言看真相，总是隔着层纱，我们需要定性的结论&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-nasm&#34; data-lang=&#34;nasm&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;; Hello World Program (Getting input)&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 2&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;; Compile with: nasm -f elf helloworld-input.asm&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 3&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;; Link with (64 bit systems require elf_i386 option): ld -m elf_i386 helloworld-input.o -o helloworld-input&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 4&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;; Run with: ./helloworld-input&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 5&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt; 
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 6&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;%include        &amp;#39;functions.asm&amp;#39;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 7&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;&lt;/span&gt; 
+&lt;span class=&#34;ln&#34;&gt; 8&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;SECTION&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;.data&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 9&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;msg1&lt;/span&gt;        &lt;span class=&#34;nv&#34;&gt;db&lt;/span&gt;      &lt;span class=&#34;s&#34;&gt;&amp;#39;Please enter your name: &amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;0h&lt;/span&gt;      &lt;span class=&#34;c1&#34;&gt;; message string asking user for input&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;msg2&lt;/span&gt;        &lt;span class=&#34;nv&#34;&gt;db&lt;/span&gt;      &lt;span class=&#34;s&#34;&gt;&amp;#39;Hello, &amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mh&#34;&gt;0h&lt;/span&gt;                       &lt;span class=&#34;c1&#34;&gt;; message string to use after user has entered their name&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;11&lt;/span&gt; 
+&lt;span class=&#34;ln&#34;&gt;12&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;SECTION&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;.bss&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;13&lt;/span&gt;&lt;span class=&#34;nl&#34;&gt;sinput:&lt;/span&gt;     &lt;span class=&#34;kd&#34;&gt;resb&lt;/span&gt;    &lt;span class=&#34;mi&#34;&gt;255&lt;/span&gt;                                 &lt;span class=&#34;c1&#34;&gt;; reserve a 255 byte space in memory for the users input string&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;14&lt;/span&gt; 
+&lt;span class=&#34;ln&#34;&gt;15&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;SECTION&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;.text&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;16&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;global&lt;/span&gt;  &lt;span class=&#34;nv&#34;&gt;_start&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;17&lt;/span&gt; 
+&lt;span class=&#34;ln&#34;&gt;18&lt;/span&gt;&lt;span class=&#34;nl&#34;&gt;_start:&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;19&lt;/span&gt; 
+&lt;span class=&#34;ln&#34;&gt;20&lt;/span&gt;    &lt;span class=&#34;nf&#34;&gt;mov&lt;/span&gt;     &lt;span class=&#34;nb&#34;&gt;eax&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;msg1&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;21&lt;/span&gt;    &lt;span class=&#34;nf&#34;&gt;call&lt;/span&gt;    &lt;span class=&#34;nb&#34;&gt;sp&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;rint&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;22&lt;/span&gt; 
+&lt;span class=&#34;ln&#34;&gt;23&lt;/span&gt;    &lt;span class=&#34;nf&#34;&gt;mov&lt;/span&gt;     &lt;span class=&#34;nb&#34;&gt;edx&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;255&lt;/span&gt;        &lt;span class=&#34;c1&#34;&gt;; number of bytes to read&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;24&lt;/span&gt;    &lt;span class=&#34;nf&#34;&gt;mov&lt;/span&gt;     &lt;span class=&#34;nb&#34;&gt;ecx&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;si&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;nput&lt;/span&gt;     &lt;span class=&#34;c1&#34;&gt;; reserved space to store our input (known as a buffer)&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;25&lt;/span&gt;    &lt;span class=&#34;nf&#34;&gt;mov&lt;/span&gt;     &lt;span class=&#34;nb&#34;&gt;ebx&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;          &lt;span class=&#34;c1&#34;&gt;; read from the STDIN file&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;26&lt;/span&gt;    &lt;span class=&#34;nf&#34;&gt;mov&lt;/span&gt;     &lt;span class=&#34;nb&#34;&gt;eax&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;3&lt;/span&gt;          &lt;span class=&#34;c1&#34;&gt;; invoke SYS_READ (kernel opcode 3)&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;27&lt;/span&gt;    &lt;span class=&#34;nf&#34;&gt;int&lt;/span&gt;     &lt;span class=&#34;mh&#34;&gt;80h&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;28&lt;/span&gt; 
+&lt;span class=&#34;ln&#34;&gt;29&lt;/span&gt;    &lt;span class=&#34;nf&#34;&gt;mov&lt;/span&gt;     &lt;span class=&#34;nb&#34;&gt;eax&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;msg2&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;30&lt;/span&gt;    &lt;span class=&#34;nf&#34;&gt;call&lt;/span&gt;    &lt;span class=&#34;nb&#34;&gt;sp&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;rint&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;31&lt;/span&gt; 
+&lt;span class=&#34;ln&#34;&gt;32&lt;/span&gt;    &lt;span class=&#34;nf&#34;&gt;mov&lt;/span&gt;     &lt;span class=&#34;nb&#34;&gt;eax&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;si&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;nput&lt;/span&gt;     &lt;span class=&#34;c1&#34;&gt;; move our buffer into eax (Note: input contains a linefeed)&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;33&lt;/span&gt;    &lt;span class=&#34;nf&#34;&gt;call&lt;/span&gt;    &lt;span class=&#34;nb&#34;&gt;sp&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;rint&lt;/span&gt;          &lt;span class=&#34;c1&#34;&gt;; call our print function&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;34&lt;/span&gt; 
+&lt;span class=&#34;ln&#34;&gt;35&lt;/span&gt;    &lt;span class=&#34;nf&#34;&gt;call&lt;/span&gt;    &lt;span class=&#34;nv&#34;&gt;quit&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;$ nasm -f elf helloworld-input.asm
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;$ ld -m elf_i386 helloworld-input.o -o helloworld-input
+&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;$ ./helloworld-input
+&lt;span class=&#34;ln&#34;&gt;4&lt;/span&gt;Please enter your name: Dylan
+&lt;span class=&#34;ln&#34;&gt;5&lt;/span&gt;Hello, Dylan
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;ENTER 后程序结束。嗯？EOF 呢？&lt;/p&gt;
+&lt;p&gt;如果，你的阻塞读，只需要处理一次(在 &lt;a href=&#34;https://pubs.opengroup.org/onlinepubs/007908775/xbd/termios.html#tag_008_001_006&#34;&gt;Canonical mode input processing&lt;/a&gt; 里就是一行)输入，那么 ENTER 就够用了，用不着 EOF。ENTER 的作用只是：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;这一行输入已完成(结束)，读函数别阻塞了，排空缓冲区，立刻返回。还想再读？从新发 sys_read！(嘿，老铁，你的煎饼熟了，拿走吧，钱货两清。要加个蛋？那您从新下单)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;但是，如果你需要不停的处理用户输入，则要将阻塞读扔进循环，通常是满足某种条件就 break 的死循环(一如：Server 端的 ACCEPT 所属的循环)。而这时，ENTER 还是那个 ENTER，该起什么作用还起什么作用，但他不能用来退出这个循环，那咱们选个谁来退出这个循环？&lt;/p&gt;
+&lt;p&gt;啊～ EOF，掀起你的盖头来(你说啥？杀进程、重启机器、拔插销……噫，夫子乱人之性也！)&lt;/p&gt;
+&lt;p&gt;哦噫，那人，你一开始说 C 的实现很具有代表性，结果你仨例子没一个 C 的？(忘了我 多难过 多不能接受；忘了我 只要你好过 就足够；忘了我 忘了我们的梦；当你想起我 我已不是我……)&lt;/p&gt;
+&lt;p&gt;.&lt;/p&gt;
+&lt;p&gt;.&lt;/p&gt;
+&lt;p&gt;.&lt;/p&gt;
+&lt;p&gt;我们多空出一些空间，给出比较重要的结论：&lt;/p&gt;
+&lt;p&gt;EOF 对于在整个阻塞读过程中的系统、终端、用户程序来说，至关重要。因而关于 EOF 的众多描述，往往是系统、终端、程序和 EOF 放一堆儿全搓了。这容易产生系统和终端的 EOF 和某种语言定义的 EOF 是一回事的错觉。&lt;/p&gt;
+&lt;p&gt;而实际上——操作系统并不关心也不必知道某种计算机语言所定义的 EOF 是什么样子；他只是和终端配合，识别出由某种组合键击标识的他俩所认识的 EOF。当满足条件时结束阻塞，终端和系统按自己的逻辑处理后将控制权返给某种语言的库函数，库函数此时有 100% 解释权，比如：出错就直接捏一个自己定义的 EOF 返回(也就是说，在库函数按自己的逻辑解释系统的返回之前，压根儿就没有语言自己定义的 EOF 什么事呢)。&lt;/p&gt;
+&lt;p&gt;.&lt;/p&gt;
+&lt;p&gt;.&lt;/p&gt;
+&lt;p&gt;.&lt;/p&gt;
+&lt;p&gt;至此，我们大概可以解释——&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;EOF 做什么用的？没有行不行？&lt;/li&gt;
+&lt;li&gt;EOF 是归语言的，还是归系统的？&lt;/li&gt;
+&lt;li&gt;取名字可是个学问，老外管这个“用来解决前面那一堆文字阐述的事儿”的玩意儿叫：End-of-File。你觉得是否传神呢。&lt;/li&gt;
+&lt;li&gt;计算机唯快不破的，怎么分清个头尾居然这么麻烦。&lt;/li&gt;
+&lt;li&gt;为什么阻塞读所在的循环，在已经输入了一些内容到终端的情况下，要按两次 CTRL-D 才能退出。&lt;/li&gt;
+&lt;li&gt;ENTER 不能替代 EOF，但 EOF 有时却起到了 ENTER 的效用。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;em&gt;场外乱入一下，之后的内容大都与本文无关可略：写到这里的时候，不知怎么的，忽然忆起了一个关于32位操作系统和4G物理内存的故事，有兴趣可以递归浏览一把，这哥们写的挺好，让我不必再为这个话题在脑子里反转剧情了：&lt;a href=&#34;https://www.zhihu.com/question/22594254&#34;&gt;为何微软不在新的操作系统中让 32 位支持大于 4GB 的内存？&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;section-nan&#34;&gt;section-NaN&lt;/h2&gt;
+&lt;h3 id=&#34;多余的话&#34;&gt;多余的话&lt;/h3&gt;
+&lt;p&gt;今天，我们使用计算机也好，学习计算机相关的知识技术也罢，都已经是在面对一个封装到几乎无可在封、间接到几乎无缝可插、象与质天差地别、与其诞生伊始相去甚远的集大成的存在了。用起来固然比旧时要愉悦(比如：输入方式一再的简化)，但乱花渐欲迷人眼，对于追溯着学习这门学科并试图窥其全貌的人就不那么友好了……时常是，原本好奇心给足了动力的，就是向回捣着捣着就困了。端的是不如从一开始就看着计算机经过飞速成长，激烈蜕变，无奈取舍等等过程而演化成今天的样子来的自然。(好在，据那些玩过大型机的人自己说，还是微机省电~)&lt;/p&gt;
+&lt;p&gt;各行有各行的业障，各界有各界的风景。在 CS 世界里——&lt;/p&gt;
+&lt;p&gt;我们有：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;图灵的杯具&lt;/li&gt;
+&lt;li&gt;二极管诞生的趣闻&lt;/li&gt;
+&lt;li&gt;快摩尔不下去的定律&lt;/li&gt;
+&lt;li&gt;因为 Intel 曾把地址总线和数据总线做的不一边宽而造成的内存管理的违和，以及为了兼容之而不得不背到今后的内存分段包袱&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;也有：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;人月神话中绕不过的怪圈&lt;/li&gt;
+&lt;li&gt;被日本的毒舌程序员喷的体无完肤、他自己却耍的飞起的 C 指针声明&lt;/li&gt;
+&lt;li&gt;IBM 发现应该摁住微软但已经来不及时的故事，被微软和谷歌换位上演&lt;/li&gt;
+&lt;li&gt;Sping 望着 EJB 远去的背影，独自呢喃——我终于变成了自己当年所讨厌的样子&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;曾记否：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;今日大红大紫的 iOS 因为 jobs 和 linus 两人的&amp;quot;矜持&amp;quot;而没能跑在 Linux 上的&amp;quot;佳话&amp;quot;&lt;/li&gt;
+&lt;li&gt;感谢 BitMover 公司，我们能用上 linus 用快的难以望其项背的速度开发的免费开源的 GIT；哦对，别忘记听一听关于 GIT 用 C 却没用 C++ 编写而引起的论战，其规模和影响力丝毫不亚于宏内核与微内核之辩&lt;/li&gt;
+&lt;li&gt;我至今记忆犹新的一个笑话——【1987 - Larry Wall 在电脑前打了个盹，脑门子压到了键盘上。醒来之后，Larry Wall 深信 ，在他的显示器上出现的神秘字符串并非是随机的，那是某种编程语言之程序样例的神谕。那必是上帝要他的先知——Larry Wall，去设计的。Perl 语言就此诞生了。】容我先笑一阵&lt;/li&gt;
+&lt;li&gt;高德纳老爷子说，读不懂《计算机程序设计艺术》就不要学习编程，给我造成的是不是入错行的疑问，好伤心&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;不可略：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;自互联网普及以来，现实中的种种在虚拟中的微妙映射&lt;/li&gt;
+&lt;li&gt;尚未从“心，脑，计算机”的灵魂拷问中醒过神来的人们，面对人工智能时的不知所措与欲罢不能&lt;/li&gt;
+&lt;li&gt;似乎这个领域生来就是未走先跑，因而其衍生与附属也就难免其俗&lt;/li&gt;
+&lt;li&gt;太多了，太多了……&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;别忘了：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;程序员们可以为争论哪种语言天下第一而错过人生中许多更重要的事情，比如休息&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;还有还有，梦中的橄榄树，橄榄树……&lt;/p&gt;
+
+
+&lt;p style=&#34;text-align:right&#34;&gt;——2020年08月01日，北京丰台&lt;/p&gt;
+
+
+&lt;hr&gt;
+&lt;p&gt;本文采用 &lt;a href=&#34;https://creativecommons.org/licenses/by-sa/4.0/&#34;&gt;知识共享署名许可协议（CC-BY 4.0）&lt;/a&gt;进行许可，转载注明来源即可。如有错误劳烦评论或邮件指出。&lt;img src=&#34;/images/site/CC-BY_icon.svg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>邻位对换法生成全排列</title>
+      <link>/post/original/cs/math/permutation/</link>
+      <pubDate>Thu, 02 Feb 2017 17:16:09 +0800</pubDate>
+      
+      <guid>/post/original/cs/math/permutation/</guid>
+      <description>
+        
+          &lt;h2 id=&#34;算法原理&#34;&gt;算法原理&lt;/h2&gt;
+&lt;h3 id=&#34;相关算法插入法&#34;&gt;相关算法——插入法&lt;/h3&gt;
+&lt;p&gt;对于集合&lt;/p&gt;
+&lt;p&gt;$$
+S=\{a_1, a_2, ..., a_n\}
+$$&lt;/p&gt;
+&lt;p&gt;若已知前 $n-1$ 个元素的全排列，则 $n$ 个元素的全排列&lt;/p&gt;
+&lt;p&gt;$$
+p_i=\{p_1,p_2,...,p_{(n-1)!}\}
+$$&lt;/p&gt;
+&lt;p&gt;可以这样生成：将 $a_n$ 插入 $p_i$ 不同位置中，由此，得到集合 $S$ 的全排列&lt;/p&gt;
+&lt;p&gt;为什么这样操作能得到集合 $S$ 的全排列？因为每个 $p_i$ 的可能插入位置为 $n$ 个，所以总数是 $n!$ 又因为每个 $p_i$ 是不同的，因此，得到的排列必然没有重复&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;插入法&lt;/code&gt;有一个缺点：为了产生 $n$ 个元素的排列，必须知道并存储所有 $n-1$ 个元素的排列，然后才能产生出所有 $n$ 阶排列&lt;/p&gt;
+&lt;h3 id=&#34;邻位对换法的改进&#34;&gt;邻位对换法的改进&lt;/h3&gt;
+&lt;p&gt;依赖&lt;code&gt;插入法&lt;/code&gt;能够生成全排列的事实，但&lt;code&gt;邻位对换法&lt;/code&gt;不需要知道 $n-1$ 个元素的排列，只需要从某一个初始排列状态开始，进行特定的相邻元素交换即可生成全排列&lt;/p&gt;
+&lt;h2 id=&#34;算法正确性&#34;&gt;算法正确性&lt;/h2&gt;
+&lt;p&gt;假设算法对 $n$ 个元素能生成全排列，只需要证明其对 $n+1$ 个元素，也能生成全排列，对于新进来的元素，将其认为值最大，插入最右方，每次从右移到左，或者改变方向后从左移到右，就可以认为对于一个排列从不同位置插入生成一个新的排列，而原本 $n$ 个元素是全排列的，因此对于 $n+1$ 个元素也是全排列的，因此邻位对换法能生成全排列&lt;/p&gt;
+&lt;p&gt;以 $S=\{1, 2, 3, 4\}$ 为例。若 $\{1, 2, 3\}$ 的全排列为：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;$p_1$&lt;/th&gt;
+&lt;th&gt;$p_2$&lt;/th&gt;
+&lt;th&gt;$p_3$&lt;/th&gt;
+&lt;th&gt;$p_4$&lt;/th&gt;
+&lt;th&gt;$p_5$&lt;/th&gt;
+&lt;th&gt;$p_6$&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;123&lt;/td&gt;
+&lt;td&gt;132&lt;/td&gt;
+&lt;td&gt;312&lt;/td&gt;
+&lt;td&gt;321&lt;/td&gt;
+&lt;td&gt;231&lt;/td&gt;
+&lt;td&gt;213&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;那么，将 $4$ 按从尾到头的方式插入每一个排列，就得到：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/images/post/original/cs/math/permutation1.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;观察——&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;第 1 列，&lt;strong&gt;从上往下&lt;/strong&gt;走&lt;br&gt;
+第 2 列，&lt;strong&gt;从下往上&lt;/strong&gt;走&lt;br&gt;
+第 3 列，&lt;strong&gt;从上往下&lt;/strong&gt;走&lt;br&gt;
+．．．&lt;br&gt;
+一直走到最后一列，&lt;strong&gt;当前方向&lt;/strong&gt;上的最后一格&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;规律：&lt;strong&gt;路径上的任一排列是前一个排列交换两个相邻元素而得&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;比如 1423 ，它是由 1243 通过 4 与 2 换位得到&lt;/p&gt;
+&lt;p&gt;即：一个排列，由上一排列通过交换该排列下标为 $k-1$ 和 $k$ 的元素得到，越界的情况由突变解决。&lt;/p&gt;
+&lt;h2 id=&#34;算法步骤&#34;&gt;算法步骤&lt;/h2&gt;
+&lt;p&gt;在上面的模式中，交换的下标 $k$ 的序列为（设元素下标从左到右）：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;3 2 1 {递减到1突变为3}&lt;br&gt;
+1 2 3 {递增到3突变为1}&lt;br&gt;
+3 2 1 {递减到1突变为3}&lt;br&gt;
+1 2 3 {递增到3突变为1}&lt;br&gt;
+3 2 1 {递减到1突变为3}&lt;br&gt;
+1 2 3&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;可以看到：对元素个数为 $n$ 的集合 $S$，其交换下标 $k, k \in [1,n-1]$ 的序列有如下规律：&lt;/p&gt;
+&lt;p&gt;1）开始时 $k = n-1$，每次减 $1$&lt;/p&gt;
+&lt;p&gt;2）当减到 $1$ 或加到 $n-1$ 时，$k$ 值发生突变：若前一个 $k = 1$，则变为 $n-1$；若前一个 $k = n-1$，则变为 $1$&lt;/p&gt;
+&lt;p&gt;3）$k$ 值突变后，新的 $k$ 以突变前的 $k$ 值开始递进（若是 $1$ 就递增，若是 $n-1$ 就递减）&lt;/p&gt;
+&lt;p&gt;4）$k$ 值突变后的交换下标序列是突变前的序列关于突变位置的“镜像”&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;比如：前 7 个交换下标 3 2 1  &lt;strong&gt;{3}&lt;/strong&gt; 1 2 3  （加粗的位置为突变位置）&lt;br&gt;
+显然，突变位置后的下标 1 2 3 是突变前的下标 3 2 1 的&amp;quot;镜像&amp;quot;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;根据如上规律，可编写相应的算法实现&lt;/p&gt;
+&lt;h2 id=&#34;代码实现&#34;&gt;代码实现&lt;/h2&gt;
+&lt;h3 id=&#34;java&#34;&gt;Java&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;&lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;nn&#34;&gt;java.util.ArrayList&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 2&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 3&lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;class&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;Permutation&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 4&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 5&lt;/span&gt;    &lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;static&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;String&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[]&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;args&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 6&lt;/span&gt;        &lt;span class=&#34;n&#34;&gt;String&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[]&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;result&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;permutation&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;12345&amp;#34;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 7&lt;/span&gt;        &lt;span class=&#34;c1&#34;&gt;// System.out.println( result.length + &amp;#34;\r\n&amp;#34; );
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 8&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;        &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;String&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;s&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;result&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 9&lt;/span&gt;            &lt;span class=&#34;n&#34;&gt;System&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;out&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;println&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;s&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;10&lt;/span&gt;        &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;11&lt;/span&gt;    &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;12&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;13&lt;/span&gt;    &lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;static&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;String&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[]&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;permutation&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;String&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;str&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;14&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;15&lt;/span&gt;        &lt;span class=&#34;n&#34;&gt;ArrayList&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;String&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;charList&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;new&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ArrayList&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;String&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;();&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;16&lt;/span&gt;        &lt;span class=&#34;kt&#34;&gt;char&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[]&lt;/span&gt;            &lt;span class=&#34;n&#34;&gt;arrChars&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;str&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;toCharArray&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;();&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;17&lt;/span&gt;        &lt;span class=&#34;kt&#34;&gt;long&lt;/span&gt;              &lt;span class=&#34;n&#34;&gt;times&lt;/span&gt;    &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;18&lt;/span&gt;        &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt;               &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt;        &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;arrChars&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;length&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;19&lt;/span&gt;        &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt;               &lt;span class=&#34;n&#34;&gt;inc&lt;/span&gt;      &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;20&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;21&lt;/span&gt;        &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;arrChars&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;length&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;++&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;22&lt;/span&gt;            &lt;span class=&#34;n&#34;&gt;times&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;23&lt;/span&gt;        &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;24&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;25&lt;/span&gt;        &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;times&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;++&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;26&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;27&lt;/span&gt;            &lt;span class=&#34;n&#34;&gt;swap&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;arrChars&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;1&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;28&lt;/span&gt;            &lt;span class=&#34;n&#34;&gt;charList&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;add&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;new&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;String&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;arrChars&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;29&lt;/span&gt;            &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;inc&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;30&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;31&lt;/span&gt;            &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;1&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;32&lt;/span&gt;                &lt;span class=&#34;n&#34;&gt;inc&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;33&lt;/span&gt;                &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;34&lt;/span&gt;                &lt;span class=&#34;n&#34;&gt;swap&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;arrChars&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;arrChars&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;length&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;arrChars&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;length&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;1&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;35&lt;/span&gt;                &lt;span class=&#34;n&#34;&gt;charList&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;add&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;new&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;String&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;arrChars&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;36&lt;/span&gt;                &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;++;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;37&lt;/span&gt;            &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;38&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;39&lt;/span&gt;            &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;arrChars&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;length&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;1&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;40&lt;/span&gt;                &lt;span class=&#34;n&#34;&gt;inc&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;41&lt;/span&gt;                &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;arrChars&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;length&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;42&lt;/span&gt;                &lt;span class=&#34;n&#34;&gt;swap&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;arrChars&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;1&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;43&lt;/span&gt;                &lt;span class=&#34;n&#34;&gt;charList&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;add&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;new&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;String&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;arrChars&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;44&lt;/span&gt;                &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;++;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;45&lt;/span&gt;            &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;46&lt;/span&gt;        &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;47&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;48&lt;/span&gt;        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;charList&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;toArray&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;new&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;String&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;49&lt;/span&gt;    &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;50&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;51&lt;/span&gt;    &lt;span class=&#34;kd&#34;&gt;private&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;static&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;swap&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;char&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[]&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;arr&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;k1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;k2&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;52&lt;/span&gt;        &lt;span class=&#34;kt&#34;&gt;char&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;tmp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;arr&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;k1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;];&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;53&lt;/span&gt;        &lt;span class=&#34;n&#34;&gt;arr&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;k1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;arr&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;k2&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;];&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;54&lt;/span&gt;        &lt;span class=&#34;n&#34;&gt;arr&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;k2&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;tmp&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;55&lt;/span&gt;    &lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;56&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;57&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;c&#34;&gt;C++&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;#include&lt;/span&gt; &lt;span class=&#34;cpf&#34;&gt;&amp;lt;iostream&amp;gt;&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 2&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;#include&lt;/span&gt; &lt;span class=&#34;cpf&#34;&gt;&amp;lt;string&amp;gt;&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 3&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;#include&lt;/span&gt; &lt;span class=&#34;cpf&#34;&gt;&amp;lt;iterator&amp;gt;&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 4&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;#include&lt;/span&gt; &lt;span class=&#34;cpf&#34;&gt;&amp;lt;algorithm&amp;gt;&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 5&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 6&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;using&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;namespace&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 7&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 8&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;#define _swap(a, b) { int t = a; a = b; b = t; }
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 9&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;permutation&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;11&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;12&lt;/span&gt;	&lt;span class=&#34;kt&#34;&gt;long&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;long&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;times&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;13&lt;/span&gt;	&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;list&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;new&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;],&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;maxK&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;dir&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;14&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;15&lt;/span&gt;	&lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;long&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;long&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;++&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;16&lt;/span&gt;		&lt;span class=&#34;n&#34;&gt;times&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;list&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;17&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;18&lt;/span&gt;	&lt;span class=&#34;n&#34;&gt;list&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;n&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;19&lt;/span&gt;	&lt;span class=&#34;c1&#34;&gt;// copy(list, list + n, ostream_iterator&amp;lt;int&amp;gt;(cout, &amp;#34; &amp;#34;)), cout &amp;lt;&amp;lt; endl;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;20&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;21&lt;/span&gt;	&lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;long&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;long&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;times&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;++&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;22&lt;/span&gt;		&lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;j&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;j&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;++&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;j&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;23&lt;/span&gt;			&lt;span class=&#34;n&#34;&gt;_swap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;list&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;k&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;],&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;list&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]);&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;24&lt;/span&gt;			&lt;span class=&#34;c1&#34;&gt;// copy(list, list + n, ostream_iterator&amp;lt;int&amp;gt;(cout, &amp;#34; &amp;#34;)), cout &amp;lt;&amp;lt; endl;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;25&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;			&lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;dir&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;26&lt;/span&gt;		&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;27&lt;/span&gt;		&lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;nl&#34;&gt;maxK&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;28&lt;/span&gt;		&lt;span class=&#34;n&#34;&gt;_swap&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;list&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;k&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;],&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;list&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]);&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;29&lt;/span&gt;		&lt;span class=&#34;c1&#34;&gt;// copy(list, list + n, ostream_iterator&amp;lt;int&amp;gt;(cout, &amp;#34; &amp;#34;)), cout &amp;lt;&amp;lt; endl;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;30&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;		&lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;maxK&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;31&lt;/span&gt;		&lt;span class=&#34;n&#34;&gt;dir&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;dir&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;32&lt;/span&gt;	&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;33&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;34&lt;/span&gt;	&lt;span class=&#34;k&#34;&gt;delete&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[]&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;list&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;35&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;36&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;37&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;38&lt;/span&gt;	&lt;span class=&#34;n&#34;&gt;permutation&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;39&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;40&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;41&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;说明&#34;&gt;说明&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;实现相同功能的递归实现较多，但时间与空间复杂度高&lt;/li&gt;
+&lt;li&gt;不使用递归的代码看上去较多一点，但效能收益可观&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://zh.wikipedia.org/wiki/%E5%85%A8%E6%8E%92%E5%88%97%E7%94%9F%E6%88%90%E7%AE%97%E6%B3%95&#34;&gt;全排列生成算法&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;p&gt;本文采用 &lt;a href=&#34;https://creativecommons.org/licenses/by-sa/4.0/&#34;&gt;知识共享署名许可协议（CC-BY 4.0）&lt;/a&gt;进行许可，转载注明来源即可。如有错误劳烦评论或邮件指出。&lt;img src=&#34;/images/site/CC-BY_icon.svg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+
+        
+      </description>
     </item>
     
   </channel>

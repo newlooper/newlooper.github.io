@@ -5,17 +5,70 @@
     <link>/tags/smtp/</link>
     <description>Recent content in SMTP on Looper 的博客</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>zh-cn</language>
-    <managingEditor>newlooper@gmail.com (Dylan Cheng)</managingEditor>
-    <webMaster>newlooper@gmail.com (Dylan Cheng)</webMaster>
+    <language>zh-CN</language>
+    <copyright>Copyright © Dylan(github.com/newlooper); all rights reserved.</copyright>
     <lastBuildDate>Sun, 03 Sep 2017 13:34:45 +0800</lastBuildDate><atom:link href="/tags/smtp/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>GitLab on Docker 配置 SMTP 服务</title>
       <link>/post/original/gitlab/docker_smtp/</link>
       <pubDate>Sun, 03 Sep 2017 13:34:45 +0800</pubDate>
-      <author>newlooper@gmail.com (Dylan Cheng)</author>
+      
       <guid>/post/original/gitlab/docker_smtp/</guid>
-      <description>起因 gitlab 官方 docker 容器部署完毕。容器中的服务越少越好，所以使用外部 SMTP 发送邮件。 环境 撰写此文时： Docker 17.06.1-ce GitLab Community Edition 9.5.2 ab97415 步骤 网易 163 邮箱 授权码设置 协议开启与服务</description>
+      <description>
+        
+          &lt;h2 id=&#34;起因&#34;&gt;起因&lt;/h2&gt;
+&lt;p&gt;gitlab 官方 docker 容器部署完毕。容器中的服务越少越好，所以使用外部 SMTP 发送邮件。&lt;/p&gt;
+&lt;h2 id=&#34;环境&#34;&gt;环境&lt;/h2&gt;
+&lt;p&gt;撰写此文时：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Docker 17.06.1-ce&lt;/li&gt;
+&lt;li&gt;GitLab Community Edition 9.5.2 ab97415&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;步骤&#34;&gt;步骤&lt;/h2&gt;
+&lt;h3 id=&#34;网易-163-邮箱&#34;&gt;网易 163 邮箱&lt;/h3&gt;
+&lt;h4 id=&#34;授权码设置&#34;&gt;授权码设置&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&#34;/images/post/original/gitlab_163mail_smtp/1.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;h4 id=&#34;协议开启与服务器地址&#34;&gt;协议开启与服务器地址&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&#34;/images/post/original/gitlab_163mail_smtp/2.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;容器中的-etcgitlabgitlabrb&#34;&gt;容器中的 /etc/gitlab/gitlab.rb&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-ruby&#34; data-lang=&#34;ruby&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;### Email Settings&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 2&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# gitlab_rails[&amp;#39;gitlab_email_enabled&amp;#39;] = true&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 3&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;gitlab_rails&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;gitlab_email_from&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;&amp;lt;yourname&amp;gt;@163.com&amp;#39;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 4&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# gitlab_rails[&amp;#39;gitlab_email_display_name&amp;#39;] = &amp;#39;Example&amp;#39;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 5&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# gitlab_rails[&amp;#39;gitlab_email_reply_to&amp;#39;] = &amp;#39;noreply@example.com&amp;#39;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 6&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# gitlab_rails[&amp;#39;gitlab_email_subject_suffix&amp;#39;] = &amp;#39;&amp;#39;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 7&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;gitlab_rails&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;smtp_enable&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kp&#34;&gt;true&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 8&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;gitlab_rails&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;smtp_address&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;smtp.163.com&amp;#34;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 9&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;gitlab_rails&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;smtp_port&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;994&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;gitlab_rails&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;smtp_user_name&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;&amp;lt;yourname&amp;gt;@163.com&amp;#34;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;11&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;gitlab_rails&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;smtp_password&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;&amp;lt;your 163 auth code&amp;gt;&amp;#34;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;12&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;gitlab_rails&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;smtp_domain&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;163.com&amp;#34;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;13&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;gitlab_rails&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;smtp_authentication&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;ss&#34;&gt;:login&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;14&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;gitlab_rails&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;smtp_enable_starttls_auto&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kp&#34;&gt;false&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;15&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;gitlab_rails&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;smtp_tls&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kp&#34;&gt;true&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;16&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;###! **Can be: &amp;#39;none&amp;#39;, &amp;#39;peer&amp;#39;, &amp;#39;client_once&amp;#39;, &amp;#39;fail_if_no_peer_cert&amp;#39;**&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;17&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;###! Docs: http://api.rubyonrails.org/classes/ActionMailer/Base.html&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;18&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;gitlab_rails&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;smtp_openssl_verify_mode&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;peer&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;注意事项&#34;&gt;注意事项&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;gitlab_rails[&#39;gitlab_email_from&#39;]&lt;/code&gt; 和 &lt;code&gt;gitlab_rails[&#39;smtp_user_name&#39;]&lt;/code&gt; 一致&lt;/p&gt;
+&lt;p&gt;以下三项：改变其中一项设置，其他项需匹配&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;gitlab_rails[&#39;smtp_enable_starttls_auto&#39;] = false&lt;/li&gt;
+&lt;li&gt;gitlab_rails[&#39;smtp_tls&#39;] = true&lt;/li&gt;
+&lt;li&gt;gitlab_rails[&#39;smtp_port&#39;] = 994&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;配置完毕：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;gitlab-ctl reconfigure
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://docs.gitlab.com/omnibus/docker/README.html&#34;&gt;https://docs.gitlab.com/omnibus/docker/README.html&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://docs.gitlab.com/omnibus/settings/smtp.html&#34;&gt;https://docs.gitlab.com/omnibus/settings/smtp.html&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;http://wap.mail.163.com/xm/static/html/163_symbian_2.html&#34;&gt;http://wap.mail.163.com/xm/static/html/163_symbian_2.html&lt;/a&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;本文采用 &lt;a href=&#34;https://creativecommons.org/licenses/by-sa/4.0/&#34;&gt;知识共享署名许可协议（CC-BY 4.0）&lt;/a&gt;进行许可，转载注明来源即可。如有错误劳烦评论或邮件指出。&lt;img src=&#34;/images/site/CC-BY_icon.svg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;hr&gt;
+
+        
+      </description>
     </item>
     
   </channel>

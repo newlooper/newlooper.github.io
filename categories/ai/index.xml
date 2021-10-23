@@ -5,17 +5,214 @@
     <link>/categories/ai/</link>
     <description>Recent content in AI on Looper 的博客</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>zh-cn</language>
-    <managingEditor>newlooper@gmail.com (Dylan Cheng)</managingEditor>
-    <webMaster>newlooper@gmail.com (Dylan Cheng)</webMaster>
+    <language>zh-CN</language>
+    <copyright>Copyright © Dylan(github.com/newlooper); all rights reserved.</copyright>
     <lastBuildDate>Tue, 01 Jun 2021 14:12:22 +0800</lastBuildDate><atom:link href="/categories/ai/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Gomoku Protocol [译]</title>
       <link>/post/original/game/board-game/renju/gomoku-protocol/</link>
       <pubDate>Tue, 01 Jun 2021 14:12:22 +0800</pubDate>
-      <author>newlooper@gmail.com (Dylan Cheng)</author>
+      
       <guid>/post/original/game/board-game/renju/gomoku-protocol/</guid>
-      <description>0 译序 动机 —— 研究学习五子棋 AI 的同时，对比了很多支持主流五子棋 AI 的 GUI。 结论是：都有一些体验不佳之处，决定自定写一个。要与 AI 程序交互，需要</description>
+      <description>
+        
+          &lt;h2 id=&#34;0-译序&#34;&gt;0 译序&lt;/h2&gt;
+&lt;p&gt;动机 —— 研究学习五子棋 AI 的同时，对比了很多支持主流五子棋 AI 的 GUI。&lt;/p&gt;
+&lt;p&gt;结论是：都有一些体验不佳之处，决定自定写一个。要与 AI 程序交互，需要适配 AI 的接口，因此翻译这篇文章 &lt;a href=&#34;http://petr.lastovicka.sweb.cz/protocl2en.htm&#34;&gt;Gomoku New protocol&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;意图 —— 研究过接口协议后，五子棋 GUI 的实现&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;对主流 AI 的支持&lt;/li&gt;
+&lt;li&gt;人人对战、人机对战、机机对战&lt;/li&gt;
+&lt;li&gt;良好的用户体验、高度定制&lt;/li&gt;
+&lt;li&gt;跨平台、易扩展&lt;/li&gt;
+&lt;li&gt;恰当的开源协议&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;1-简介&#34;&gt;1 简介&lt;/h2&gt;
+&lt;p&gt;此文档描述了一个 AI (Artificial Intelligence) 如何与 go-moku 管理器(一个管理和控制比赛的程序)进行交互。&lt;/p&gt;
+&lt;p&gt;管理器创建两个管道：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;第一个用来从管理器向 AI 发送指令&lt;/li&gt;
+&lt;li&gt;第二个则从 AI 向管理器传递响应&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;该 AI 使用标准输入/输出函数(如：C 语言的 &lt;code&gt;scanf&lt;/code&gt; 和 &lt;code&gt;printf&lt;/code&gt; ，Pascal 的 &lt;code&gt;readln&lt;/code&gt; 和 &lt;code&gt;writeln&lt;/code&gt; )因而可以使用任何编程语言编写。该 AI 程序必须是一个控制台应用程序，没有 GUI 界面。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;注意！&lt;/p&gt;
+&lt;p&gt;一些运行时库会缓存输出，比如：在 C 的 &lt;code&gt;printf&lt;/code&gt; 之后需要调用&lt;code&gt;fflush(stdout)&lt;/code&gt;
+AI 实现者也可以调用一些低级的函数： &lt;code&gt;ReadFile&lt;/code&gt; 和 &lt;code&gt;WriteFile&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;每一行包含一条指令（只有一个例外）。管理器采用 &lt;code&gt;CR LF&lt;/code&gt; (0x0d,0x0a) 标识一行的结束。AI 则可以用 &lt;code&gt;CR LF&lt;/code&gt;， &lt;code&gt;LF&lt;/code&gt; 或 &lt;code&gt;CR&lt;/code&gt; 来标识响应行的结尾。管理器将忽略空的行。如何行内容过长，可以静默的截断该行但程序不能崩溃。&lt;/p&gt;
+&lt;p&gt;如果 AI 是单线程的，则在 AI 在进行思考或响应一条指令时，不要读取输入，否则导致死锁（AI 和 管理器均进入等待状态）。在上述情况下，一个回合的时限达到后，管理器将终止 AI 程序。&lt;/p&gt;
+&lt;p&gt;AI 可以使用两个线程来避免上述问题。一个线程读取指令，而另一个负责计算和回写响应。鉴于多个线程的方案，同步机制也必须引入（事件、锁、信号量等）。&lt;/p&gt;
+&lt;p&gt;AI 的线程数对于比赛来说并不重要，一个线程比赛足够了。但是两个线程对于人类玩家来说很有用，比如有的人可能想在 AI 思考过程中改变比赛时限。&lt;/p&gt;
+&lt;p&gt;AI 的思考应该可以中断而不必关闭 AI 程序。&lt;/p&gt;
+&lt;p&gt;AI 必须处理这些指令： &lt;code&gt;START&lt;/code&gt;  &lt;code&gt;BEGIN&lt;/code&gt;  &lt;code&gt;INFO&lt;/code&gt;  &lt;code&gt;BORAD&lt;/code&gt;  &lt;code&gt;TURN&lt;/code&gt;  &lt;code&gt;END&lt;/code&gt; 。如果接受到除此之外的指令则统一返回： &lt;code&gt;UNKNOWN&lt;/code&gt; (为了向后兼容以及未来的协议扩展)&lt;/p&gt;
+&lt;h2 id=&#34;2-ai-名称与临时文件&#34;&gt;2 AI 名称与临时文件&lt;/h2&gt;
+&lt;p&gt;AI 名称只能包含：英文字母 &lt;code&gt;[A-Za-z]&lt;/code&gt;、阿拉伯数字 &lt;code&gt;[0-9]&lt;/code&gt;、横杠 &lt;code&gt;(-)&lt;/code&gt;、下划线 &lt;code&gt;(_)&lt;/code&gt;和点 &lt;code&gt;(.)&lt;/code&gt;。程序名比如以 &lt;code&gt;pbrain-&lt;/code&gt; 为前缀&lt;/p&gt;
+&lt;p&gt;例如：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;pbrain-swine.exe
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;pbrain-pisq5.exe
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;前缀的要求仅限制可执行程序的名称，压缩打包文件本身没有此限制。压缩打包文件中可以同时包含 32位 和 64位 的 EXE 文件，且 64位 的可执行文件名必须包含 64 后缀&lt;/p&gt;
+&lt;p&gt;例如：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;MyGomo.zip
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;-- pbrain-MyGomo.exe
+&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;-- pbrain-MyGomo64.exe
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;籍此，管理器可以在不同的平台上，选择适配的程序。&lt;/p&gt;
+&lt;p&gt;工作目录由管理器来设定，该目录不必与 AI 程序所在路径相同，AI 必须用完整路径来指出其所使用的所有数据文件的位置。该路径可以通过函数 GetModuleFileName 或者程序启动时的命令行参数获得。管理器必须采用上述方式启动 AI 程序，使得 AI 程序可以打开那些数据文件。&lt;/p&gt;
+&lt;p&gt;AI 可以在当前目录创建一个文件夹来存储临时文件。该目录的名称必须与 AI 的名称一致，该目录的大小限制在 Gomocup 网页中描述（当前为 20MB）。当管理器退出时，或比赛结束时，管理器可以删除所有临时文件。&lt;/p&gt;
+&lt;p&gt;指令 &lt;code&gt;INFO folder&lt;/code&gt; 用来指定需要持久保存的文件的位置。&lt;/p&gt;
+&lt;h2 id=&#34;3-强制指令&#34;&gt;3 强制指令&lt;/h2&gt;
+&lt;h3 id=&#34;31-start-size&#34;&gt;3.1 START [size]&lt;/h3&gt;
+&lt;p&gt;AI 接收到此指令时，执行自身初始化并绘制一个空棋盘，但此时没有任何行棋的动作。&lt;/p&gt;
+&lt;p&gt;参数 &lt;code&gt;size&lt;/code&gt; 用来指定棋盘的大小，AI 必须支持 20x20 大小的棋盘&lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt;，这是 Gomocpu 锦标赛的规定尺寸。&lt;/p&gt;
+&lt;p&gt;建议但不强制 AI 支持其他尺寸的棋盘，若 AI 不支持指令给出的尺寸，则需以 &lt;code&gt;ERROR&lt;/code&gt; 响应&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;管理器发送:
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;	START &lt;span class=&#34;m&#34;&gt;20&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;AI 回答：
+&lt;span class=&#34;ln&#34;&gt;4&lt;/span&gt;	OK &lt;span class=&#34;c1&#34;&gt;# 一切正常&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;5&lt;/span&gt;	ERROR &amp;lt;message&amp;gt; &lt;span class=&#34;c1&#34;&gt;# 不支持的棋盘尺寸或其他错误&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;32-turn-xy&#34;&gt;3.2 TURN [X],[Y]&lt;/h3&gt;
+&lt;p&gt;参数 &lt;code&gt;[X],[Y]&lt;/code&gt; 表示对手的落子位置，横纵坐标都属于 [0,N] ，其中 N 为自然数。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;管理器发送：
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;      TURN 10,10
+&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;AI 回答：
+&lt;span class=&#34;ln&#34;&gt;4&lt;/span&gt;      11,10
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;33-begin&#34;&gt;3.3 BEGIN&lt;/h3&gt;
+&lt;p&gt;此指令在一局比赛的开始，由管理器发送给其中一个 AI。表明期望该 AI 在一个空棋盘上开始行棋。之后其他的 AI 通过接收 &lt;code&gt;TURN&lt;/code&gt; 指令的方式得悉对手的落子。 &lt;code&gt;BEGIN&lt;/code&gt; 指令在启用&lt;strong&gt;自动开局&lt;/strong&gt;时将不被使用，这是因为参赛的双方 AI 都将接收 &lt;code&gt;BOARD&lt;/code&gt; 指令&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;管理器发送：
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;      BEGIN
+&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;AI 回答：
+&lt;span class=&#34;ln&#34;&gt;4&lt;/span&gt;      10,10
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;34-board&#34;&gt;3.4 BOARD&lt;/h3&gt;
+&lt;p&gt;此指令强制规定整个行棋局面。适合从中途延续一局比赛、或执行撤销/重做等用户指令的场景。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;BOARD&lt;/code&gt; 指令通常在 &lt;code&gt;START&lt;/code&gt; ， &lt;code&gt;RESTART&lt;/code&gt; 或 &lt;code&gt;RECTSTART&lt;/code&gt; 指令之后执行，此时棋盘为空。如果当前有任何比赛在进行中，管理器将在发送 &lt;code&gt;BOARD&lt;/code&gt; 指令前发送 &lt;code&gt;RESTART&lt;/code&gt; 指令&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;BOARD&lt;/code&gt; 指令之后，发送局面数据，格式为：&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;[X],[Y],[field]&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;其中：&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;[X],[Y]&lt;/code&gt; 为坐标&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;[field]&lt;/code&gt; 为：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;1 表示自己的落子&lt;/li&gt;
+&lt;li&gt;2 表示对手的落子&lt;/li&gt;
+&lt;li&gt;3 仅在设置了&lt;strong&gt;持续行棋&lt;/strong&gt;选项后，表示胜利线中的落子，或者(renju规则)禁手点&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;如果是 renju 规则，则管理器必须按照真实的行棋顺序发送局面数据。&lt;/p&gt;
+&lt;p&gt;如果是 Gomoku 规则，则管理器可以用任意顺序发送局面数据，且 AI 需自行处理这些数据。&lt;/p&gt;
+&lt;p&gt;数据发送完成后，管理器发送 &lt;code&gt;DONE&lt;/code&gt; 指令通知 AI，用以期望 AI 的计算应答，以及后续的 &lt;code&gt;TURN&lt;/code&gt; 或 &lt;code&gt;BEGIN&lt;/code&gt; 指令&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;管理器发送：
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;      BOARD
+&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;      10,10,1
+&lt;span class=&#34;ln&#34;&gt;4&lt;/span&gt;      10,11,2
+&lt;span class=&#34;ln&#34;&gt;5&lt;/span&gt;      11,11,1
+&lt;span class=&#34;ln&#34;&gt;6&lt;/span&gt;      9,10,2
+&lt;span class=&#34;ln&#34;&gt;7&lt;/span&gt;      DONE
+&lt;span class=&#34;ln&#34;&gt;8&lt;/span&gt;AI 回答：
+&lt;span class=&#34;ln&#34;&gt;9&lt;/span&gt;      9,9
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;35-info-key-value&#34;&gt;3.5 INFO [key] [value]&lt;/h3&gt;
+&lt;p&gt;AI 可以忽略这条指令。然而，若无限制的忽略则直接判负。&lt;/p&gt;
+&lt;p&gt;AI 必须能够应对&lt;strong&gt;管理器没有通过INFO指令给出下面文档中提到的全部信息&lt;/strong&gt;的情况。&lt;/p&gt;
+&lt;p&gt;下列信息全部在一局比赛开始时发送，锦标赛期间时限信息将不被修改。&lt;/p&gt;
+&lt;p&gt;建议 AI 在任何情况下都响应该指令，因为人类对手可以在 AI 思考过程中修改下列信息&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;timeout_turn  - &lt;span class=&#34;nb&#34;&gt;time&lt;/span&gt; limit &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; each move &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;milliseconds, &lt;span class=&#34;nv&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;play as fast as possible&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;timeout_match - &lt;span class=&#34;nb&#34;&gt;time&lt;/span&gt; limit of a whole match &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;milliseconds, &lt;span class=&#34;nv&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;no limit&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;max_memory    - memory limit &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;bytes, &lt;span class=&#34;nv&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;no limit&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;4&lt;/span&gt;time_left     - remaining &lt;span class=&#34;nb&#34;&gt;time&lt;/span&gt; limit of a whole match &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;milliseconds&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;5&lt;/span&gt;game_type     - &lt;span class=&#34;nv&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;opponent is human, &lt;span class=&#34;nv&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;opponent is brain, &lt;span class=&#34;nv&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;tournament, &lt;span class=&#34;nv&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;network tournament
+&lt;span class=&#34;ln&#34;&gt;6&lt;/span&gt;rule          - bitmask or sum of &lt;span class=&#34;nv&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;exactly five in a row win, &lt;span class=&#34;nv&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;continuous game, &lt;span class=&#34;nv&#34;&gt;4&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;renju
+&lt;span class=&#34;ln&#34;&gt;7&lt;/span&gt;evaluate      - coordinates X,Y representing current position of the mouse cursor
+&lt;span class=&#34;ln&#34;&gt;8&lt;/span&gt;folder        - folder &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; persistent files
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;时限和内存限制在第一步棋之前发送(在 &lt;code&gt;START&lt;/code&gt; 指令之前、或紧跟 &lt;code&gt;START&lt;/code&gt; )；&lt;/p&gt;
+&lt;p&gt;time_left 在每一步棋之前发送(也就是 &lt;code&gt;TURN&lt;/code&gt; , &lt;code&gt;BEGIN&lt;/code&gt; 和 &lt;code&gt;BOARD&lt;/code&gt; 之前)；&lt;/p&gt;
+&lt;p&gt;当 AI 超时的情况下，剩余时间可以是负值；&lt;/p&gt;
+&lt;p&gt;对于无时限的对局，剩余时间为：2147483647；&lt;/p&gt;
+&lt;p&gt;对于有时限的对局，管理器必须发送 time_left，从而 AI 可以忽略 timeout_match 仅响应 time_left&lt;/p&gt;
+&lt;p&gt;一局比赛的时间是从进程创建到比赛结束（但不包含对手回合的时间），一个回合的时间包含除了初始化指令( &lt;code&gt;START&lt;/code&gt; , &lt;code&gt;RECTSTART&lt;/code&gt; , &lt;code&gt;RESTART&lt;/code&gt; )的全部时间，回合时限为 0 表示 AI 应该尽可能快的行棋（例如：只进行静态评估而不搜索可能的行棋）&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;INFO folder&lt;/code&gt; 用来指定需要被持久化的文件保存到哪里。由于这些文件对于其他 AI 和程序都是可见的，因此 AI 必须创建自己的子目录，目录名与 AI 名一致。如果管理器没有发送 &lt;code&gt;INFO folder&lt;/code&gt;，则 AI 不能持久保存文件&lt;/p&gt;
+&lt;p&gt;只有调试版本的程序才应该响应 &lt;code&gt;INFO evaluate&lt;/code&gt; 指令，比如在某些窗口中打印评估信息，这些信息不应该打印到标准输出。发布版本的程序应该忽略 &lt;code&gt;INFO evaluate&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;问：AI 接收到不认识的 &lt;code&gt;INFO&lt;/code&gt; 怎么办&lt;/p&gt;
+&lt;p&gt;答：忽略，该指令大概不重要；如果他是重要的，就不该出现在 &lt;code&gt;INFO&lt;/code&gt; 中&lt;/p&gt;
+&lt;p&gt;问：AI 接收到不现实的 &lt;code&gt;INFO&lt;/code&gt; 怎么办(比如：特别小的内存限制值)&lt;/p&gt;
+&lt;p&gt;答：AI 应该在标准输出上等待，直到管理器发送一个非 &lt;code&gt;INFO&lt;/code&gt; 指令( &lt;code&gt;TURN&lt;/code&gt; , &lt;code&gt;BOARD&lt;/code&gt; or &lt;code&gt;BEGIN&lt;/code&gt; )，管理器发送 &lt;code&gt;INFO&lt;/code&gt; 指令时并不读取 AI 的响应&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;INFO timeout_match &lt;span class=&#34;m&#34;&gt;300000&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;INFO timeout_turn &lt;span class=&#34;m&#34;&gt;10000&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;INFO max_memory &lt;span class=&#34;m&#34;&gt;83886080&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;4&lt;/span&gt; 
+&lt;span class=&#34;ln&#34;&gt;5&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 没有期待的响应&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;36-end&#34;&gt;3.6 END&lt;/h3&gt;
+&lt;p&gt;AI 在接收到这条指令时应该尽快中止。管理器等待 AI 自行完成，但若中止过程太久（比如1秒），则管理器将结束 AI 进程。AI 在接收到 &lt;code&gt;END&lt;/code&gt; 指令后，不应该在标准输出上写任何信息。但在 AI 进程结束前，管理器不要关闭管道。&lt;/p&gt;
+&lt;p&gt;AI 应该删除其临时文件&lt;/p&gt;
+&lt;h3 id=&#34;37-about&#34;&gt;3.7 ABOUT&lt;/h3&gt;
+&lt;p&gt;管理器期望 AI 在一个行内给出自身的一些信息，信息的格式为 key=&amp;quot;info&amp;quot;，多个信息用逗号隔开，建议的 key 包括：name, version, author, country, www, email。管理器应当识别这些信息，但是也必须能够应对旧版 AI 中曾经使用的非结构化的人类习惯文本&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;管理器发送：
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;      ABOUT
+&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;AI 回答：
+&lt;span class=&#34;ln&#34;&gt;4&lt;/span&gt;      &lt;span class=&#34;nv&#34;&gt;name&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;SomeBrain&amp;#34;&lt;/span&gt;, &lt;span class=&#34;nv&#34;&gt;version&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;1.0&amp;#34;&lt;/span&gt;, &lt;span class=&#34;nv&#34;&gt;author&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;Nymand&amp;#34;&lt;/span&gt;, &lt;span class=&#34;nv&#34;&gt;country&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;USA&amp;#34;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;4-可选命令&#34;&gt;4 可选命令&lt;/h2&gt;
+&lt;p&gt;本章节中的扩展命令在 Gomocup 锦标赛中并不强制要求支持，但在人类对弈过程中是很有用的。&lt;/p&gt;
+&lt;h3 id=&#34;41-rectstart-widthheight&#34;&gt;4.1 RECTSTART [width],[height]&lt;/h3&gt;
+&lt;p&gt;与 &lt;code&gt;START&lt;/code&gt; 类似，区别在于棋盘为矩形。&lt;code&gt;[width]&lt;/code&gt; 描述横轴，&lt;code&gt;[height]&lt;/code&gt; 描述纵轴。若棋盘为正方形则必须使用 &lt;code&gt;START&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;管理器发送：
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;      RECTSTART 30,20
+&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;AI 回答：
+&lt;span class=&#34;ln&#34;&gt;4&lt;/span&gt;      OK &lt;span class=&#34;c1&#34;&gt;# parameters are good&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;5&lt;/span&gt;      ERROR message &lt;span class=&#34;c1&#34;&gt;# rectangular board is not supported or other error&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;42-restart&#34;&gt;4.2 RESTART&lt;/h3&gt;
+&lt;p&gt;该指令在一局比赛结束或中止后执行。棋盘尺寸不变。AI 释放上一局的棋盘和其他资源，创建一个新的空棋盘并使自己准备开始新的一局比赛，准备停当后 AI 回写 &lt;code&gt;OK&lt;/code&gt; 并等待后续的对局指令。如果 AI 回答 &lt;code&gt;UNKNOWN&lt;/code&gt; ，管理器将发送 &lt;code&gt;END&lt;/code&gt; 并重新运行 AI 进程&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;管理器发送：
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;      RESTART
+&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;AI 回答：
+&lt;span class=&#34;ln&#34;&gt;4&lt;/span&gt;      OK
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;43-takeback-xy&#34;&gt;4.3 TAKEBACK [X],[Y]&lt;/h3&gt;
+&lt;p&gt;该指令用于撤销最后的一步行棋，AI 移除 &lt;code&gt;[X],[Y]&lt;/code&gt; 处的落子后回答 &lt;code&gt;OK&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;管理器发送：
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;      TAKEBACK 9,10
+&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;AI 回答：
+&lt;span class=&#34;ln&#34;&gt;4&lt;/span&gt;      OK
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;44-play-xy&#34;&gt;4.4 PLAY [X],[Y]&lt;/h3&gt;
+&lt;p&gt;仅当 AI 发送 &lt;code&gt;SUGGEST&lt;/code&gt; 指令时，用来强制 AI 行棋在 &lt;code&gt;[X],[Y]&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;期望的响应：与 &lt;code&gt;PLAY&lt;/code&gt; 指令指定的 &lt;code&gt;[X],[Y]&lt;/code&gt; 相同；若 AI 不认同管理器发送的坐标，其可以回答一个不同于 &lt;code&gt;PLAY&lt;/code&gt; 指令的坐标，但行棋位置必须按照 &lt;code&gt;PLAY&lt;/code&gt; 指令指定的位置落子&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;AI 发送：
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;      SUGGEST 10,10
+&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;管理器发送：
+&lt;span class=&#34;ln&#34;&gt;4&lt;/span&gt;      PLAY 12,10
+&lt;span class=&#34;ln&#34;&gt;5&lt;/span&gt;AI 在 12,10 落子并且回答:
+&lt;span class=&#34;ln&#34;&gt;6&lt;/span&gt;      12,10
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;5-由-ai-发送的指令&#34;&gt;5 由 AI 发送的指令&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;以下指令由 AI 按需发送，管理器必须能够识别这些指令&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;51-unknown-error-message&#34;&gt;5.1 UNKNOWN [error message]&lt;/h3&gt;
+&lt;p&gt;AI 发送此指令，表明其接收到了未知的或未实现的指令。这意味着在 AI 接收到奇怪的指令时不是退出程序。&lt;/p&gt;
+&lt;p&gt;指令后跟随的消息被用来通过管理器展现给用户。若管理器发送的可选指令未由 AI 实现，则管理器应当转而发送强制指令。&lt;/p&gt;
+&lt;h3 id=&#34;52-error-error-message&#34;&gt;5.2 ERROR [error message]&lt;/h3&gt;
+&lt;p&gt;AI 发送此指令，表明其接收到了已经实现的指令，但是在处理过程中出现了错误。比如内存限制太小或者棋盘尺寸太大。&lt;/p&gt;
+&lt;p&gt;指令后跟随的简短消息将由管理器写入日志窗口或日志文件。&lt;/p&gt;
+&lt;p&gt;管理器也可是试图修改一些游戏选项并重发指令！&lt;/p&gt;
+&lt;h3 id=&#34;53-message-message&#34;&gt;5.3 MESSAGE [message]&lt;/h3&gt;
+&lt;p&gt;发送给用户的消息。管理器可以将该消息写入日志窗口或日志文件。期望的是，AI 在响应管理器的一些指令之前，发送这些消息。一条消息中不可以有换行符，多行文本应该拆分成多个 &lt;code&gt;MESSAGE&lt;/code&gt; 指令发送给管理器&lt;/p&gt;
+&lt;p&gt;建议之发送英文消息。若 AI 发送其他语种的消息，其应该检测系统的 &lt;code&gt;code page&lt;/code&gt; 并且不要发送该 &lt;code&gt;code page&lt;/code&gt; 中无法显示的字符&lt;/p&gt;
+&lt;h3 id=&#34;54-debug-message&#34;&gt;5.4 DEBUG [message]&lt;/h3&gt;
+&lt;p&gt;与 &lt;code&gt;MESSAGE&lt;/code&gt; 指令类似，但仅面向 AI 的作者提供调试信息。这些信息在 Gomocup 锦标赛中将不被公开可见。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;管理器发送：
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;      TURN 10,15
+&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;AI 回答:
+&lt;span class=&#34;ln&#34;&gt;4&lt;/span&gt;      DEBUG The most promising move now is &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;10,14&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;alfa&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;10025&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;beta&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;8641&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;5&lt;/span&gt;      DEBUG The most promising move now is &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;11,14&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;alfa&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;10125&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;beta&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;8641&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;6&lt;/span&gt;      MESSAGE I will be the winner  
+&lt;span class=&#34;ln&#34;&gt;7&lt;/span&gt;      10,16
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;55-suggest-xy&#34;&gt;5.5 SUGGEST [X],[Y]&lt;/h3&gt;
+&lt;p&gt;AI 可以自行推荐行棋的坐标，而内部的局面状态并不改变。管理器可能忽略 AI 的建议而强制另一个坐标给 AI。期望的管理器应答是 &lt;code&gt;PLAY&lt;/code&gt; 或者 &lt;code&gt;END&lt;/code&gt; 指令。&lt;/p&gt;
+&lt;p&gt;在 Gomocup 锦标赛中，管理器始终采纳 AI 在SUGGEST指令中给出的行棋位置。大多数 AI 都不使用此指令&lt;/p&gt;
+&lt;section class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn:1&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;(五子棋棋盘的默认大小为15x15，详见：http://renju.net/study/rifrules.php)&amp;#160;&lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/section&gt;
+
+        
+      </description>
     </item>
     
   </channel>
